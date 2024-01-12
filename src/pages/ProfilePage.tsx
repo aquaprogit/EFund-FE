@@ -5,6 +5,7 @@ import '../styles/profile-page.css';
 import Users from "../services/api/Users";
 import { useUser } from "../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
+import styles from '../components/profile/Edit/Edit.module.css';
 
 const ProfilePage = () => {
     const { user, refreshUser } = useUser();
@@ -74,13 +75,7 @@ const ProfilePage = () => {
     return (
         <PageWrapper>
             {user ?
-                <Box style={{
-                    width: '100%',
-                    display: 'flex',
-                    flexDirection: 'row',
-                    gap: '10px',
-                    margin: '20px'
-                }}>
+                <Box className={styles.container}>
                     <Box className='personal-info'>
                         <input
                             style={{ display: "none" }}
