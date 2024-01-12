@@ -1,23 +1,24 @@
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import { Avatar, Box, Button, IconButton, TextField, Typography } from "@mui/material";
-import PageWrapper from "../components/common/PageWrapper";
-import '../styles/profile-page.css';
-import Users from "../services/api/Users";
-import { useUser } from "../contexts/UserContext";
+import { Avatar, Box, Button, IconButton, Typography } from "@mui/material";
+import PageWrapper from "../../components/common/PageWrapper";
+import '../../styles/profile-page.css';
+import Users, {UpdateUserInfo} from "../../services/api/Users";
+import { useUser } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
-import styles from '../components/profile/Edit/Edit.module.css';
+import styles from "./ProfilePage.module.css";
+import Edit from "../../components/profile/Edit/Edit";
 
 const ProfilePage = () => {
     const { user, refreshUser } = useUser();
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+    // const [name, setName] = useState('');
+    // const [email, setEmail] = useState('');
     const [avatarUrl, setAvatarUrl] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
-        setName(user?.name ?? '');
-        setEmail(user?.email ?? '');
+        // setName(user?.name ?? '');
+        // setEmail(user?.email ?? '');
         setAvatarUrl(user?.avatarUrl ?? '');
     }, [user]);
 
@@ -25,21 +26,23 @@ const ProfilePage = () => {
         refreshUser();
     }, []);
 
-    const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setName(event.target.value);
-    };
+    // const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     setName(event.target.value);
+    // };
 
-    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setEmail(event.target.value);
-    };
+    // const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     setEmail(event.target.value);
+    // };
 
     const handleEditClick = () => {
         setIsEditing(true);
     };
 
-    const handleSaveClick = () => {
+    const handleSaveClick = async (data: UpdateUserInfo) => {
         // Save the updated name and email
         setIsEditing(false);
+        await Users.updateInfo(data);
+        await refreshUser();
     };
 
     const [, setImage] = useState<File>();
@@ -98,25 +101,30 @@ const ProfilePage = () => {
                             <Button size="small" onClick={handleDeleteAvatar}>Delete Avatar</Button>
                         )}
                         {isEditing ? (
-                            <>
-                                <TextField
-                                    placeholder="Name"
-                                    size="small"
-                                    value={name}
-                                    onChange={handleNameChange}
-                                />
-                                <TextField
-                                    placeholder="Email"
-                                    size="small"
-                                    value={email}
-                                    onChange={handleEmailChange}
-                                />
-                                <Button onClick={handleSaveClick}>Save</Button>
-                            </>
+                            <Edit
+                                initialName={user.name}
+                                initialEmail={user.email}
+                                handleSaveClick={handleSaveClick}
+                            />
+                            // <>
+                            //     <TextField
+                            //         placeholder="Name"
+                            //         size="small"
+                            //         value={name}
+                            //         onChange={handleNameChange}
+                            //     />
+                            //     <TextField
+                            //         placeholder="Email"
+                            //         size="small"
+                            //         value={email}
+                            //         onChange={handleEmailChange}
+                            //     />
+                            //     <Button onClick={handleSaveClick}>Save</Button>
+                            // </>
                         ) : (
                             <>
-                                <Typography variant="h6">{name}</Typography>
-                                <Typography variant="body1">{email}</Typography>
+                                <Typography variant="h6">{user.name}</Typography>
+                                <Typography variant="body1">{user.email}</Typography>
                                 <Button onClick={handleEditClick}>Edit</Button>
                             </>
                         )}
