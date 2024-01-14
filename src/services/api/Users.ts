@@ -1,9 +1,6 @@
 import API from "./repository/API";
 
-export type UpdateUserInfo = {
-    name: string,
-    email: string,
-}
+export type UpdateUserInfo = { [key: string]: string }
 
 const Users = {
     async uploadAvatar(file: File): Promise<boolean> {

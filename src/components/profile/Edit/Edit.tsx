@@ -1,6 +1,11 @@
-import React, {useState} from 'react';
-import {Button, TextField} from "@mui/material";
+import React, {useMemo} from 'react';
+import {Box, TypographyVariant} from "@mui/material";
 import {EditProps} from "./Edit.types";
+import styles from "./Edit.module.css";
+import Info from "../Info/Info";
+
+
+
 
 const Edit: React.FC<EditProps> = (
     {
@@ -9,38 +14,18 @@ const Edit: React.FC<EditProps> = (
         handleSaveClick,
     }
 ) => {
-
-    const [name, setName] = useState(initialName);
-    const [email, setEmail] = useState(initialEmail);
-    const handleNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setName(event.target.value);
-    };
-    const handleEmailChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setEmail(event.target.value);
-    };
-    const updateUserInfo = () => {
-        const updateInfo = {
-            name,
-            email
-        }
-        handleSaveClick(updateInfo);
-    }
+    const info = useMemo(() => [
+        {
+            initialValue: initialName,
+            placeholder: 'Name',
+            variant: 'h6' as TypographyVariant,
+        },
+    ], []);
     return (
-        <>
-            <TextField
-                placeholder="Name"
-                size="small"
-                value={name}
-                onChange={handleNameChange}
-            />
-            <TextField
-                placeholder="Email"
-                size="small"
-                value={email}
-                onChange={handleEmailChange}
-            />
-            <Button onClick={updateUserInfo}>Save</Button>
-        </>
+        <Box className={styles.info}>
+            <Info info={info}  updateHandler={handleSaveClick}/>
+
+        </Box>
     );
 };
 

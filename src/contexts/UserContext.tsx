@@ -2,10 +2,11 @@ import { PropsWithChildren, createContext, useContext, useEffect, useState } fro
 import User from "../models/user/User";
 import Auth from "../services/api/Auth";
 
+export type RefreshUser = () => Promise<User | null> ;
 interface UserContextProps {
     user: User | null;
     updateUser: (newUser: User | null) => void;
-    refreshUser: () => Promise<User | null>;
+    refreshUser: RefreshUser;
     loading: boolean;
 }
 
