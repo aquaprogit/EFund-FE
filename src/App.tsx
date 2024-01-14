@@ -8,6 +8,8 @@ import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
 import { UserProvider } from './contexts/UserContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import AddPage from './pages/fundraising/AddFundraisingPage';
+import PageWrapper from './components/common/PageWrapper';
 
 const darkTheme = createTheme({
   palette: {
@@ -86,6 +88,7 @@ const App: React.FC = () => (
             <Route path="/sign-up" element={<SignUpPage />} />
             <Route path='/sign-in' element={<SignInPage />} />
             <Route path='/settings' element={(<SettingsPage />)} />
+            <Route path='/add-fundraising' element={<AddPage />} />
 
             <Route path="*" element={<h1 style={{ color: 'red' }} >Not Found</h1>} />
           </Routes>

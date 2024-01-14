@@ -35,6 +35,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
                                 onSignOut={() => updateUser(null)}
                                 onSettings={() => navigate('/settings')}
                                 onProfile={() => navigate('/profile')}
+                                onAdd={() => navigate('/add-fundraising')}
                             />
                             :
                             <>

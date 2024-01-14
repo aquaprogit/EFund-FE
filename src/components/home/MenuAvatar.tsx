@@ -1,8 +1,9 @@
 import Logout from "@mui/icons-material/Logout";
 import Settings from "@mui/icons-material/Settings";
-import { Avatar, ListItemIcon, Divider, Menu, MenuItem, Typography } from '@mui/material';
-import { useState } from "react";
+import AddIcon from '@mui/icons-material/Add';
 import Person2Icon from '@mui/icons-material/Person2';
+import { Avatar, Divider, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import { useState } from "react";
 import { stringAvatar } from "../../services/utils/convert";
 import { useUser } from "../../contexts/UserContext";
 
@@ -10,6 +11,7 @@ interface MenuAvatarProps {
     onSignOut: () => void;
     onSettings: () => void;
     onProfile: () => void;
+    onAdd: () => void;
 }
 
 const MenuAvatar = (props: MenuAvatarProps) => {
@@ -73,6 +75,13 @@ const MenuAvatar = (props: MenuAvatarProps) => {
                         <Person2Icon fontSize="small" />
                     </ListItemIcon>
                     Profile
+                </MenuItem>
+                <Divider />
+                <MenuItem onClick={props.onAdd}>
+                    <ListItemIcon>
+                        <AddIcon fontSize="small" />
+                    </ListItemIcon>
+                    Add fundraising
                 </MenuItem>
                 <Divider />
                 <MenuItem onClick={props.onSettings}>
