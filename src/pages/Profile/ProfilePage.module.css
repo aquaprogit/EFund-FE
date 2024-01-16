@@ -1,9 +1,14 @@
+.main-content {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
 .container {
     width: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
-    margin: 20px;
+
 }
 
 .personal-info {
@@ -11,6 +16,11 @@
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    background-color: red;
+}
+
+
+.credentials-section {
+    display: flex;
+    row-gap: 50px;
 }
 

@@ -1,0 +1,8 @@
+.confirm-container {
+    display: flex;
+    flex-direction: column;
+}
+.validation {
+    display: flex;
+    justify-content: center;
+}

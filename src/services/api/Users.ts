@@ -2,6 +2,7 @@ import API from "./repository/API";
 
 export type UpdateUserInfo = { [key: string]: string }
 
+
 const Users = {
     async uploadAvatar(file: File): Promise<boolean> {
         const formData = new FormData();
@@ -17,7 +18,6 @@ const Users = {
     async updateInfo(requestBody: UpdateUserInfo): Promise<any> {
         const response = await API.put('/users/me', requestBody);
         return response.success;
-
     }
 }
 
