@@ -15,7 +15,7 @@ const Toaster: React.FC = () => {
             autoHideDuration={3000}
             anchorOrigin={{vertical: 'top', horizontal: 'center'}}
         >
-            <Alert severity={'error' as AlertColor}>{info.message}</Alert>
+            <Alert severity={info.severity as AlertColor}>{info.message}</Alert>
         </Snackbar>
     );
 };

@@ -1,7 +1,7 @@
 import API from "./repository/API";
 
 export type UpdateUserInfo = { [key: string]: string }
-
+export type AddPassword = {password: string}
 
 const Users = {
     async uploadAvatar(file: File): Promise<boolean> {
@@ -18,6 +18,14 @@ const Users = {
     async updateInfo(requestBody: UpdateUserInfo): Promise<any> {
         const response = await API.put('/users/me', requestBody);
         return response.success;
+    },
+    async addPassword(requestBody: AddPassword) {
+        try {
+            return await API.post('/users/add-password', requestBody)
+        }
+        catch (e) {
+            console.error(e)
+        }
     }
 }
 

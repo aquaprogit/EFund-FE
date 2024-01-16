@@ -4,6 +4,7 @@ interface User {
     name: string;
     role: string;
     avatarUrl: string;
+    hasPassword: boolean;
 }
 
 export default User;
