@@ -4,6 +4,10 @@ import { AuthSuccessResponse, SignUpResponse } from '../../models/api/response/A
 import { ErrorModel } from '../../models/api/response/base/ErrorModel';
 import User from '../../models/user/User';
 
+export type UpdateUserEmail = {newEmail: string}
+export type ConfirmChangeEmail = {newEmail: string, code: number}
+export type ResendCode = {userId: string}
+
 const Auth = {
     signUp: async (request: SignUpRequest): Promise<SignUpResponse | undefined> => {
         const response = await API.post<SignUpRequest, SignUpResponse>('/auth/sign-up', request);
@@ -77,6 +81,7 @@ const Auth = {
             return undefined;
         }
 
+
         // if (retry) {
 
         //     const tokens = {
@@ -134,7 +139,33 @@ const Auth = {
         }
 
         return response.error;
+    },
+    async changeEmail(requestBody: UpdateUserEmail): Promise<any> {
+        try {
+            return await API.post('/users/change-email', requestBody);
+        }
+        catch (e) {
+            console.error(e);
+        }
+
+    },
+    async confirmChangeEmail(requestBody: ConfirmChangeEmail) {
+        try {
+            return await API.post('/users/confirm-change-email', requestBody);
+        }
+        catch (e) {
+            console.error(e);
+        }
+    },
+    async resendConfirmationCode (requestBody: ResendCode) {
+        try {
+            return await API.post('/auth/resend-confirmation-code', requestBody);
+        }
+        catch (e) {
+            console.error(e);
+        }
     }
+
 };
 
 export default Auth;

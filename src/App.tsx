@@ -3,13 +3,21 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/HomePage';
 import SignUpPage from './pages/SignUpPage';
 import SignInPage from './pages/SignInPage';
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import {CssBaseline} from '@mui/material';
 import SettingsPage from './pages/SettingsPage';
-import ProfilePage from './pages/ProfilePage';
+import ProfilePage from './pages/Profile/ProfilePage';
 import { UserProvider } from './contexts/UserContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import AddPage from './pages/fundraising/AddFundraisingPage';
 import PageWrapper from './components/common/PageWrapper';
+import ConfirmChangeEmail from "./pages/ChangeEmail/ConfirmChangeEmail";
+import ToasterContextProvider from "./contexts/ToasterContext";
+import Toaster from "./components/Toaster/Toaster";
+import AddPassword from "./pages/AddPassword/AddPassword";
+import ChangePassword from "./pages/ChangePassword/ChangePassword";
+import LinkToken from "./pages/LinkToken/LinkToken";
+import ChangeEmail from "./pages/ChangeEmail/ChangeEmail";
 
 const darkTheme = createTheme({
   palette: {
@@ -78,23 +86,31 @@ const lightTheme = createTheme({
 
 const App: React.FC = () => (
   <ThemeProvider theme={lightTheme}>
-    <GoogleOAuthProvider clientId="389428898545-0si1v4m7uojr1m4gfspehhvpn91120pb.apps.googleusercontent.com">
-      <UserProvider>
-        <CssBaseline />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/sign-up" element={<SignUpPage />} />
-            <Route path='/sign-in' element={<SignInPage />} />
-            <Route path='/settings' element={(<SettingsPage />)} />
-            <Route path='/add-fundraising' element={<AddPage />} />
+    <ToasterContextProvider>
+      <Toaster />
+      <GoogleOAuthProvider clientId="389428898545-0si1v4m7uojr1m4gfspehhvpn91120pb.apps.googleusercontent.com">
+        <UserProvider>
+          <CssBaseline />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/change-email" element={<ChangeEmail />} />
+              <Route path={'/confirm-change-email'} element={<ConfirmChangeEmail />}/>
+              <Route path="/sign-up" element={<SignUpPage />} />
+              <Route path='/sign-in' element={<SignInPage />} />
+              <Route path='/settings' element={(<SettingsPage />)} />
+              <Route path={'/add-password'} element={<AddPassword />}/>
+              <Route path="/change-password" element={<ChangePassword />} />
+              <Route path='/link-token' element={<LinkToken />} />
+              <Route path='/add-fundraising' element={<AddPage />} />
+              <Route path="*" element={<h1 style={{ color: 'red' }} >Not Found</h1>} />
+            </Routes>
+          </BrowserRouter>
+        </UserProvider>
+      </GoogleOAuthProvider>
+    </ToasterContextProvider>
 
-            <Route path="*" element={<h1 style={{ color: 'red' }} >Not Found</h1>} />
-          </Routes>
-        </BrowserRouter>
-      </UserProvider>
-    </GoogleOAuthProvider>
   </ThemeProvider>
 
 );
