@@ -6,33 +6,50 @@ import TextField from "@mui/material/TextField";
 import Auth from "../../services/api/Auth";
 import useInfo from "../../hooks/useInfo";
 import useUser from "../../hooks/useUser";
+import {useLocation, useNavigate} from "react-router-dom";
 
 const ConfirmChangeEmail = () => {
     const [code, setCode] = useState('');
     const {user} = useUser()
     const {addInfo} = useInfo()
-    // const {state: {newEmail}} = useLocation();
-    const email = 'andrijmalarcuk8@gmail.com'
+    const {state: {newEmail}} = useLocation();
+    const navigate = useNavigate()
+
+
     const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         setCode(event.target.value);
     }
     const onSubmit: React.MouseEventHandler<HTMLButtonElement> = async () => {
-
-        const response = await Auth.confirmChangeEmail({newEmail: email, code: parseInt(code, 10)})
-        if (response && response.error) {
-            addInfo('error', response.error.message)
+        try {
+            const response = await Auth.confirmChangeEmail({newEmail, code: parseInt(code, 10)})
+            if (response && response.error) {
+                addInfo('error', response.error.message)
+            }
+            else {
+                addInfo('success', 'Email has been successfully changed')
+                navigate('/')
+            }
         }
+        catch (e) {
+            addInfo('error', 'Unexpected error')
+        }
+
 
     }
     const resendConfirmationCode = async () => {
-        console.log(user)
-        const response = await Auth.resendConfirmationCode({userId: user!.id})
-        if (response && response.success) {
-            addInfo('success', 'Confirmation code has been resent')
+        try {
+            const response = await Auth.resendConfirmationCode({userId: user!.id})
+            if (response && response.success) {
+                addInfo('success', 'Confirmation code has been resent')
+            }
+            else if (response && response.error) {
+                addInfo('error', response.error.message)
+            }
         }
-        else if (response && response.error) {
-            addInfo('error', response.error.message)
+        catch (e) {
+            addInfo('error', 'Unexpected error')
         }
+
 
     }
     return (
