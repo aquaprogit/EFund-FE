@@ -45,6 +45,7 @@ const ProfilePage = () => {
                     </Box>
                     <Box className={styles.credentialsSection}>
                         <Typography onClick={() => navigate('/change-email')}>Change Email</Typography>
+                        {!user.hasMonobankToken &&  <Typography onClick={() => navigate('/link-token')}>Link Monobank token</Typography>}
 
                         {
                             !user.hasPassword ?

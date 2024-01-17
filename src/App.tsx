@@ -9,12 +9,13 @@ import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/Profile/ProfilePage';
 import { UserProvider } from './contexts/UserContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import ChangeEmail from "./pages/ChangeEmail/ChangeEmail";
 import ConfirmChangeEmail from "./pages/ChangeEmail/ConfirmChangeEmail";
 import ToasterContextProvider from "./contexts/ToasterContext";
 import Toaster from "./components/Toaster/Toaster";
 import AddPassword from "./pages/AddPassword/AddPassword";
 import ChangePassword from "./pages/ChangePassword/ChangePassword";
+import LinkToken from "./pages/LinkToken/LinkToken";
+import ChangeEmail from "./pages/ChangeEmail/ChangeEmail";
 
 const darkTheme = createTheme({
   palette: {
@@ -102,6 +103,7 @@ const App: React.FC = () => (
               <Route path='/settings' element={(<SettingsPage />)} />
               <Route path={'/add-password'} element={<AddPassword />}/>
               <Route path="/change-password" element={<ChangePassword />} />
+              <Route path='/link-token' element={<LinkToken />} />
               <Route path="*" element={<h1 style={{ color: 'red' }} >Not Found</h1>} />
             </Routes>
           </BrowserRouter>
