@@ -14,6 +14,7 @@ import ConfirmChangeEmail from "./pages/ChangeEmail/ConfirmChangeEmail";
 import ToasterContextProvider from "./contexts/ToasterContext";
 import Toaster from "./components/Toaster/Toaster";
 import AddPassword from "./pages/AddPassword/AddPassword";
+import ChangePassword from "./pages/ChangePassword/ChangePassword";
 
 const darkTheme = createTheme({
   palette: {
@@ -96,11 +97,11 @@ const App: React.FC = () => (
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/change-email" element={<ChangeEmail />} />
               <Route path={'/confirm-change-email'} element={<ConfirmChangeEmail />}/>
-              <Route path="/change-password" />
               <Route path="/sign-up" element={<SignUpPage />} />
               <Route path='/sign-in' element={<SignInPage />} />
               <Route path='/settings' element={(<SettingsPage />)} />
               <Route path={'/add-password'} element={<AddPassword />}/>
+              <Route path="/change-password" element={<ChangePassword />} />
               <Route path="*" element={<h1 style={{ color: 'red' }} >Not Found</h1>} />
             </Routes>
           </BrowserRouter>

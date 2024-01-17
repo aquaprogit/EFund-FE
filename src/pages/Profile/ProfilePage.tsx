@@ -11,7 +11,6 @@ import UserAvatar from "../../components/profile/Avatar/UserAvatar";
 
 const ProfilePage = () => {
     const { user, refreshUser } = useUser();
-    console.log(user)
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -46,8 +45,13 @@ const ProfilePage = () => {
                     </Box>
                     <Box className={styles.credentialsSection}>
                         <Typography onClick={() => navigate('/change-email')}>Change Email</Typography>
-                        <Typography onClick={() => navigate('/change-password')}>Change Password</Typography>
-                        {!user.hasPassword && <Typography onClick={() => navigate('/add-password')}>Add Password</Typography>}
+
+                        {
+                            !user.hasPassword ?
+                                <Typography onClick={() => navigate('/add-password')}>Add Password</Typography>
+                                :
+                                <Typography onClick={() => navigate('/change-password')}>Change Password</Typography>
+                        }
                     </Box>
                 </Box>
                 : (

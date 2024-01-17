@@ -2,25 +2,26 @@ import React from 'react';
 import ChangeCreds from "../../templates/ChangeCreds/ChangeCreds";
 import Users from "../../services/api/Users";
 import useInfo from "../../hooks/useInfo";
-import PasswordInput from "./PasswordInput";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
-import addPasswordValidation from "../../validation/forms/AddPasswordValidation";
-import {useNavigate} from "react-router-dom";
 
-const AddPassword = () => {
+import PasswordInput from "../AddPassword/PasswordInput";
+import {useNavigate} from "react-router-dom";
+import changePasswordValidation from "../../validation/forms/ChangePasswordValidation";
+
+const ChangePassword = () => {
     const { addInfo } = useInfo();
     const { handleSubmit, register, formState: { errors } } = useForm({
-        resolver: yupResolver(addPasswordValidation),
+        resolver: yupResolver(changePasswordValidation),
     });
     const navigate = useNavigate()
 
-    const onSubmit = async (data: { password: string; confirmPassword: string }) => {
+    const onSubmit = async (data: { password: string; newPassword: string }) => {
         try {
-            const response = await Users.addPassword({ password: data.password });
+            const response = await Users.changePassword({oldPassword: data.password, newPassword: data.newPassword});
 
             if (response && response.success) {
-                addInfo('success', 'Password has been successfully added');
+                addInfo('success', 'Password has been successfully changed');
                 navigate('/profile')
             } else if (response && response.error) {
                 addInfo('error', response.error.message);
@@ -30,24 +31,23 @@ const AddPassword = () => {
             addInfo('error', 'An error occurred while adding the password.');
         }
     };
-
     return (
-        <ChangeCreds title={'Add password'} buttonHandler={handleSubmit(onSubmit)}>
+        <ChangeCreds title={'Change password'} buttonHandler={handleSubmit(onSubmit)}>
             <form>
                 <PasswordInput
                     register={register('password')}
-                    placeholder={'Password'}
+                    placeholder={'Old password'}
                     error={errors['password']}
                 />
 
                 <PasswordInput
-                    register={register('confirmPassword')}
-                    placeholder={'Confirm password'}
-                    error={errors['confirmPassword']}
+                    register={register('newPassword')}
+                    placeholder={'New Password'}
+                    error={errors['newPassword']}
                 />
             </form>
         </ChangeCreds>
     );
 };
 
-export default AddPassword;
+export default ChangePassword;

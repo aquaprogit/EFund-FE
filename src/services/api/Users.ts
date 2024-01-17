@@ -2,6 +2,7 @@ import API from "./repository/API";
 
 export type UpdateUserInfo = { [key: string]: string }
 export type AddPassword = {password: string}
+export type ChangePassword = {oldPassword: string, newPassword: string}
 
 const Users = {
     async uploadAvatar(file: File): Promise<boolean> {
@@ -22,6 +23,14 @@ const Users = {
     async addPassword(requestBody: AddPassword) {
         try {
             return await API.post('/users/add-password', requestBody)
+        }
+        catch (e) {
+            console.error(e)
+        }
+    },
+    async changePassword(requestBody: ChangePassword) {
+        try {
+            return await API.post('/users/change-password', requestBody)
         }
         catch (e) {
             console.error(e)
