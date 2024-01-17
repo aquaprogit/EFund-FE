@@ -4,6 +4,7 @@ import MenuAvatar from "../home/MenuAvatar";
 import { ReactNode, useEffect } from "react";
 import '../../styles/page-wrapper.css';
 import { useUser } from "../../contexts/UserContext";
+import useInfo from "../../hooks/useInfo";
 
 interface PageWrapperProps {
     children: ReactNode;
@@ -12,10 +13,20 @@ interface PageWrapperProps {
 const PageWrapper = ({ children }: PageWrapperProps) => {
     const { user, loading, updateUser, refreshUser } = useUser();
     const navigate = useNavigate();
+    const {addInfo} = useInfo()
 
     useEffect(() => {
         refreshUser();
     }, []);
+
+    const onAdd = () => {
+        if (!user!.hasMonobankToken) {
+            addInfo('warning', 'Please link monobank token to your account to get access to this functionality')
+        }
+        else {
+            navigate('/add-fundraising')
+        }
+    }
 
     return (
         <Box
@@ -35,7 +46,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
                                 onSignOut={() => updateUser(null)}
                                 onSettings={() => navigate('/settings')}
                                 onProfile={() => navigate('/profile')}
-                                onAdd={() => navigate('/add-fundraising')}
+                                onAdd={onAdd}
                             />
                             :
                             <>

@@ -14,10 +14,11 @@ const LinkToken = () => {
             const response = await Monobank.linkToken(token);
             if (response && response.error) {
                 addInfo('error', response.error.message)
-                navigate('/profile')
+
             }
             else if (response && response.success) {
                 addInfo('success', 'Token has been successfully linked')
+                navigate('/profile')
 
             }
         }
