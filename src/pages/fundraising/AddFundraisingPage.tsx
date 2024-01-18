@@ -15,10 +15,10 @@ const AddPage = () => {
     const [imageUrl, setImageUrl] = useState<string>(defaultImage);
     const [title, setTitle] = useState<string>('');
     const [description, setDescription] = useState<string>('');
-    const [monobankJarId, setMonobankJarId] = useState<string>('');
+    const [monobankJar, setMonobankJar] = useState<string>('');
+    const [monobankJarId, setMonobankJarId] = useState('');
     const [tags, setTags] = useState<string[]>([]);
     const [jars, setJars] = useState<Jar[]>([])
-    const [currentJarId, setCurrentJarId] = useState('');
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
     const {addInfo} = useInfo()
     const inputFile = useRef<HTMLInputElement | null>(null)
@@ -88,7 +88,7 @@ const AddPage = () => {
             title,
             description,
             monobankJarId,
-            tags
+            tags,
         }
         try {
             const response = await Fundraisings.createFundraising(requestBody)
@@ -99,9 +99,11 @@ const AddPage = () => {
                 else {
                     const fundraisingId = response.data!.id
                     const files = inputFile.current?.files
-                    if (files) {
+
+                    if (files && files.length > 0) {
                         await uploadImage(fundraisingId, files[0])
                     }
+                    addInfo('success', 'Fundraising has been successfully created')
 
                 }
             }
@@ -162,9 +164,9 @@ const AddPage = () => {
                             <Select
                                 labelId="demo-select-small-label"
                                 id="demo-select-small"
-                                value={monobankJarId}
+                                value={monobankJar}
                                 label="Monobank jar"
-                                onChange={(e) => setMonobankJarId(e.target.value)}
+                                onChange={(e) => setMonobankJar(e.target.value)}
                                 open={Boolean(openJarsMenu)}
                                 onClose={handleCloseJarsMenu}
                                 onOpen={handleOpenJarsMenu}
@@ -173,7 +175,7 @@ const AddPage = () => {
                                     <MenuItem
                                         key={jar.title}
                                         value={jar.title}
-                                        onClick={() => setCurrentJarId(jar.id)}
+                                        onClick={() => setMonobankJarId(jar.id)}
                                     >
                                         {jar.title}
                                     </MenuItem>
@@ -186,7 +188,7 @@ const AddPage = () => {
                             onChange={handleTagsChange}
                             placeholder={'Tags'}
                         />
-                        <Button size={'large'}>Create</Button>
+                        <Button size={'large'} onClick={onSubmit}>Create</Button>
                     </CardContent>
                 </Card>
             </Box>
