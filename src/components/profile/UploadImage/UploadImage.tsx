@@ -1,36 +1,19 @@
-import React, {ChangeEvent} from 'react';
+import React from 'react';
 import {Avatar, Box, Button, IconButton} from "@mui/material";
-import styles from './UserAvatar.module.css';
-import {UserAvatarProps} from "./UserAvatar.types";
-import Users from "../../../services/api/Users";
+import styles from './UploadImage.module.css';
+import {UploadImageProps} from "./UploadImage.types";
 
 
-const UserAvatar: React.FC<UserAvatarProps> = (
+const UploadImage: React.FC<UploadImageProps> = (
     {
         inputFile,
         url,
-        refreshUser
+        handleFileUpload,
+        handleDeleteFile,
 
     }
 ) => {
-    console.log(url, '!!!!')
-    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-        const { files } = e.target;
-        if (files && files.length) {
-            Users.uploadAvatar(files[0]).then((response) => {
-                if (response) {
-                    refreshUser();
-                }
-            });
-        }
-    };
-    const handleDeleteAvatar = () => {
-        Users.deleteAvatar().then((response) => {
-            if (response) {
-                refreshUser();
-            }
-        });
-    };
+
     const avatarOverridingStyles = {
         height: '200px',
         width: '200px'
@@ -52,11 +35,11 @@ const UserAvatar: React.FC<UserAvatarProps> = (
                 />
             </IconButton>
             {!url.includes('Default') && (
-                <Button size="small" onClick={handleDeleteAvatar}>Delete Avatar</Button>
+                <Button size="small" onClick={handleDeleteFile}>Delete Avatar</Button>
             )}
         </Box>
 
     );
 };
 
-export default UserAvatar;
+export default UploadImage;

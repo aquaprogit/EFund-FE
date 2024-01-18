@@ -2,7 +2,6 @@ import {
     Box,
     Card,
     CardContent,
-    CardMedia,
     Typography,
     Select,
     MenuItem,
@@ -11,12 +10,15 @@ import {
 } from "@mui/material";
 import PageWrapper from "../../components/common/PageWrapper";
 import '../../styles/pages/fundraising/add-page.css';
-import {useEffect, useState} from "react";
+import {ChangeEvent, useEffect, useRef, useState} from "react";
 import LimitedTextField from "../../components/common/LimitedTextField";
 import React from "react";
 import Monobank from "../../services/api/Monobank/Monobank";
 import Jar from "../../models/Jar";
 import {MuiChipsInput} from "mui-chips-input";
+import useInfo from "../../hooks/useInfo";
+import UploadImage from "../../components/profile/UploadImage/UploadImage";
+import Fundraisings from "../../services/api/Fundraisings";
 
 const AddPage = () => {
     const [imageUrl, setImageUrl] = useState<string>('http://localhost:8080/Uploads/Default/Fundraisings/avatar.png');
@@ -26,6 +28,9 @@ const AddPage = () => {
     const [tags, setTags] = useState<string[]>([]);
     const [jars, setJars] = useState<Jar[]>([])
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
+    const [fundraisingId, setFundraisingId] = useState('')
+    const {addInfo} = useInfo()
+    const inputFile = useRef(null)
 
     const handleOpenJarsMenu = (event: any) => {
         setOpenJarsMenu(event.currentTarget);
@@ -36,11 +41,19 @@ const AddPage = () => {
     };
 
     const getMonobankJars = async () => {
-        const response = await Monobank.getJars();
-        if (response) {
-            // @ts-ignore
-            setJars(response.data)
+        try {
+            const response = await Monobank.getJars();
+            if (response) {
+                if (response.data) {
+                    // @ts-ignore
+                    setJars(response.data)
+                }
+            }
         }
+        catch (e) {
+            addInfo('error', 'Unexpected error')
+        }
+
     }
     const handleTagsChange = (newTags: Array<string>) => {
         setTags(newTags)
@@ -48,7 +61,29 @@ const AddPage = () => {
     useEffect(() => {
         getMonobankJars()
     }, []);
-    console.log(tags)
+    const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+        try {
+            const { files } = e.target;
+            if (files && files.length) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    if (event.target) {
+                        setImageUrl(event.target.result as string);
+                    }
+
+                };
+                reader.readAsDataURL(files[0]);
+                const response = await Fundraisings.uploadImage(fundraisingId, files[0])
+                if (response.error) {
+                    addInfo('error', response.error.message)
+                }
+            }
+        }
+        catch (e) {
+            addInfo('error', 'Unexpected error while adding fundraising image')
+        }
+    }
+
     return (
         <PageWrapper>
             <Box className='content-wrapper'>
@@ -62,16 +97,21 @@ const AddPage = () => {
                     height: '100%',
                     width: 800,
                 }}>
-                    <CardMedia
-                        component="img"
-                        sx={{
-                            width: 175,
-                            height: 175,
-                            objectFit: 'initial',
-                        }}
-                        image={imageUrl}
-                        alt={'Fundraising Avatar'}
+                    <UploadImage
+                        inputFile={inputFile}
+                        handleFileUpload={handleFileUpload}
+                        url={imageUrl}
                     />
+                    {/*<CardMedia*/}
+                    {/*    component="img"*/}
+                    {/*    sx={{*/}
+                    {/*        width: 175,*/}
+                    {/*        height: 175,*/}
+                    {/*        objectFit: 'initial',*/}
+                    {/*    }}*/}
+                    {/*    image={imageUrl}*/}
+                    {/*    alt={'Fundraising UploadImage'}*/}
+                    {/*/>*/}
                     <CardContent style={{
                         flexGrow: 1,
                         padding: 0,

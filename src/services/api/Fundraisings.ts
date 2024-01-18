@@ -14,6 +14,14 @@ const Fundraisings = {
         const response = await API.get<Fundraising>(`/fundraisings/${id}`);
 
         return response.data;
+    },
+    async uploadImage(id: string, file: File) {
+        const formData = new FormData();
+        formData.append('file', file);
+        return await API.post(`/fundraisings/${id}/avatar`, formData)
+    },
+    async deleteImage(id: string) {
+        return await API.delete(`/fundraisings/${id}/avatar`)
     }
 };
 
