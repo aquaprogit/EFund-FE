@@ -9,6 +9,7 @@ import {MuiChipsInput} from "mui-chips-input";
 import useInfo from "../../hooks/useInfo";
 import UploadImage from "../../components/profile/UploadImage/UploadImage";
 import Fundraisings from "../../services/api/Fundraisings";
+import {useNavigate} from "react-router-dom";
 
 const AddPage = () => {
     const defaultImage = 'http://localhost:8080/Uploads/Default/Fundraisings/avatar.png'
@@ -22,6 +23,7 @@ const AddPage = () => {
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
     const {addInfo} = useInfo()
     const inputFile = useRef<HTMLInputElement | null>(null)
+    const navigate = useNavigate()
     const handleOpenJarsMenu = (event: any) => {
         setOpenJarsMenu(event.currentTarget);
     };
@@ -104,6 +106,7 @@ const AddPage = () => {
                         await uploadImage(fundraisingId, files[0])
                     }
                     addInfo('success', 'Fundraising has been successfully created')
+                    navigate('/')
 
                 }
             }
