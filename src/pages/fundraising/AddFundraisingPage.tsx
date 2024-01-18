@@ -1,18 +1,8 @@
-import {
-    Box,
-    Card,
-    CardContent,
-    Typography,
-    Select,
-    MenuItem,
-    InputLabel,
-    FormControl,
-} from "@mui/material";
+import {Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, Typography,} from "@mui/material";
 import PageWrapper from "../../components/common/PageWrapper";
 import '../../styles/pages/fundraising/add-page.css';
-import {ChangeEvent, useEffect, useRef, useState} from "react";
+import React, {ChangeEvent, useEffect, useRef, useState} from "react";
 import LimitedTextField from "../../components/common/LimitedTextField";
-import React from "react";
 import Monobank from "../../services/api/Monobank/Monobank";
 import Jar from "../../models/Jar";
 import {MuiChipsInput} from "mui-chips-input";
@@ -21,17 +11,17 @@ import UploadImage from "../../components/profile/UploadImage/UploadImage";
 import Fundraisings from "../../services/api/Fundraisings";
 
 const AddPage = () => {
-    const [imageUrl, setImageUrl] = useState<string>('http://localhost:8080/Uploads/Default/Fundraisings/avatar.png');
+    const defaultImage = 'http://localhost:8080/Uploads/Default/Fundraisings/avatar.png'
+    const [imageUrl, setImageUrl] = useState<string>(defaultImage);
     const [title, setTitle] = useState<string>('');
     const [description, setDescription] = useState<string>('');
-    const [monobankJar, setMonobankJar] = useState<string>('');
+    const [monobankJarId, setMonobankJarId] = useState<string>('');
     const [tags, setTags] = useState<string[]>([]);
     const [jars, setJars] = useState<Jar[]>([])
+    const [currentJarId, setCurrentJarId] = useState('');
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
-    const [fundraisingId, setFundraisingId] = useState('')
     const {addInfo} = useInfo()
-    const inputFile = useRef(null)
-
+    const inputFile = useRef<HTMLInputElement | null>(null)
     const handleOpenJarsMenu = (event: any) => {
         setOpenJarsMenu(event.currentTarget);
     };
@@ -58,10 +48,18 @@ const AddPage = () => {
     const handleTagsChange = (newTags: Array<string>) => {
         setTags(newTags)
     }
-    useEffect(() => {
-        getMonobankJars()
-    }, []);
-    const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const uploadImage = async (fundraisingId: string, file: File) => {
+        try {
+            const response = await Fundraisings.uploadImage(fundraisingId, file)
+            if (response.error) {
+                addInfo('error', response.error.message)
+            }
+        }
+        catch (e) {
+            addInfo('error', 'Unexpected error while uploading image')
+        }
+    }
+    const handleFileUpload =  (e: ChangeEvent<HTMLInputElement>) => {
         try {
             const { files } = e.target;
             if (files && files.length) {
@@ -70,19 +68,51 @@ const AddPage = () => {
                     if (event.target) {
                         setImageUrl(event.target.result as string);
                     }
-
                 };
                 reader.readAsDataURL(files[0]);
-                const response = await Fundraisings.uploadImage(fundraisingId, files[0])
-                if (response.error) {
-                    addInfo('error', response.error.message)
-                }
             }
         }
         catch (e) {
             addInfo('error', 'Unexpected error while adding fundraising image')
         }
     }
+    const handleDeleteFile = () => {
+        setImageUrl(defaultImage)
+        if (inputFile.current) {
+            inputFile.current.value = '';
+            inputFile.current.files = new DataTransfer().files;
+        }
+    }
+    const onSubmit = async () => {
+        const requestBody = {
+            title,
+            description,
+            monobankJarId,
+            tags
+        }
+        try {
+            const response = await Fundraisings.createFundraising(requestBody)
+            if (response) {
+                if (response.error) {
+                    addInfo('error', response.error.message)
+                }
+                else {
+                    const fundraisingId = response.data!.id
+                    const files = inputFile.current?.files
+                    if (files) {
+                        await uploadImage(fundraisingId, files[0])
+                    }
+
+                }
+            }
+        }
+        catch (e) {
+            addInfo('error', 'Unexpected error while creating fundraising')
+        }
+    }
+    useEffect(() => {
+        getMonobankJars()
+    }, []);
 
     return (
         <PageWrapper>
@@ -100,18 +130,9 @@ const AddPage = () => {
                     <UploadImage
                         inputFile={inputFile}
                         handleFileUpload={handleFileUpload}
+                        handleDeleteFile={handleDeleteFile}
                         url={imageUrl}
                     />
-                    {/*<CardMedia*/}
-                    {/*    component="img"*/}
-                    {/*    sx={{*/}
-                    {/*        width: 175,*/}
-                    {/*        height: 175,*/}
-                    {/*        objectFit: 'initial',*/}
-                    {/*    }}*/}
-                    {/*    image={imageUrl}*/}
-                    {/*    alt={'Fundraising UploadImage'}*/}
-                    {/*/>*/}
                     <CardContent style={{
                         flexGrow: 1,
                         padding: 0,
@@ -141,15 +162,19 @@ const AddPage = () => {
                             <Select
                                 labelId="demo-select-small-label"
                                 id="demo-select-small"
-                                value={monobankJar}
+                                value={monobankJarId}
                                 label="Monobank jar"
-                                onChange={(e) => setMonobankJar(e.target.value)}
+                                onChange={(e) => setMonobankJarId(e.target.value)}
                                 open={Boolean(openJarsMenu)}
                                 onClose={handleCloseJarsMenu}
                                 onOpen={handleOpenJarsMenu}
                             >
                                 {jars && jars.map((jar) => (
-                                    <MenuItem key={jar.title} value={jar.title}>
+                                    <MenuItem
+                                        key={jar.title}
+                                        value={jar.title}
+                                        onClick={() => setCurrentJarId(jar.id)}
+                                    >
                                         {jar.title}
                                     </MenuItem>
                                 ))}
@@ -161,6 +186,7 @@ const AddPage = () => {
                             onChange={handleTagsChange}
                             placeholder={'Tags'}
                         />
+                        <Button size={'large'}>Create</Button>
                     </CardContent>
                 </Card>
             </Box>
