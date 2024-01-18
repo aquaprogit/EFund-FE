@@ -39,12 +39,15 @@ const ConfirmChangeEmail = () => {
     const resendConfirmationCode = async () => {
         try {
             const response = await Auth.resendConfirmationCode({userId: user!.id})
-            if (response && response.success) {
-                addInfo('success', 'Confirmation code has been resent')
+            if (response) {
+                if (response.success) {
+                    addInfo('success', 'Confirmation code has been resent')
+                }
+                else if (response.error) {
+                    addInfo('error', response.error.message)
+                }
             }
-            else if (response && response.error) {
-                addInfo('error', response.error.message)
-            }
+
         }
         catch (e) {
             addInfo('error', 'Unexpected error')

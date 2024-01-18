@@ -4,7 +4,6 @@ import {
     CardContent,
     CardMedia,
     Typography,
-    TextField,
     Select,
     MenuItem,
     InputLabel,
@@ -12,9 +11,11 @@ import {
 } from "@mui/material";
 import PageWrapper from "../../components/common/PageWrapper";
 import '../../styles/pages/fundraising/add-page.css';
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import LimitedTextField from "../../components/common/LimitedTextField";
 import React from "react";
+import Monobank from "../../services/api/Monobank/Monobank";
+import Jar from "../../models/Jar";
 
 const AddPage = () => {
     const [imageUrl, setImageUrl] = useState<string>('http://localhost:8080/Uploads/Default/Fundraisings/avatar.png');
@@ -22,7 +23,27 @@ const AddPage = () => {
     const [description, setDescription] = useState<string>('');
     const [monobankJar, setMonobankJar] = useState<string>('');
     const [tags, setTags] = useState<string[]>([]);
+    const [jars, setJars] = useState<Jar[]>([])
+    const [openJarsMenu, setOpenJarsMenu] = useState(null);
+    const handleOpenJarsMenu = (event: any) => {
+        setOpenJarsMenu(event.currentTarget);
+    };
 
+    const handleCloseJarsMenu = () => {
+        setOpenJarsMenu(null);
+    };
+
+    const getMonobankJars = async () => {
+        const response = await Monobank.getJars();
+        if (response) {
+            // @ts-ignore
+            setJars(response.data)
+        }
+    }
+    useEffect(() => {
+        getMonobankJars()
+    }, []);
+    console.log(jars)
     return (
         <PageWrapper>
             <Box className='content-wrapper'>
@@ -78,10 +99,15 @@ const AddPage = () => {
                                 value={monobankJar}
                                 label="Monobank jar"
                                 onChange={(e) => setMonobankJar(e.target.value)}
+                                open={Boolean(openJarsMenu)}
+                                onClose={handleCloseJarsMenu}
+                                onOpen={handleOpenJarsMenu}
                             >
-                                <MenuItem value="">
-                                    <em>None</em>
-                                </MenuItem>
+                                {jars && jars.map((jar) => (
+                                    <MenuItem key={jar.title} value={jar.title}>
+                                        {jar.title}
+                                    </MenuItem>
+                                ))}
                             </Select>
                         </FormControl>
                     </CardContent>
