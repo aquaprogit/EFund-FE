@@ -16,6 +16,7 @@ import LimitedTextField from "../../components/common/LimitedTextField";
 import React from "react";
 import Monobank from "../../services/api/Monobank/Monobank";
 import Jar from "../../models/Jar";
+import {MuiChipsInput} from "mui-chips-input";
 
 const AddPage = () => {
     const [imageUrl, setImageUrl] = useState<string>('http://localhost:8080/Uploads/Default/Fundraisings/avatar.png');
@@ -25,6 +26,7 @@ const AddPage = () => {
     const [tags, setTags] = useState<string[]>([]);
     const [jars, setJars] = useState<Jar[]>([])
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
+
     const handleOpenJarsMenu = (event: any) => {
         setOpenJarsMenu(event.currentTarget);
     };
@@ -40,10 +42,13 @@ const AddPage = () => {
             setJars(response.data)
         }
     }
+    const handleTagsChange = (newTags: Array<string>) => {
+        setTags(newTags)
+    }
     useEffect(() => {
         getMonobankJars()
     }, []);
-    console.log(jars)
+    console.log(tags)
     return (
         <PageWrapper>
             <Box className='content-wrapper'>
@@ -110,6 +115,12 @@ const AddPage = () => {
                                 ))}
                             </Select>
                         </FormControl>
+                        <MuiChipsInput
+                            size={'small'}
+                            value={tags}
+                            onChange={handleTagsChange}
+                            placeholder={'Tags'}
+                        />
                     </CardContent>
                 </Card>
             </Box>
