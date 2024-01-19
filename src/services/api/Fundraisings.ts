@@ -15,6 +15,16 @@ const Fundraisings = {
 
         return response.data;
     },
+    getMyFundraising: async (params: {page: number, pageSize: number}): Promise<Paged<Fundraising> | undefined> => {
+        try {
+            const response = await API.get<Paged<Fundraising>>('/fundraisings/', params)
+            return response.data
+        }
+        catch (e) {
+            console.error(e)
+        }
+
+    },
 
     async getFundraising(id: string): Promise<Fundraising | undefined> {
         const response = await API.get<Fundraising>(`/fundraisings/${id}`);
@@ -36,7 +46,7 @@ const Fundraisings = {
     },
     async deleteImage(id: string) {
         return await API.delete(`/fundraisings/${id}/avatar`)
-    }
+    },
 };
 
 export default Fundraisings;

@@ -27,6 +27,9 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
             navigate('/add-fundraising')
         }
     }
+    const onMyFundraising = () => {
+        navigate('/my-fundraisings')
+    }
 
     return (
         <Box
@@ -47,6 +50,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
                                 onSettings={() => navigate('/settings')}
                                 onProfile={() => navigate('/profile')}
                                 onAdd={onAdd}
+                                onMyFundraising={onMyFundraising}
                             />
                             :
                             <>
