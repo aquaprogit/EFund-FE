@@ -109,7 +109,7 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                         gap: 0.5
                     }}>
                         <Typography style={{ wordWrap: 'break-word' }} variant="h4" component="div" textOverflow={'ellipsis'} overflow={'hidden'} color={textColor}>
-                            WWWWWWWWWWWWWWWWWWWWWWW
+                            {props.fundraising.title}
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 1 }}>
                             {props.fundraising.tags.map((tag, index) => (
@@ -122,7 +122,7 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                             ))}
                         </Box>
                         <Typography variant="body1" textOverflow={'ellipsis'} overflow={'hidden'} color={textColor}>
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque hic vel quo Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum, doloribus. Sint voluptatibus autem molestias explicabo facere nulla repudiand Lorem ipsum, dolor sit amet consectetur adipisicing elit. Magni, totam! Iusto laudantium libero officia maxime minima, inventore cum, quaerat delectus quam, deleniti mollitia rerum sint ullam tempore! Saepe, voluptatem rem! ae eos, repellat doloribus qui, provident dolor esse voluptas totam reprehenderit dicta ullam. s? Reprehenderit minima natus in corrupti atque saepe ut, ipsam, aliquam laborum quam sit esse id nostrum voluptatum vel.
+                            {props.fundraising.description}
                         </Typography>
                         <Box
                             sx={{
