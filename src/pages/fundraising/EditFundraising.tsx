@@ -9,6 +9,7 @@ import {Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Selec
 import UploadImage from "../../components/profile/UploadImage/UploadImage";
 import LimitedTextField from "../../components/common/LimitedTextField";
 import {MuiChipsInput} from "mui-chips-input";
+import ReportSection from "../../components/Reports/ReportSection";
 
 const EditFundraising = () => {
     const defaultImage = 'http://localhost:8080/Uploads/Default/Fundraisings/avatar.png'
@@ -213,6 +214,7 @@ const EditFundraising = () => {
                     </CardContent>
                 </Card>
                 <Typography variant={'h3'}>Reports</Typography>
+                <ReportSection fundraisingId={state.id}/>
             </Box>
         </PageWrapper>
     );

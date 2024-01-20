@@ -19,6 +19,7 @@ import LinkToken from "./pages/LinkToken/LinkToken";
 import ChangeEmail from "./pages/ChangeEmail/ChangeEmail";
 import MyFundraisingsPage from "./pages/fundraising/MyFundraisingsPage";
 import EditFundraising from "./pages/fundraising/EditFundraising";
+import AddReport from "./pages/Report/AddReport";
 
 const darkTheme = createTheme({
   palette: {
@@ -107,6 +108,7 @@ const App: React.FC = () => (
               <Route path='/add-fundraising' element={<AddPage />} />
               <Route path='/my-fundraisings' element={<MyFundraisingsPage />}/>
               <Route path='/edit-fundraising' element={<EditFundraising />} />
+              <Route path={'/add-report'} element={<AddReport />}/>
               <Route path="*" element={<h1 style={{ color: 'red' }} >Not Found</h1>} />
             </Routes>
           </BrowserRouter>
