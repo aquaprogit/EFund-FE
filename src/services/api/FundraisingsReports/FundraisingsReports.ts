@@ -27,9 +27,19 @@ class FundraisingsReports {
         }
         catch (e) {
             console.error(e)
+
         }
     }
 
+    static async deleteReport (id: string) {
+        try {
+            return await API.delete(`/fundraising-reports/${id}`)
+        }
+        catch (e) {
+            console.error(e)
+
+        }
+    }
 }
 
 export default FundraisingsReports

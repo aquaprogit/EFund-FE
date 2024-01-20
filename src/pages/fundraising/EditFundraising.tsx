@@ -217,7 +217,7 @@ const EditFundraising = () => {
                     </CardContent>
                 </Card>
                 <Typography variant={'h3'}>Reports</Typography>
-                <ReportSection reports={reports} fundraisingId={state.id}/>
+                <ReportSection setReports={setReports} reports={reports} fundraisingId={state.id}/>
             </Box>
         </PageWrapper>
     );

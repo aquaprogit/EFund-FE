@@ -1,17 +1,19 @@
 import React, {useEffect} from 'react';
 import {Box, Button} from "@mui/material";
 import {useNavigate} from "react-router-dom";
-import useInfo from "../../hooks/useInfo";
+import Reports from "./Reports";
 
 type ReportSectionProps = {
     fundraisingId: string,
-    reports: Array<any>
+    reports: Array<any>,
+    setReports: Function,
 }
 
 const ReportSection: React.FC<ReportSectionProps> = (
     {
         fundraisingId,
         reports,
+        setReports
     }
 ) => {
     const navigate = useNavigate()
@@ -30,7 +32,6 @@ const ReportSection: React.FC<ReportSectionProps> = (
     //
     //     }
     // }
-    console.log(reports)
 
     useEffect(() => {
 
@@ -38,6 +39,7 @@ const ReportSection: React.FC<ReportSectionProps> = (
     return (
         <Box>
             <Button onClick={onClickHandler}>Add report</Button>
+            <Reports setReports={setReports} reports={reports} />
         </Box>
     );
 };
