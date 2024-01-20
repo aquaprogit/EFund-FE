@@ -1,18 +1,23 @@
 import { Card, CardMedia, Typography, LinearProgress, Box, CardContent, Button, Chip, Link } from '@mui/material';
 import Fundraising from '../../models/Fundraising';
+import {useNavigate} from "react-router-dom";
 
 interface FundraisingCardProps {
     fundraising: Fundraising;
     size: 'small' | 'large';
     selected?: boolean;
     onClick?: (id: string) => void;
+    isUser?: boolean
 }
 
 const FundraisingCard = (props: FundraisingCardProps) => {
     const { balance, goal, currencyCode, sendUrl } = props.fundraising.monobankJar;
     const textColor = props.selected ? 'primary.contrastText' : 'text.primary';
     const progress = (balance / goal) * 100;
-
+    const navigate = useNavigate()
+    const onEditClick = () => {
+        navigate('/edit-fundraising', {state: {id: props.fundraising.id}})
+    }
     return (
         props.size === 'small' ?
             <>
@@ -68,6 +73,15 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                             <Typography variant="body2" color={textColor}>
                                 {goal} {currencyCode}
                             </Typography>
+                            {
+                                props.isUser &&
+                                <Button
+                                    color={props.selected ? 'secondary' : 'primary'}
+                                    variant="contained"
+                                    onClick={onEditClick}>
+                                    Edit
+                                </Button>
+                            }
                             <Button
                                 color={props.selected ? 'secondary' : 'primary'}
                                 variant="contained"

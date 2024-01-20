@@ -128,7 +128,9 @@ const FundraisingList: React.FC<FundraisingListProps> = ({loader, type='ALL'}) =
                                                         key={index}
                                                         onClick={(setSelectedFundraisingId)}
                                                         fundraising={fundraising}
-                                                        size="small" />
+                                                        size="small"
+                                                        isUser={type === 'USER'}
+                                                    />
                                                 </Box>
                                             ))))
                             }

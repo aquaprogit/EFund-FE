@@ -47,6 +47,14 @@ const Fundraisings = {
     async deleteImage(id: string) {
         return await API.delete(`/fundraisings/${id}/avatar`)
     },
+    async updateFundraising  (id: string, requestBody: AddFundraisingBody) {
+        try {
+            return await API.put<AddFundraisingBody, Fundraising>(`/fundraisings/${id}`, requestBody)
+        }
+        catch (e) {
+            console.error()
+        }
+    }
 };
 
 export default Fundraisings;
