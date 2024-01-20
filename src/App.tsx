@@ -4,7 +4,7 @@ import HomePage from './pages/HomePage';
 import SignUpPage from './pages/SignUpPage';
 import SignInPage from './pages/SignInPage';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
-import {CssBaseline} from '@mui/material';
+import { CssBaseline } from '@mui/material';
 import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/Profile/ProfilePage';
 import { UserProvider } from './contexts/UserContext';
@@ -77,10 +77,10 @@ const lightTheme = createTheme({
       default: '#ebf2fa',
       paper: '#e2e2e2',
     },
-    // text: {
-    //   primary: '#041C32',
-    //   secondary: '#041C32',
-    // }
+    text: {
+      primary: '#041C32',
+      secondary: '#00DD4D',
+    }
   },
 });
 
@@ -96,11 +96,11 @@ const App: React.FC = () => (
               <Route path="/" element={<HomePage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/change-email" element={<ChangeEmail />} />
-              <Route path={'/confirm-change-email'} element={<ConfirmChangeEmail />}/>
+              <Route path={'/confirm-change-email'} element={<ConfirmChangeEmail />} />
               <Route path="/sign-up" element={<SignUpPage />} />
               <Route path='/sign-in' element={<SignInPage />} />
               <Route path='/settings' element={(<SettingsPage />)} />
-              <Route path={'/add-password'} element={<AddPassword />}/>
+              <Route path={'/add-password'} element={<AddPassword />} />
               <Route path="/change-password" element={<ChangePassword />} />
               <Route path='/link-token' element={<LinkToken />} />
               <Route path='/add-fundraising' element={<AddPage />} />

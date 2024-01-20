@@ -1,6 +1,6 @@
-import React, {useMemo} from 'react';
-import {Box, TypographyVariant} from "@mui/material";
-import {EditProps} from "./Edit.types";
+import React, { useMemo } from 'react';
+import { Box, TypographyVariant } from "@mui/material";
+import { EditProps } from "./Edit.types";
 import styles from "./Edit.module.css";
 import Info from "../Info/Info";
 
@@ -23,8 +23,7 @@ const Edit: React.FC<EditProps> = (
     ], []);
     return (
         <Box className={styles.info}>
-            <Info info={info}  updateHandler={handleSaveClick}/>
-
+            <Info info={info} updateHandler={handleSaveClick} />
         </Box>
     );
 };

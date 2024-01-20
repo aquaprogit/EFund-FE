@@ -14,7 +14,7 @@ import PageWrapper from "../../components/common/PageWrapper";
 import '../../styles/pages/fundraising/add-page.css';
 import { useState } from "react";
 import LimitedTextField from "../../components/common/LimitedTextField";
-import ChipsInput from "../../components/common/ChipsInput";
+// import ChipsInput from "../../components/common/ChipsInput";
 import React from "react";
 
 const AddPage = () => {
@@ -85,7 +85,7 @@ const AddPage = () => {
                                 </MenuItem>
                             </Select>
                         </FormControl>
-                        <ChipsInput selectedValues={tags} setSelectedValues={setTags} />
+                        {/* <ChipsInput selectedValues={tags} setSelectedValues={setTags} /> */}
                     </CardContent>
                 </Card>
             </Box>

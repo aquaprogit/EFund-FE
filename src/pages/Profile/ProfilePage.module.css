@@ -4,11 +4,9 @@
     padding: 20px;
 }
 .container {
-    width: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
-
 }
 
 .personal-info {
@@ -23,4 +21,3 @@
     display: flex;
     row-gap: 50px;
 }
-

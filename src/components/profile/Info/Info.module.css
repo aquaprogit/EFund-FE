@@ -4,3 +4,10 @@
     justify-content: flex-start;
     row-gap: 10px;
 }
+
+.infoItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}

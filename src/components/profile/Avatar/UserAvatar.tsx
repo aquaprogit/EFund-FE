@@ -1,7 +1,7 @@
-import React, {ChangeEvent} from 'react';
-import {Avatar, Box, Button, IconButton} from "@mui/material";
+import React, { ChangeEvent } from 'react';
+import { Avatar, Box, Button, IconButton } from "@mui/material";
 import styles from './UserAvatar.module.css';
-import {UserAvatarProps} from "./UserAvatar.types";
+import { UserAvatarProps } from "./UserAvatar.types";
 import Users from "../../../services/api/Users";
 
 
@@ -10,10 +10,8 @@ const UserAvatar: React.FC<UserAvatarProps> = (
         inputFile,
         url,
         refreshUser
-
     }
 ) => {
-    console.log(url, '!!!!')
     const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
         const { files } = e.target;
         if (files && files.length) {
@@ -32,12 +30,14 @@ const UserAvatar: React.FC<UserAvatarProps> = (
         });
     };
     const avatarOverridingStyles = {
-        height: '200px',
-        width: '200px'
+        height: '150px',
+        width: '150px'
     }
     return (
-        <Box className={styles.container}>
-            <IconButton onClick={() => (inputFile?.current as HTMLInputElement | null)?.click()}>
+        <Box className={styles.container}
+        >
+            <IconButton
+                onClick={() => (inputFile?.current as HTMLInputElement | null)?.click()}>
                 <Avatar
                     className={styles.profileAvatar}
                     sx={avatarOverridingStyles}
@@ -52,7 +52,9 @@ const UserAvatar: React.FC<UserAvatarProps> = (
                 />
             </IconButton>
             {!url.includes('Default') && (
-                <Button size="small" onClick={handleDeleteAvatar}>Delete Avatar</Button>
+                <Button
+                    className={styles.deleteAvatarButton}
+                    style={{}} size="small" onClick={handleDeleteAvatar}>Delete Avatar</Button>
             )}
         </Box>
 
