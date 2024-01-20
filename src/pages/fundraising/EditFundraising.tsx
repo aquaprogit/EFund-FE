@@ -212,6 +212,7 @@ const EditFundraising = () => {
                         <Button size={'large'} onClick={onSubmit}>Edit</Button>
                     </CardContent>
                 </Card>
+                <Typography variant={'h3'}>Reports</Typography>
             </Box>
         </PageWrapper>
     );
