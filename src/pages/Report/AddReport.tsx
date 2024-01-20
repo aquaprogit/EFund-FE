@@ -13,11 +13,13 @@ const AddReport = () => {
     const {state} = useLocation()
     const navigate = useNavigate()
     const createFormData = () => {
-        const formData = new FormData()
-        files.forEach(file => {
-            formData.append('file', file)
-        })
-        return formData
+        const formData = new FormData();
+
+        files.forEach((file) => {
+            formData.append(`files`, file);
+        });
+
+        return formData;
     }
     const addReport = async () => {
        try {
@@ -33,7 +35,6 @@ const AddReport = () => {
                    addInfo('error', response.error.message)
                }
                else if (response.success) {
-                   console.log(response)
                    const formData = createFormData()
                    const attachaments = await FundraisingsReports.addAttachments(response.data.id, formData)
                    if (attachaments!.success) {

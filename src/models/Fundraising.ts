@@ -10,4 +10,5 @@ export default interface Fundraising{
     isClosed: boolean;
     tags: string[];
     monobankJar: Jar;
+    reports: Array<any>
 }

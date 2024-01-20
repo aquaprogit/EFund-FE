@@ -21,6 +21,15 @@ class FundraisingsReports {
             console.error(e)
         }
     }
+    static async getReport (id: string) {
+        try {
+            return await API.get(`/fundraising-reports/${id}`)
+        }
+        catch (e) {
+            console.error(e)
+        }
+    }
+
 }
 
 export default FundraisingsReports

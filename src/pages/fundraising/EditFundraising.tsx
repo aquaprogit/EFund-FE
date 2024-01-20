@@ -21,11 +21,12 @@ const EditFundraising = () => {
     const [tags, setTags] = useState<string[]>([]);
     const [jars, setJars] = useState<Jar[]>([])
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
+    const [reports, setReports] = useState([])
     const {addInfo} = useInfo()
     const inputFile = useRef<HTMLInputElement | null>(null)
     const navigate = useNavigate()
+
     const {state} = useLocation()
-    console.log(state)
     const handleOpenJarsMenu = (event: any) => {
         setOpenJarsMenu(event.currentTarget);
     };
@@ -119,13 +120,15 @@ const EditFundraising = () => {
     }
     const fetchData = async () => {
         try {
-            const {avatarUrl, title, description, monobankJarId, monobankJar, tags} = (await Fundraisings.getFundraising(state.id))!
+            const {avatarUrl, title, description, monobankJarId, monobankJar, tags, reports} = (await Fundraisings.getFundraising(state.id))!
             setImageUrl(avatarUrl)
             setTitle(title)
             setDescription(description)
             setMonobankJarId(monobankJarId)
             setMonobankJar(monobankJar.title)
             setTags(tags)
+            // @ts-ignore
+            setReports(reports)
         }
         catch (e) {
             addInfo('error', 'Unexpected error')
@@ -214,7 +217,7 @@ const EditFundraising = () => {
                     </CardContent>
                 </Card>
                 <Typography variant={'h3'}>Reports</Typography>
-                <ReportSection fundraisingId={state.id}/>
+                <ReportSection reports={reports} fundraisingId={state.id}/>
             </Box>
         </PageWrapper>
     );

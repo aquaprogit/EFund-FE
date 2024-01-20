@@ -44,7 +44,7 @@ const ReportTemplate: React.FC<ReportTemplate> = (
                 value={description}
                 onChange={(e: any) => setDescription(e.target.value)}
             />
-            <FileUpload value={files} onChange={setFiles}/>
+            <FileUpload value={files} onChange={setFiles} multiple/>
             <Button onClick={onClickHandler}>{buttonText}</Button>
         </Box>
 
