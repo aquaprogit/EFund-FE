@@ -1,18 +1,23 @@
 import { Card, CardMedia, Typography, LinearProgress, Box, CardContent, Button, Chip, Link } from '@mui/material';
 import Fundraising from '../../models/Fundraising';
+import {useNavigate} from "react-router-dom";
 
 interface FundraisingCardProps {
     fundraising: Fundraising;
     size: 'small' | 'large';
     selected?: boolean;
     onClick?: (id: string) => void;
+    isUser?: boolean
 }
 
 const FundraisingCard = (props: FundraisingCardProps) => {
     const { balance, goal, currencyCode, sendUrl } = props.fundraising.monobankJar;
     const textColor = props.selected ? 'primary.contrastText' : 'text.primary';
     const progress = (balance / goal) * 100;
-
+    const navigate = useNavigate()
+    const onEditClick = () => {
+        navigate('/edit-fundraising', {state: {id: props.fundraising.id}})
+    }
     return (
         props.size === 'small' ?
             <>
@@ -68,6 +73,15 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                             <Typography variant="body2" color={textColor}>
                                 {goal} {currencyCode}
                             </Typography>
+                            {
+                                props.isUser &&
+                                <Button
+                                    color={props.selected ? 'secondary' : 'primary'}
+                                    variant="contained"
+                                    onClick={onEditClick}>
+                                    Edit
+                                </Button>
+                            }
                             <Button
                                 color={props.selected ? 'secondary' : 'primary'}
                                 variant="contained"
@@ -109,7 +123,7 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                         gap: 0.5
                     }}>
                         <Typography style={{ wordWrap: 'break-word' }} variant="h4" component="div" textOverflow={'ellipsis'} overflow={'hidden'} color={textColor}>
-                            WWWWWWWWWWWWWWWWWWWWWWW
+                            {props.fundraising.title}
                         </Typography>
                         <Box sx={{ display: 'flex', gap: 1 }}>
                             {props.fundraising.tags.map((tag, index) => (
@@ -122,7 +136,7 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                             ))}
                         </Box>
                         <Typography variant="body1" textOverflow={'ellipsis'} overflow={'hidden'} color={textColor}>
-                            Lorem ipsum dolor sit amet consectetur adipisicing elit. Cumque hic vel quo Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum, doloribus. Sint voluptatibus autem molestias explicabo facere nulla repudiand Lorem ipsum, dolor sit amet consectetur adipisicing elit. Magni, totam! Iusto laudantium libero officia maxime minima, inventore cum, quaerat delectus quam, deleniti mollitia rerum sint ullam tempore! Saepe, voluptatem rem! ae eos, repellat doloribus qui, provident dolor esse voluptas totam reprehenderit dicta ullam. s? Reprehenderit minima natus in corrupti atque saepe ut, ipsam, aliquam laborum quam sit esse id nostrum voluptatum vel.
+                            {props.fundraising.description}
                         </Typography>
                         <Box
                             sx={{

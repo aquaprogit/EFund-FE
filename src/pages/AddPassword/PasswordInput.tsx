@@ -1,6 +1,6 @@
-import React, {useMemo} from 'react';
+import React, { useMemo } from 'react';
 import TextField from "@mui/material/TextField";
-import {Box, InputAdornment, Typography} from "@mui/material";
+import { Box, InputAdornment } from "@mui/material";
 import styles from './AddPassword.module.css';
 import IconButton from "@mui/material/IconButton";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
@@ -13,8 +13,8 @@ type PasswordInputProps = {
 };
 
 const PasswordInput: React.FC<PasswordInputProps> = ({
-     register,
-     placeholder,
+    register,
+    placeholder,
     error
 }) => {
     const [isVisible, setIsVisible] = React.useState(false);
@@ -53,10 +53,11 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
                 size={'small'}
                 placeholder={placeholder}
                 InputProps={inputProps}
+                error={!!error}
+                helperText={error?.message}
                 {...register}
-                sx={{width: '400px'}}
+                sx={{ width: '400px' }}
             />
-            {error && <Typography sx={{color: 'red'}}>{error.message}</Typography> }
         </Box>
     );
 };

@@ -74,7 +74,6 @@ const InfoItem: React.FC<InfoItemProps> = ({ id, placeholder, variant, edit, val
                 />
             ) : (
                 <Typography
-                    sx={{ color: 'text.secondary' }}
                     variant={variant}>{value}</Typography>
             )}
         </Box>

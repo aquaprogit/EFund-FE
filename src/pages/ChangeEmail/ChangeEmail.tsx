@@ -1,16 +1,15 @@
-import React, {useState} from 'react';
-import PageWrapper from "../../components/common/PageWrapper";
+import React, { useState } from 'react';
 import ChangeCreds from "../../templates/ChangeCreds/ChangeCreds";
 import TextField from "@mui/material/TextField";
-import {useNavigate} from "react-router-dom";
 import Auth from "../../services/api/Auth";
-
 import useInfo from "../../hooks/useInfo";
+import ConfirmChangeEmail from './ConfirmChangeEmail';
 
-const ChangeEmail = () => {
+const ChangeEmail = (props: { onClose: () => void }) => {
     const [newEmail, setNewEmail] = useState('');
-    const navigate = useNavigate();
-    const {addInfo} = useInfo()
+    const error = !!newEmail && !!!newEmail.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
+    const [confirmationSent, setConfirmationSent] = useState(false);
+    const { sendNotification: addInfo } = useInfo();
     const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNewEmail(event.target.value);
     }
@@ -23,7 +22,7 @@ const ChangeEmail = () => {
                 addInfo('error', response.error.message);
             }
             else if (response.success || response.error.errorCode === 4) {
-                navigate('/confirm-change-email', {state: {newEmail}});
+                setConfirmationSent(true);
             }
         }
         catch (e) {
@@ -33,11 +32,22 @@ const ChangeEmail = () => {
 
     }
     return (
-        <PageWrapper>
-            <ChangeCreds title={'Change Email'} buttonHandler={onSubmit}>
-                <TextField type={'email'} placeholder={'New Email'} value={newEmail} onChange={onChangeHandler}/>
-            </ChangeCreds>
-        </PageWrapper>
+        confirmationSent
+            ?
+            <ConfirmChangeEmail newEmail={newEmail} onClose={props.onClose} />
+            : <>
+                <ChangeCreds buttonLabel='Send code' title={'Change Email'} buttonHandler={onSubmit}>
+                    <TextField
+                        error={error}
+                        helperText={error ? 'Invalid email format' : ''}
+                        style={{ width: '300px' }}
+                        size={"small"}
+                        type={'email'}
+                        placeholder={'New Email'}
+                        value={newEmail}
+                        onChange={onChangeHandler} />
+                </ChangeCreds>
+            </>
     );
 };
 

@@ -1,6 +1,6 @@
 .info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: flex-start;
     row-gap: 10px;
 }

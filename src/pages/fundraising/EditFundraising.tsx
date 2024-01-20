@@ -1,19 +1,18 @@
-import { Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, Typography, } from "@mui/material";
-import PageWrapper from "../../components/common/PageWrapper";
-import '../../styles/pages/fundraising/add-page.css';
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
-import LimitedTextField from "../../components/common/LimitedTextField";
-import Monobank from "../../services/api/Monobank/Monobank";
+import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
 import Jar from "../../models/Jar";
-import { MuiChipsInput } from "mui-chips-input";
 import useInfo from "../../hooks/useInfo";
-import UploadImage from "../../components/profile/UploadImage/UploadImage";
+import { useLocation, useNavigate } from "react-router-dom";
+import Monobank from "../../services/api/Monobank/Monobank";
 import Fundraisings from "../../services/api/Fundraisings";
-import { useNavigate } from "react-router-dom";
+import PageWrapper from "../../components/common/PageWrapper";
+import { Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import UploadImage from "../../components/profile/UploadImage/UploadImage";
+import LimitedTextField from "../../components/common/LimitedTextField";
+import { MuiChipsInput } from "mui-chips-input";
 
-const AddPage = () => {
+const EditFundraising = () => {
     const defaultImage = 'http://localhost:8080/Uploads/Default/Fundraisings/avatar.png'
-    const [imageUrl, setImageUrl] = useState<string>(defaultImage);
+    const [imageUrl, setImageUrl] = useState<string>('');
     const [title, setTitle] = useState<string>('');
     const [description, setDescription] = useState<string>('');
     const [monobankJar, setMonobankJar] = useState<string>('');
@@ -24,6 +23,8 @@ const AddPage = () => {
     const { sendNotification: addInfo } = useInfo()
     const inputFile = useRef<HTMLInputElement | null>(null)
     const navigate = useNavigate()
+    const { state } = useLocation()
+    console.log(state)
     const handleOpenJarsMenu = (event: any) => {
         setOpenJarsMenu(event.currentTarget);
     };
@@ -45,7 +46,6 @@ const AddPage = () => {
         catch (e) {
             addInfo('error', 'Unexpected error')
         }
-
     }
     const handleTagsChange = (newTags: Array<string>) => {
         setTags(newTags)
@@ -78,12 +78,13 @@ const AddPage = () => {
             addInfo('error', 'Unexpected error while adding fundraising image')
         }
     }
-    const handleDeleteFile = () => {
+    const handleDeleteFile = async () => {
         setImageUrl(defaultImage)
         if (inputFile.current) {
             inputFile.current.value = '';
             inputFile.current.files = new DataTransfer().files;
         }
+        await Fundraisings.deleteImage(state.id)
     }
     const onSubmit = async () => {
         const requestBody = {
@@ -93,7 +94,7 @@ const AddPage = () => {
             tags,
         }
         try {
-            const response = await Fundraisings.createFundraising(requestBody)
+            const response = await Fundraisings.updateFundraising(state.id, requestBody)
             if (response) {
                 if (response.error) {
                     addInfo('error', response.error.message)
@@ -105,24 +106,41 @@ const AddPage = () => {
                     if (files && files.length > 0) {
                         await uploadImage(fundraisingId, files[0])
                     }
-                    addInfo('success', 'Fundraising has been successfully created')
-                    navigate('/')
+                    addInfo('success', 'Fundraising has been successfully edited')
+                    navigate('/my-fundraisings')
 
                 }
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error while creating fundraising')
+            addInfo('error', 'Unexpected error while editing fundraising')
         }
     }
+    const fetchData = async () => {
+        try {
+            const { avatarUrl, title, description, monobankJarId, monobankJar, tags } = (await Fundraisings.getFundraising(state.id))!
+            setImageUrl(avatarUrl)
+            setTitle(title)
+            setDescription(description)
+            setMonobankJarId(monobankJarId)
+            setMonobankJar(monobankJar.title)
+            setTags(tags)
+        }
+        catch (e) {
+            addInfo('error', 'Unexpected error')
+        }
+
+    }
+
     useEffect(() => {
         getMonobankJars()
+        fetchData()
     }, []);
 
     return (
         <PageWrapper>
             <Box className='content-wrapper'>
-                <Typography variant='h5'>Creating Fundraising</Typography>
+                <Typography variant='h5'>Edit Fundraising</Typography>
                 <Card style={{
                     display: 'flex',
                     flexDirection: 'row',
@@ -163,10 +181,10 @@ const AddPage = () => {
                             multiline
                         />
                         <FormControl sx={{ m: 1, minWidth: 200 }} size="small">
-                            <InputLabel id="monobank-jar-label">Monobank jar</InputLabel>
+                            <InputLabel id="demo-select-small-label">Monobank jar</InputLabel>
                             <Select
-                                labelId="monobank-jar-label"
-                                id="monobank-jar"
+                                labelId="demo-select-small-label"
+                                id="demo-select-small"
                                 value={monobankJar}
                                 label="Monobank jar"
                                 onChange={(e) => setMonobankJar(e.target.value)}
@@ -191,12 +209,13 @@ const AddPage = () => {
                             onChange={handleTagsChange}
                             placeholder={'Tags'}
                         />
-                        <Button size={'large'} onClick={onSubmit}>Create</Button>
+                        <Button size={'large'} onClick={onSubmit}>Edit</Button>
                     </CardContent>
                 </Card>
+                <Typography variant={'h3'}>Reports</Typography>
             </Box>
         </PageWrapper>
     );
-}
+};
 
-export default AddPage;
+export default EditFundraising;

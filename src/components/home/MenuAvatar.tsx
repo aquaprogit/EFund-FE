@@ -6,12 +6,14 @@ import { Avatar, Divider, ListItemIcon, Menu, MenuItem, Typography } from '@mui/
 import { useState } from "react";
 import { stringAvatar } from "../../services/utils/convert";
 import { useUser } from "../../contexts/UserContext";
+import {CallToAction} from "@mui/icons-material";
 
 interface MenuAvatarProps {
     onSignOut: () => void;
     onSettings: () => void;
     onProfile: () => void;
     onAdd: () => void;
+    onMyFundraising: () => void;
 }
 
 const MenuAvatar = (props: MenuAvatarProps) => {
@@ -83,7 +85,17 @@ const MenuAvatar = (props: MenuAvatarProps) => {
                     </ListItemIcon>
                     Add fundraising
                 </MenuItem>
+                <MenuItem onClick={props.onMyFundraising}>
+                    <ListItemIcon>
+                        <CallToAction/>
+                    </ListItemIcon>
+                    My fundraising
+                </MenuItem>
                 <Divider />
+                <MenuItem>
+                    <ListItemIcon>
+                    </ListItemIcon>
+                </MenuItem>
                 <MenuItem onClick={props.onSettings}>
                     <ListItemIcon>
                         <Settings fontSize="small" />

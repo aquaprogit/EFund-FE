@@ -21,3 +21,7 @@
     display: flex;
     row-gap: 50px;
 }
+
+.accordionsContainer{
+    width: 85%;
+}

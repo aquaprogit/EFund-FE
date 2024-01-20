@@ -12,12 +12,13 @@ interface APIResponse<T> {
 }
 
 export const API = {
-    get: async <TResponse>(url: string): Promise<APIResponse<TResponse>> => {
+    get: async <TResponse>(url: string, params?: any): Promise<APIResponse<TResponse>> => {
         try {
             const response = await axios.get<TResponse>(API_URL + url, {
                 headers: {
                     'Authorization': 'Bearer ' + localStorage.getItem('accessToken')
-                }
+                },
+                params
             });
             return { success: true, data: response.data };
         } catch (error: any) {

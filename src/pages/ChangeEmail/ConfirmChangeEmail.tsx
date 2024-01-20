@@ -1,33 +1,30 @@
-import React, {useState} from 'react';
-import {Box, Button, Typography} from "@mui/material";
+import React, { useState } from 'react';
+import { Box, Button, Typography } from "@mui/material";
 import styles from './ChangeEmail.module.css';
 import TextField from "@mui/material/TextField";
 
 import Auth from "../../services/api/Auth";
 import useInfo from "../../hooks/useInfo";
-import useUser from "../../hooks/useUser";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useUser } from "../../contexts/UserContext";
 
-const ConfirmChangeEmail = () => {
+const ConfirmChangeEmail = (props: { newEmail: string, onClose: () => void }) => {
     const [code, setCode] = useState('');
-    const {user} = useUser()
-    const {addInfo} = useInfo()
-    const {state: {newEmail}} = useLocation();
-    const navigate = useNavigate()
-
+    const { user, refreshUser } = useUser();
+    const { sendNotification: addInfo } = useInfo();
 
     const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         setCode(event.target.value);
     }
     const onSubmit: React.MouseEventHandler<HTMLButtonElement> = async () => {
         try {
-            const response = await Auth.confirmChangeEmail({newEmail, code: parseInt(code, 10)})
+            const response = await Auth.confirmChangeEmail({ newEmail: props.newEmail, code: parseInt(code, 10) })
             if (response && response.error) {
                 addInfo('error', response.error.message)
             }
             else {
-                addInfo('success', 'Email has been successfully changed')
-                navigate('/')
+                addInfo('success', 'Email has been successfully changed');
+                await refreshUser();
+                props.onClose();
             }
         }
         catch (e) {
@@ -38,23 +35,24 @@ const ConfirmChangeEmail = () => {
     }
     const resendConfirmationCode = async () => {
         try {
-            const response = await Auth.resendConfirmationCode({userId: user!.id})
-            if (response && response.success) {
-                addInfo('success', 'Confirmation code has been resent')
+            const response = await Auth.resendConfirmationCode({ userId: user!.id })
+            if (response) {
+                if (response.success) {
+                    addInfo('success', 'Confirmation code has been resent')
+                }
+                else if (response.error) {
+                    addInfo('error', response.error.message)
+                }
             }
-            else if (response && response.error) {
-                addInfo('error', response.error.message)
-            }
+
         }
         catch (e) {
             addInfo('error', 'Unexpected error')
         }
-
-
     }
     return (
-        <Box className={styles.confirmContainer}>
-            <Typography variant={'h4'}>Enter confirmation code</Typography>
+        <Box className={styles.wrapper}>
+            <Typography variant={'h5'}>Enter confirmation code</Typography>
             <Box className={styles.validation}>
                 <TextField
                     size={"small"}
@@ -62,7 +60,7 @@ const ConfirmChangeEmail = () => {
                     value={code}
                     onChange={onChangeHandler}
                 />
-                <Button onClick={resendConfirmationCode}>Resend confirmation code</Button>
+                <Button size='small' onClick={resendConfirmationCode}>Resend code</Button>
             </Box>
             <Button size={'large'} onClick={onSubmit}>Submit</Button>
         </Box>
