@@ -59,9 +59,6 @@ const Report: React.FC<ReportProps> = ({
             }
         }
     }
-    const editReport =  () => {
-        navigate('/edit-report', {state: {fundraisingId: fundraisingId}})
-    }
     return (
         <Box>
             <Typography variant={'h2'}>{title}</Typography>
@@ -72,7 +69,6 @@ const Report: React.FC<ReportProps> = ({
                 <Attachment key={attachment.id} {...attachment} />
             ))}
             <Button onClick={deleteReport}>Delete</Button>
-            <Button onClick={editReport}>Edit</Button>
         </Box>
     );
 };
