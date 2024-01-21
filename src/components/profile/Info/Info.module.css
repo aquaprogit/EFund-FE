@@ -1,6 +1,13 @@
 .info {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: flex-start;
     row-gap: 10px;
+}
+
+.infoItem {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
 }

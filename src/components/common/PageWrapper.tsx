@@ -13,7 +13,7 @@ interface PageWrapperProps {
 const PageWrapper = ({ children }: PageWrapperProps) => {
     const { user, loading, updateUser, refreshUser } = useUser();
     const navigate = useNavigate();
-    const {addInfo} = useInfo()
+    const { sendNotification: addInfo } = useInfo()
 
     useEffect(() => {
         refreshUser();

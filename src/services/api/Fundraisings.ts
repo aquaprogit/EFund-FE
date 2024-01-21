@@ -29,6 +29,7 @@ const Fundraisings = {
     async getFundraising(id: string): Promise<Fundraising | undefined> {
         const response = await API.get<Fundraising>(`/fundraisings/${id}`);
 
+        console.log(response.data?.tags)
         return response.data;
     },
     async createFundraising(requestBody: AddFundraisingBody) {

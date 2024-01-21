@@ -8,5 +8,13 @@
 .profile-avatar:hover {
     cursor: pointer;
     filter: brightness(80%);
+}
 
+.deleteAvatarButton{
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.container:hover .deleteAvatarButton {
+    opacity: 1;
 }

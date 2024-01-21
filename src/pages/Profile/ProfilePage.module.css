@@ -4,11 +4,9 @@
     padding: 20px;
 }
 .container {
-    width: 100%;
     display: flex;
     align-items: center;
     gap: 10px;
-
 }
 
 .personal-info {
@@ -24,3 +22,7 @@
     row-gap: 50px;
 }
 
+.accordionsContainer{
+    width: 80%;
+    min-width: 700px;
+}

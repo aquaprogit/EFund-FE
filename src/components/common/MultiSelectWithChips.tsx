@@ -1,50 +1,61 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import Chip from '@mui/material/Chip';
+import { Chip, FilterOptionsState } from '@mui/material';
+import useInfo from '../../hooks/useInfo';
 
-const MultiSelectWithChip = (props: { names: string[], onChange: (selected: string[]) => void }) => {
-    const [selectedOptions, setSelectedOptions] = React.useState<string[]>([]);
-
-    useEffect(() => {
-        props.onChange(selectedOptions);
-    }, [props, selectedOptions]);
+const MultiSelectWithChip = (props: {
+    label: string,
+    values: string[],
+    defaultValues?: string[],
+    limitTags?: number,
+    freeSolo?: boolean,
+    width?: string,
+    onChange: (selected: string[]) => void
+}) => {
+    const { sendNotification } = useInfo();
+    const [selectedOptions, setSelectedOptions] = useState<string[]>(props.defaultValues || []);
 
     const handleChange = (event: React.SyntheticEvent, value: string[]) => {
+        if (value.length > 5) {
+            sendNotification('error', 'You can select up to 5 tags');
+            return;
+        }
+        props.onChange(value);
         setSelectedOptions(value);
     };
 
+    const filterOptions = (options: string[], state: FilterOptionsState<string>) => {
+        return options.filter((option) => !state.inputValue.includes(option));
+    };
+
+    useEffect(() => {
+        if (props.defaultValues)
+            setSelectedOptions(props.defaultValues);
+    }, [props.defaultValues]);
+
     return (
-        <div
-            style={{
-                width: '250px',
-            }}
-        >
-            <Autocomplete
-                multiple
-                limitTags={2}
-                options={props.names}
-                value={selectedOptions}
-                onChange={handleChange}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        label=""
-                        variant="standard"
-                    />
-                )}
-                renderTags={(value, getTagProps) =>
-                    value.map((option, index) => (
-                        <Chip
-                            size='small'
-                            color='primary'
-                            label={option}
-                            {...getTagProps({ index })}
-                        />
-                    ))
-                }
-            />
-        </div>
+        <Autocomplete
+            sx={{ ml: 0, width: props.width, maxWidth: '400px', minWidth: '100px' }}
+            size='small'
+            multiple
+            limitTags={props.limitTags}
+            freeSolo={props.freeSolo}
+            defaultValue={props.defaultValues}
+            options={props.values}
+            value={selectedOptions}
+            onChange={handleChange}
+            filterOptions={filterOptions}
+            renderTags={(value: readonly string[], getTagProps) =>
+                value.map((option: string, index: number) => (
+                    <Chip color='primary' variant="filled" label={option.toLowerCase()} {...getTagProps({ index })} />
+                ))
+            }
+            getOptionLabel={(option) => option.toLowerCase()}
+            renderInput={(params) => (
+                <TextField {...params} label={props.label} placeholder={props.label} />
+            )}
+        />
     );
 };
 

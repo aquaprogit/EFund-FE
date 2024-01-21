@@ -1,14 +1,13 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import ChangeCreds from "../../templates/ChangeCreds/ChangeCreds";
 import TextField from "@mui/material/TextField";
 import Monobank from "../../services/api/Monobank/Monobank";
 import useInfo from "../../hooks/useInfo";
-import {useNavigate} from "react-router-dom";
+import { Typography } from '@mui/material';
 
-const LinkToken = () => {
+const LinkToken = (props: { onClose: () => void }) => {
     const [token, setToken] = useState('')
-    const {addInfo} = useInfo()
-    const navigate = useNavigate()
+    const { sendNotification: addInfo } = useInfo()
     const onSubmit = async () => {
         try {
             const response = await Monobank.linkToken(token);
@@ -18,8 +17,7 @@ const LinkToken = () => {
             }
             else if (response && response.success) {
                 addInfo('success', 'Token has been successfully linked')
-                navigate('/profile')
-
+                props.onClose();
             }
         }
         catch (e) {
@@ -30,14 +28,19 @@ const LinkToken = () => {
         setToken(event.target.value);
     }
     return (
-        <ChangeCreds buttonHandler={onSubmit} title={'Link monobank token'}>
+        <ChangeCreds buttonLabel='Link' buttonHandler={onSubmit} title='Link monobank token'>
             <TextField
+                style={{ width: '300px' }}
                 value={token}
                 required
                 onChange={onChangeHandler}
                 placeholder={'Token'}
                 size={'small'}
             />
+            <Typography
+                variant={'caption'}
+                sx={{ color: 'text.secondary' }}>You can get token <a href='https://api.monobank.ua/' target='_blank' rel='noreferrer'>here</a>
+            </Typography>
         </ChangeCreds>
     );
 };

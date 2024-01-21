@@ -1,16 +1,23 @@
-import React, {ChangeEvent, useEffect, useRef} from "react";
-import {Box, Typography} from "@mui/material";
+import React, { ChangeEvent, useEffect, useRef } from "react";
+import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Dialog, Typography } from "@mui/material";
 import PageWrapper from "../../components/common/PageWrapper";
 import '../../styles/profile-page.css';
-import Users, {UpdateUserInfo} from "../../services/api/Users";
+import Users, { UpdateUserInfo } from "../../services/api/Users";
 import { useUser } from "../../contexts/UserContext";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styles from "./ProfilePage.module.css";
 import Edit from "../../components/profile/Edit/Edit";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import UploadImage from "../../components/profile/UploadImage/UploadImage";
+import ChangePassword from "../ChangePassword/ChangePassword";
+import AddPassword from "../AddPassword/AddPassword";
+import ChangeEmail from "../ChangeEmail/ChangeEmail";
+import LinkToken from "../LinkToken/LinkToken";
 
 const ProfilePage = () => {
-    const { user, refreshUser } = useUser();
+    const [openedDialogue, setOpenedDialogue] = React.useState<string | false>(false);
+    const [expanded, setExpanded] = React.useState<string | false>(false);
+    const { user, refreshUser, loading } = useUser();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -21,6 +28,11 @@ const ProfilePage = () => {
         await Users.updateInfo(data);
         await refreshUser();
     };
+
+    const handleChange =
+        (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
+            setExpanded(isExpanded ? panel : false);
+        };
 
     const inputFile = useRef(null);
     const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
@@ -44,37 +56,115 @@ const ProfilePage = () => {
     return (
         <PageWrapper>
             {user ?
-                <Box className={styles.mainContent}>
-                    <Box className={styles.container}>
-                        <UploadImage
-                            inputFile={inputFile}
-                            handleFileUpload={handleFileUpload}
-                            handleDeleteFile={handleDeleteFile}
-                            url={user.avatarUrl}
-                        />
-                        <Box className={styles.personalInfo}>
-                            <Edit
-                                initialName={user.name}
-                                initialEmail={user.email}
-                                handleSaveClick={handleSaveClick}
-                            />
-                        </Box>
+                <Box className={styles.mainContent} sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '30px',
+                    padding: '30px',
+                    width: '100%',
+                    height: '100%',
+                }}>
+                    <UploadImage
+                        inputFile={inputFile}
+                        handleFileUpload={handleFileUpload}
+                        handleDeleteFile={handleDeleteFile}
+                        url={user.avatarUrl}
+                    />
+                    <Box className={styles.accordionsContainer}>
+                        <Accordion expanded={expanded === 'panel1'} onChange={handleChange('panel1')}>
+                            <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                            >
+                                <Typography sx={{ width: '33%', flexShrink: 0 }}>
+                                    Personal data
+                                </Typography>
+                                <Typography sx={{ color: 'text.secondary' }}>User data description here</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <Edit
+                                    initialName={user.name}
+                                    initialEmail={user.email}
+                                    handleSaveClick={handleSaveClick}
+                                />
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    gap: 2,
+                                    alignItems: 'center',
+                                }}>
+                                    <Typography variant="body1">Email:</Typography>
+                                    <Typography variant="body1">{user.email}</Typography>
+                                    <Button size="small" onClick={() => setOpenedDialogue('changeEmail')}>Change Email</Button>
+                                </Box>
+                            </AccordionDetails>
+                        </Accordion>
+                        <Accordion expanded={expanded === 'panel2'} onChange={handleChange('panel2')}>
+                            <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="panel2bh-content"
+                                id="panel2bh-header"
+                            >
+                                <Typography sx={{ width: '33%', flexShrink: 0 }}>Security</Typography>
+                                <Typography sx={{ color: 'text.secondary' }}>
+                                    Security settings
+                                </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', alignContent: 'center' }}>
+                                    {user.hasPassword
+                                        ? <Button disabled={!user.hasPassword} onClick={() => setOpenedDialogue('changePassword')}>Change Password</Button>
+                                        : <Button disabled={user.hasPassword} onClick={() => setOpenedDialogue('addPassword')}>Add Password</Button>
+                                    }
+                                    <Button onClick={() => setOpenedDialogue('changeEmail')}>Change Email</Button>
+                                </Box>
 
+                            </AccordionDetails>
+                        </Accordion>
+                        <Accordion expanded={expanded === 'panel3'} onChange={handleChange('panel3')}>
+                            <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="panel3bh-content"
+                                id="panel3bh-header"
+                            >
+                                <Typography sx={{ width: '33%', flexShrink: 0 }}>
+                                    Advanced settings
+                                </Typography>
+                                <Typography sx={{ color: 'text.secondary' }}>
+                                    You can see more advanced settings here
+                                </Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                    <Button onClick={() => setOpenedDialogue('linkToken')}>{user.hasMonobankToken ? 'Update Token' : 'Link Token'}</Button>
+                                </Box>
+                            </AccordionDetails>
+                        </Accordion>
                     </Box>
-                    <Box className={styles.credentialsSection}>
-                        <Typography onClick={() => navigate('/change-email')}>Change Email</Typography>
-                        {!user.hasMonobankToken &&  <Typography onClick={() => navigate('/link-token')}>Link Monobank token</Typography>}
-
-                        {
-                            !user.hasPassword ?
-                                <Typography onClick={() => navigate('/add-password')}>Add Password</Typography>
-                                :
-                                <Typography onClick={() => navigate('/change-password')}>Change Password</Typography>
-                        }
-                    </Box>
+                    <Dialog
+                        open={!!openedDialogue}
+                        onClose={() => setOpenedDialogue(false)}
+                    >
+                        {(() => {
+                            switch (openedDialogue) {
+                                case 'changePassword':
+                                    return <ChangePassword onClose={() => setOpenedDialogue(false)} />;
+                                case 'addPassword':
+                                    return <AddPassword onClose={() => setOpenedDialogue(false)} />;
+                                case 'changeEmail':
+                                    return <ChangeEmail onClose={() => setOpenedDialogue(false)} />;
+                                case 'linkToken':
+                                    return <LinkToken onClose={() => setOpenedDialogue(false)} />;
+                                default:
+                                    return <></>;
+                            }
+                        })()}
+                    </Dialog>
                 </Box>
                 : (
-                    <>{navigate('/')}</>
+                    loading
+                        ? <></>
+                        : <>{navigate('/')}</>
                 )}
         </PageWrapper >
     );

@@ -1,15 +1,17 @@
-import React, {ChangeEvent, useEffect, useRef, useState} from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import Jar from "../../models/Jar";
 import useInfo from "../../hooks/useInfo";
-import {useLocation, useNavigate} from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Monobank from "../../services/api/Monobank/Monobank";
 import Fundraisings from "../../services/api/Fundraisings";
 import PageWrapper from "../../components/common/PageWrapper";
-import {Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, Typography} from "@mui/material";
+import { Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, Skeleton, Typography } from "@mui/material";
 import UploadImage from "../../components/profile/UploadImage/UploadImage";
 import LimitedTextField from "../../components/common/LimitedTextField";
-import {MuiChipsInput} from "mui-chips-input";
 import ReportSection from "../../components/Reports/ReportSection";
+import MultiSelectWithChips from '../../components/common/MultiSelectWithChips';
+import Tags from '../../services/api/Tags';
+
 
 const EditFundraising = () => {
     const defaultImage = 'http://localhost:8080/Uploads/Default/Fundraisings/avatar.png'
@@ -18,15 +20,17 @@ const EditFundraising = () => {
     const [description, setDescription] = useState<string>('');
     const [monobankJar, setMonobankJar] = useState<string>('');
     const [monobankJarId, setMonobankJarId] = useState('');
-    const [tags, setTags] = useState<string[]>([]);
+    const [existingTags, setExistingTags] = useState<string[]>([]);
+    const [defaultTags, setDefaultTags] = useState<string[]>([]);
+    const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [jars, setJars] = useState<Jar[]>([])
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
     const [reports, setReports] = useState([])
-    const {addInfo} = useInfo()
+    const { sendNotification: addInfo } = useInfo()
     const inputFile = useRef<HTMLInputElement | null>(null)
     const navigate = useNavigate()
+    const { state } = useLocation()
 
-    const {state} = useLocation()
     const handleOpenJarsMenu = (event: any) => {
         setOpenJarsMenu(event.currentTarget);
     };
@@ -46,24 +50,34 @@ const EditFundraising = () => {
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error')
+            sendNotification('error', 'Unexpected error')
         }
     }
-    const handleTagsChange = (newTags: Array<string>) => {
-        setTags(newTags)
+
+    const getTags = async () => {
+        try {
+            const response = await Tags.getTags();
+            if (response) {
+                setExistingTags(response.map((tag) => tag.name))
+            }
+        }
+        catch (e) {
+            sendNotification('error', 'Unexpected error')
+        }
     }
+
     const uploadImage = async (fundraisingId: string, file: File) => {
         try {
             const response = await Fundraisings.uploadImage(fundraisingId, file)
             if (response.error) {
-                addInfo('error', response.error.message)
+                sendNotification('error', response.error.message)
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error while uploading image')
+            sendNotification('error', 'Unexpected error while uploading image')
         }
     }
-    const handleFileUpload =  (e: ChangeEvent<HTMLInputElement>) => {
+    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
         try {
             const { files } = e.target;
             if (files && files.length) {
@@ -77,7 +91,7 @@ const EditFundraising = () => {
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error while adding fundraising image')
+            sendNotification('error', 'Unexpected error while adding fundraising image')
         }
     }
     const handleDeleteFile = async () => {
@@ -93,13 +107,13 @@ const EditFundraising = () => {
             title,
             description,
             monobankJarId,
-            tags,
+            tags: selectedTags,
         }
         try {
             const response = await Fundraisings.updateFundraising(state.id, requestBody)
             if (response) {
                 if (response.error) {
-                    addInfo('error', response.error.message)
+                    sendNotification('error', response.error.message)
                 }
                 else {
                     const fundraisingId = response.data!.id
@@ -108,7 +122,7 @@ const EditFundraising = () => {
                     if (files && files.length > 0) {
                         await uploadImage(fundraisingId, files[0])
                     }
-                    addInfo('success', 'Fundraising has been successfully edited')
+                    sendNotification('success', 'Fundraising has been successfully edited')
                     navigate('/my-fundraisings')
 
                 }
@@ -126,9 +140,8 @@ const EditFundraising = () => {
             setDescription(description)
             setMonobankJarId(monobankJarId)
             setMonobankJar(monobankJar.title)
-            setTags(tags)
-            // @ts-ignore
             setReports(reports)
+            setDefaultTags(tags)
         }
         catch (e) {
             addInfo('error', 'Unexpected error')
@@ -137,6 +150,7 @@ const EditFundraising = () => {
     }
 
     useEffect(() => {
+        getTags();
         getMonobankJars()
         fetchData()
     }, []);
@@ -178,7 +192,6 @@ const EditFundraising = () => {
                         <LimitedTextField
                             label="Description"
                             maxChar={150}
-                            rows={3}
                             fullWidth
                             value={description}
                             onChange={(value) => setDescription(value)}
@@ -207,11 +220,14 @@ const EditFundraising = () => {
                                 ))}
                             </Select>
                         </FormControl>
-                        <MuiChipsInput
-                            size={'small'}
-                            value={tags}
-                            onChange={handleTagsChange}
-                            placeholder={'Tags'}
+                        <MultiSelectWithChips
+                            freeSolo
+                            width='400px'
+                            limitTags={2}
+                            label="Tags"
+                            defaultValues={defaultTags}
+                            values={existingTags}
+                            onChange={(newTags) => setSelectedTags(newTags)}
                         />
                         <Button size={'large'} onClick={onSubmit}>Edit</Button>
                     </CardContent>

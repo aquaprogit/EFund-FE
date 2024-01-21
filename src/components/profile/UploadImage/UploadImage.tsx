@@ -1,7 +1,7 @@
 import React from 'react';
-import {Avatar, Box, Button, IconButton} from "@mui/material";
+import { Avatar, Box, Button, IconButton } from "@mui/material";
 import styles from './UploadImage.module.css';
-import {UploadImageProps} from "./UploadImage.types";
+import { UploadImageProps } from "./UploadImage.types";
 
 
 const UploadImage: React.FC<UploadImageProps> = (
@@ -10,32 +10,36 @@ const UploadImage: React.FC<UploadImageProps> = (
         url,
         handleFileUpload,
         handleDeleteFile,
-
     }
 ) => {
 
     const avatarOverridingStyles = {
-        height: '200px',
-        width: '200px'
+        height: '150px',
+        width: '150px'
     }
     return (
-        <Box className={styles.container}>
-            <IconButton onClick={() => (inputFile?.current as HTMLInputElement | null)?.click()}>
+        <Box className={styles.container}
+        >
+            <input
+                style={{ display: "none" }}
+                accept=".jpeg,.png,.jpg"
+                ref={inputFile}
+                onChange={handleFileUpload}
+                type="file"
+            />
+            <IconButton
+                onClick={() => (inputFile?.current as HTMLInputElement | null)?.click()}>
                 <Avatar
                     className={styles.profileAvatar}
                     sx={avatarOverridingStyles}
                     src={url}
                     alt="Profile Avatar" />
-                <input
-                    style={{ display: "none" }}
-                    accept=".jpeg,.png,.jpg"
-                    ref={inputFile}
-                    onChange={handleFileUpload}
-                    type="file"
-                />
+
             </IconButton>
             {!url.includes('Default') && (
-                <Button size="small" onClick={handleDeleteFile}>Delete Avatar</Button>
+                <Button
+                    className={styles.deleteAvatarButton}
+                    size="small" onClick={handleDeleteFile}>Delete Avatar</Button>
             )}
         </Box>
 

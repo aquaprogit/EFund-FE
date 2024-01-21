@@ -1,7 +1,7 @@
 import React, { useReducer } from 'react';
 import { Box, Button, TextField, Typography, TypographyVariant } from "@mui/material";
 import styles from './Info.module.css';
-import {UpdateUserInfo} from "../../../services/api/Users";
+import { UpdateUserInfo } from "../../../services/api/Users";
 
 type InfoItemProps = {
     id: string,
@@ -29,7 +29,8 @@ type State = {
 type Action =
     | { type: 'TOGGLE_EDIT' }
     | { type: 'UPDATE_VALUE', payload: { id: string, value: string } }
-    | {type: 'SAVE'}
+    | { type: 'SAVE' }
+    | { type: 'CANCEL' }
 
 const infoReducer = (state: State, action: Action): State => {
     switch (action.type) {
@@ -61,9 +62,9 @@ const InfoItem: React.FC<InfoItemProps> = ({ id, placeholder, variant, edit, val
         dispatch({ type: 'UPDATE_VALUE', payload: { id, value: event.target.value } });
     };
 
-
     return (
         <Box className={styles.infoItem}>
+            <Typography variant="body1">{placeholder}:</Typography>
             {edit ? (
                 <TextField
                     placeholder={placeholder}
@@ -72,7 +73,8 @@ const InfoItem: React.FC<InfoItemProps> = ({ id, placeholder, variant, edit, val
                     onChange={onChangeHandler}
                 />
             ) : (
-                <Typography variant={variant}>{value}</Typography>
+                <Typography
+                    variant={variant}>{value}</Typography>
             )}
         </Box>
     );
@@ -90,12 +92,11 @@ const Info: React.FC<InfoProps> = ({ info, updateHandler }) => {
         if (state.isEditing) {
             const values = Object.values(state.values);
             const dataToUpdate = keys.reduce((acc, key, currentIndex) => {
-                    // @ts-ignore
+                // @ts-ignore
                 acc[key] = values[currentIndex];
                 return acc;
             }, {});
 
-            console.log(dataToUpdate);
             updateHandler(dataToUpdate);
             dispatch({ type: 'SAVE' });
         } else {
@@ -105,7 +106,6 @@ const Info: React.FC<InfoProps> = ({ info, updateHandler }) => {
 
     return (
         <Box className={styles.info}>
-            <Typography variant={'h5'}>Info:</Typography>
             {info.map(({ initialValue, placeholder, variant }) => (
                 <InfoItem
                     key={initialValue}
@@ -117,9 +117,12 @@ const Info: React.FC<InfoProps> = ({ info, updateHandler }) => {
                     dispatch={dispatch}
                 />
             ))}
-            <Button onClick={handleSave}>
-                {state.isEditing ? 'Save' : 'Edit'}
-            </Button>
+            <Box sx={{ display: 'flex', flexDirection: 'row' }}>
+                <Button onClick={handleSave}>
+                    {state.isEditing ? 'Save' : 'Edit'}
+                </Button>
+                {state.isEditing && (<Button onClick={() => dispatch({ type: 'CANCEL' })}>Cancel</Button>)}
+            </Box>
         </Box>
     );
 };
