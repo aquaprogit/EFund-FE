@@ -9,6 +9,7 @@ import {Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Selec
 import UploadImage from "../../components/profile/UploadImage/UploadImage";
 import LimitedTextField from "../../components/common/LimitedTextField";
 import {MuiChipsInput} from "mui-chips-input";
+import ReportSection from "../../components/Reports/ReportSection";
 
 const EditFundraising = () => {
     const defaultImage = 'http://localhost:8080/Uploads/Default/Fundraisings/avatar.png'
@@ -20,11 +21,12 @@ const EditFundraising = () => {
     const [tags, setTags] = useState<string[]>([]);
     const [jars, setJars] = useState<Jar[]>([])
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
+    const [reports, setReports] = useState([])
     const {addInfo} = useInfo()
     const inputFile = useRef<HTMLInputElement | null>(null)
     const navigate = useNavigate()
+
     const {state} = useLocation()
-    console.log(state)
     const handleOpenJarsMenu = (event: any) => {
         setOpenJarsMenu(event.currentTarget);
     };
@@ -118,13 +120,15 @@ const EditFundraising = () => {
     }
     const fetchData = async () => {
         try {
-            const {avatarUrl, title, description, monobankJarId, monobankJar, tags} = (await Fundraisings.getFundraising(state.id))!
+            const {avatarUrl, title, description, monobankJarId, monobankJar, tags, reports} = (await Fundraisings.getFundraising(state.id))!
             setImageUrl(avatarUrl)
             setTitle(title)
             setDescription(description)
             setMonobankJarId(monobankJarId)
             setMonobankJar(monobankJar.title)
             setTags(tags)
+            // @ts-ignore
+            setReports(reports)
         }
         catch (e) {
             addInfo('error', 'Unexpected error')
@@ -213,6 +217,7 @@ const EditFundraising = () => {
                     </CardContent>
                 </Card>
                 <Typography variant={'h3'}>Reports</Typography>
+                <ReportSection setReports={setReports} reports={reports} fundraisingId={state.id}/>
             </Box>
         </PageWrapper>
     );
