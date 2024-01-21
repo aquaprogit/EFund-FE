@@ -4,9 +4,11 @@ import TextField from "@mui/material/TextField";
 import Monobank from "../../services/api/Monobank/Monobank";
 import useInfo from "../../hooks/useInfo";
 import { Typography } from '@mui/material';
+import { useUser } from '../../contexts/UserContext';
 
 const LinkToken = (props: { onClose: () => void }) => {
     const [token, setToken] = useState('')
+    const { refreshUser } = useUser();
     const { sendNotification: addInfo } = useInfo()
     const onSubmit = async () => {
         try {
@@ -17,6 +19,7 @@ const LinkToken = (props: { onClose: () => void }) => {
             }
             else if (response && response.success) {
                 addInfo('success', 'Token has been successfully linked')
+                await refreshUser();
                 props.onClose();
             }
         }

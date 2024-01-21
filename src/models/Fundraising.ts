@@ -1,4 +1,5 @@
 import Jar from "./Jar";
+import Report from "./Report";
 
 export default interface Fundraising{
     id: string;
@@ -10,5 +11,5 @@ export default interface Fundraising{
     isClosed: boolean;
     tags: string[];
     monobankJar: Jar;
-    reports: Array<any>
+    reports: Report[];
 }

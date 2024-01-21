@@ -1,6 +1,6 @@
 import { Box, Pagination, Skeleton } from "@mui/material";
 import FundraisingCard from "../common/FundraisingCard";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Tag } from "../../models/Tag";
 import Fundraising from "../../models/Fundraising";
 import useUser from "../../hooks/useUser";

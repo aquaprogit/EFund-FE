@@ -25,10 +25,6 @@ const MultiSelectWithChip = (props: {
         setSelectedOptions(value);
     };
 
-    const filterOptions = (options: string[], state: FilterOptionsState<string>) => {
-        return options.filter((option) => !state.inputValue.includes(option));
-    };
-
     useEffect(() => {
         if (props.defaultValues)
             setSelectedOptions(props.defaultValues);
@@ -45,7 +41,6 @@ const MultiSelectWithChip = (props: {
             options={props.values}
             value={selectedOptions}
             onChange={handleChange}
-            filterOptions={filterOptions}
             renderTags={(value: readonly string[], getTagProps) =>
                 value.map((option: string, index: number) => (
                     <Chip color='primary' variant="filled" label={option.toLowerCase()} {...getTagProps({ index })} />

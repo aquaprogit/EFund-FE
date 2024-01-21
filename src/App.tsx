@@ -102,7 +102,6 @@ const App: React.FC = () => (
               <Route path='/add-fundraising' element={<AddPage />} />
               <Route path='/my-fundraisings' element={<MyFundraisingsPage />} />
               <Route path='/edit-fundraising' element={<EditFundraising />} />
-              <Route path={'/add-report'} element={<AddReport />}/>
               <Route path="*" element={<h1 style={{ color: 'red' }} >Not Found</h1>} />
             </Routes>
           </BrowserRouter>
