@@ -23,5 +23,6 @@
 }
 
 .accordionsContainer{
-    width: 85%;
+    width: 80%;
+    min-width: 700px;
 }

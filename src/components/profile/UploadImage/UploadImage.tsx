@@ -39,7 +39,7 @@ const UploadImage: React.FC<UploadImageProps> = (
             {!url.includes('Default') && (
                 <Button
                     className={styles.deleteAvatarButton}
-                    style={{}} size="small" onClick={handleDeleteFile}>Delete Avatar</Button>
+                    size="small" onClick={handleDeleteFile}>Delete Avatar</Button>
             )}
         </Box>
 

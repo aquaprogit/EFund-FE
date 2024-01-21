@@ -87,10 +87,15 @@ const ProfilePage = () => {
                                     initialEmail={user.email}
                                     handleSaveClick={handleSaveClick}
                                 />
-                                <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2 }}>
-                                    <Typography variant="h6">Email:</Typography>
-                                    <Typography variant="h6">{user.email}</Typography>
-                                    <Button onClick={() => setOpenedDialogue('changeEmail')}>Change Email</Button>
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    gap: 2,
+                                    alignItems: 'center',
+                                }}>
+                                    <Typography variant="body1">Email:</Typography>
+                                    <Typography variant="body1">{user.email}</Typography>
+                                    <Button size="small" onClick={() => setOpenedDialogue('changeEmail')}>Change Email</Button>
                                 </Box>
                             </AccordionDetails>
                         </Accordion>

@@ -64,7 +64,7 @@ const InfoItem: React.FC<InfoItemProps> = ({ id, placeholder, variant, edit, val
 
     return (
         <Box className={styles.infoItem}>
-            <Typography variant="h6">{placeholder}:</Typography>
+            <Typography variant="body1">{placeholder}:</Typography>
             {edit ? (
                 <TextField
                     placeholder={placeholder}

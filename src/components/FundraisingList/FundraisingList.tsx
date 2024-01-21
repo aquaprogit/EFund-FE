@@ -1,23 +1,21 @@
 import { Box, Pagination, Skeleton } from "@mui/material";
 import FundraisingCard from "../common/FundraisingCard";
-import {useEffect, useState} from "react";
-import {Tag} from "../../models/Tag";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { Tag } from "../../models/Tag";
 import Fundraising from "../../models/Fundraising";
 import useUser from "../../hooks/useUser";
 import Fundraisings from "../../services/api/Fundraisings";
 import Tags from "../../services/api/Tags";
 import Search from "../common/Search";
-import MultiSelect from "../../components/common/MultiSelectWithChips";
+import MultiSelectWithChips from "../../components/common/MultiSelectWithChips";
 import PageWrapper from "../common/PageWrapper";
-
-
 
 type FundraisingListProps = {
     loader: Function;
     type?: 'USER' | 'ALL'
 }
 
-const FundraisingList: React.FC<FundraisingListProps> = ({loader, type='ALL'}) => {
+const FundraisingList: React.FC<FundraisingListProps> = ({ loader, type = 'ALL' }) => {
     const [tags, setTags] = useState<Tag[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [selectedLoading, setSelectedLoading] = useState<boolean>(false);
@@ -39,7 +37,7 @@ const FundraisingList: React.FC<FundraisingListProps> = ({loader, type='ALL'}) =
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const params = type === 'USER' ? {page, pageSize} : { page: page, pageSize: pageSize, tags: selectedTags, title: searchQuery }
+            const params = type === 'USER' ? { page, pageSize } : { page: page, pageSize: pageSize, tags: selectedTags, title: searchQuery }
             const fundraisings = await loader(params)
             // const fundraisings = await loadFunction({ page: page, pageSize: pageSize, tags: selectedTags, title: searchQuery });
             if (fundraisings && fundraisings?.items) {
@@ -103,14 +101,19 @@ const FundraisingList: React.FC<FundraisingListProps> = ({loader, type='ALL'}) =
                         }
                     }>
                         <Search onSearch={(query) => setSearchQuery(query)} />
-                        <MultiSelect names={tags.map((tag) => tag.name)} onChange={setSelectedTags} />
+                        <MultiSelectWithChips
+                            limitTags={2}
+                            width="350px"
+                            label="Tags"
+                            values={tags.map((tag) => tag.name)}
+                            onChange={setSelectedTags} />
                     </Box >
                     <Box className='search-result-container'>
                         <div style={{
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            minWidth: 600,
+                            minWidth: 650,
                             gap: '20px',
                         }}>
                             {
@@ -136,7 +139,7 @@ const FundraisingList: React.FC<FundraisingListProps> = ({loader, type='ALL'}) =
                             }
                         </div>
                         <Pagination sx={{
-                            display: totalPages > 1 ? 'flex' : 'none',
+                            display: totalPages >= 1 ? 'flex' : 'none',
                             justifyContent: 'center',
                         }} count={totalPages} page={page} onChange={(_, value) => setPage(value)} />
                     </Box>

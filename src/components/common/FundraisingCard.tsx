@@ -1,6 +1,8 @@
-import { Card, CardMedia, Typography, LinearProgress, Box, CardContent, Button, Chip, Link } from '@mui/material';
+import { Card, CardMedia, Typography, LinearProgress, Box, CardContent, Button, Chip, Link, Accordion, AccordionActions, AccordionDetails, AccordionSummary, Avatar } from '@mui/material';
 import Fundraising from '../../models/Fundraising';
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useState } from 'react';
 
 interface FundraisingCardProps {
     fundraising: Fundraising;
@@ -11,12 +13,14 @@ interface FundraisingCardProps {
 }
 
 const FundraisingCard = (props: FundraisingCardProps) => {
+
+    const [openedReport, setOpenedReport] = useState<string | false>(false);
     const { balance, goal, currencyCode, sendUrl } = props.fundraising.monobankJar;
     const textColor = props.selected ? 'primary.contrastText' : 'text.primary';
     const progress = (balance / goal) * 100;
     const navigate = useNavigate()
     const onEditClick = () => {
-        navigate('/edit-fundraising', {state: {id: props.fundraising.id}})
+        navigate('/edit-fundraising', { state: { id: props.fundraising.id } })
     }
     return (
         props.size === 'small' ?
@@ -36,15 +40,30 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                     }}
                 >
                     <CardMedia
-                        component="img"
                         sx={{
-                            width: 75,
-                            height: 75,
-                            objectFit: 'initial',
+                            height: 100,
+                            width: 100,
                         }}
-                        image={props.fundraising.avatarUrl}
-                        alt={props.fundraising.title}
-                    />
+                    >
+                        <Avatar
+                            style={{
+                                objectFit: 'fill',
+                                height: 100,
+                                width: 100,
+                            }}
+                            src={props.fundraising.avatarUrl}
+                            alt={props.fundraising.title}
+                        />
+                        {/* <img
+                            style={{
+                                objectFit: 'fill',
+                                height: 100,
+                                width: 100,
+                            }}
+                            src={props.fundraising.avatarUrl}
+                            alt={props.fundraising.title}
+                        /> */}
+                    </CardMedia>
                     <CardContent sx={{
                         flexGrow: 1,
                         display: 'flex',
@@ -107,15 +126,30 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                     }}
                 >
                     <CardMedia
-                        component="img"
                         sx={{
-                            width: 250,
-                            height: 250,
-                            objectFit: 'initial',
+                            height: 175,
+                            width: 175,
                         }}
-                        image={props.fundraising.avatarUrl}
-                        alt={props.fundraising.title}
-                    />
+                    >
+                        <Avatar
+                            style={{
+                                objectFit: 'fill',
+                                height: 175,
+                                width: 175,
+                            }}
+                            src={props.fundraising.avatarUrl}
+                            alt={props.fundraising.title}
+                        />
+                        {/* <img
+                            style={{
+                                objectFit: 'fill',
+                                height: 175,
+                                width: 175,
+                            }}
+                            src={props.fundraising.avatarUrl}
+                            alt={props.fundraising.title}
+                        /> */}
+                    </CardMedia>
                     <CardContent sx={{
                         flexGrow: 1,
                         display: 'flex',
@@ -171,8 +205,58 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                                 Go to Monobank
                             </Button>
                         </Link>
+                        <Box sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                        }} mt={5}>
+                            <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel1-content"
+                                    id="panel1-header"
+                                >
+                                    Accordion 1
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                                    malesuada lacus ex, sit amet blandit leo lobortis eget.
+                                </AccordionDetails>
+                            </Accordion>
+                            <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel2-content"
+                                    id="panel2-header"
+                                >
+                                    Accordion 2
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                                    malesuada lacus ex, sit amet blandit leo lobortis eget.
+                                </AccordionDetails>
+                            </Accordion>
+                            <Accordion>
+                                <AccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="panel3-content"
+                                    id="panel3-header"
+                                >
+                                    Accordion Actions
+                                </AccordionSummary>
+                                <AccordionDetails>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
+                                    malesuada lacus ex, sit amet blandit leo lobortis eget.
+                                </AccordionDetails>
+                                <AccordionActions>
+                                    <Button>Cancel</Button>
+                                    <Button>Agree</Button>
+                                </AccordionActions>
+                            </Accordion>
+                        </Box>
                     </CardContent>
-                </Card>
+                </Card >
             </>
     );
 };

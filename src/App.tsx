@@ -85,7 +85,7 @@ const lightTheme = createTheme({
 });
 
 const App: React.FC = () => (
-  <ThemeProvider theme={darkTheme}>
+  <ThemeProvider theme={lightTheme}>
     <ToasterContextProvider>
       <Toaster />
       <GoogleOAuthProvider clientId="389428898545-0si1v4m7uojr1m4gfspehhvpn91120pb.apps.googleusercontent.com">

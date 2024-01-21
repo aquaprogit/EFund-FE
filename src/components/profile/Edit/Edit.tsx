@@ -18,7 +18,7 @@ const Edit: React.FC<EditProps> = (
         {
             initialValue: initialName,
             placeholder: 'Name',
-            variant: 'h6' as TypographyVariant,
+            variant: 'body1' as TypographyVariant,
         },
     ], []);
     return (
