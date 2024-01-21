@@ -8,8 +8,10 @@ import PageWrapper from "../../components/common/PageWrapper";
 import { Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, Skeleton, Typography } from "@mui/material";
 import UploadImage from "../../components/profile/UploadImage/UploadImage";
 import LimitedTextField from "../../components/common/LimitedTextField";
+import ReportSection from "../../components/Reports/ReportSection";
 import MultiSelectWithChips from '../../components/common/MultiSelectWithChips';
 import Tags from '../../services/api/Tags';
+
 
 const EditFundraising = () => {
     const defaultImage = 'http://localhost:8080/Uploads/Default/Fundraisings/avatar.png'
@@ -23,6 +25,7 @@ const EditFundraising = () => {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [jars, setJars] = useState<Jar[]>([])
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
+    const [reports, setReports] = useState([])
     const { sendNotification: addInfo } = useInfo()
     const inputFile = useRef<HTMLInputElement | null>(null)
     const navigate = useNavigate()
@@ -47,7 +50,7 @@ const EditFundraising = () => {
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error')
+            sendNotification('error', 'Unexpected error')
         }
     }
 
@@ -59,7 +62,7 @@ const EditFundraising = () => {
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error')
+            sendNotification('error', 'Unexpected error')
         }
     }
 
@@ -67,11 +70,11 @@ const EditFundraising = () => {
         try {
             const response = await Fundraisings.uploadImage(fundraisingId, file)
             if (response.error) {
-                addInfo('error', response.error.message)
+                sendNotification('error', response.error.message)
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error while uploading image')
+            sendNotification('error', 'Unexpected error while uploading image')
         }
     }
     const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
@@ -88,7 +91,7 @@ const EditFundraising = () => {
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error while adding fundraising image')
+            sendNotification('error', 'Unexpected error while adding fundraising image')
         }
     }
     const handleDeleteFile = async () => {
@@ -110,7 +113,7 @@ const EditFundraising = () => {
             const response = await Fundraisings.updateFundraising(state.id, requestBody)
             if (response) {
                 if (response.error) {
-                    addInfo('error', response.error.message)
+                    sendNotification('error', response.error.message)
                 }
                 else {
                     const fundraisingId = response.data!.id
@@ -119,7 +122,7 @@ const EditFundraising = () => {
                     if (files && files.length > 0) {
                         await uploadImage(fundraisingId, files[0])
                     }
-                    addInfo('success', 'Fundraising has been successfully edited')
+                    sendNotification('success', 'Fundraising has been successfully edited')
                     navigate('/my-fundraisings')
 
                 }
@@ -131,12 +134,13 @@ const EditFundraising = () => {
     }
     const fetchData = async () => {
         try {
-            const { avatarUrl, title, description, monobankJarId, monobankJar, tags } = (await Fundraisings.getFundraising(state.id))!
+            const {avatarUrl, title, description, monobankJarId, monobankJar, tags, reports} = (await Fundraisings.getFundraising(state.id))!
             setImageUrl(avatarUrl)
             setTitle(title)
             setDescription(description)
             setMonobankJarId(monobankJarId)
             setMonobankJar(monobankJar.title)
+            setReports(reports)
             setDefaultTags(tags)
         }
         catch (e) {
@@ -229,6 +233,7 @@ const EditFundraising = () => {
                     </CardContent>
                 </Card>
                 <Typography variant={'h3'}>Reports</Typography>
+                <ReportSection setReports={setReports} reports={reports} fundraisingId={state.id}/>
             </Box>
         </PageWrapper>
     );
