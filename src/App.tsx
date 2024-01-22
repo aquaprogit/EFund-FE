@@ -10,15 +10,12 @@ import ProfilePage from './pages/Profile/ProfilePage';
 import { UserProvider } from './contexts/UserContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import AddPage from './pages/fundraising/AddFundraisingPage';
-import ConfirmChangeEmail from "./pages/ChangeEmail/ConfirmChangeEmail";
 import ToasterContextProvider from "./contexts/ToasterContext";
 import Toaster from "./components/Toaster/Toaster";
-import AddPassword from "./pages/AddPassword/AddPassword";
-import LinkToken from "./pages/LinkToken/LinkToken";
-import ChangeEmail from "./pages/ChangeEmail/ChangeEmail";
 import MyFundraisingsPage from "./pages/fundraising/MyFundraisingsPage";
 import EditFundraising from "./pages/fundraising/EditFundraising";
-import AddReport from "./pages/Report/AddReport";
+import UsersPage from './pages/UsersPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
 
 const darkTheme = createTheme({
   palette: {
@@ -75,7 +72,7 @@ const lightTheme = createTheme({
     //   main: '#FF9800',
     // },
     background: {
-      default: '#ebf2fa',
+      default: '#f0ffff',
       paper: '#e2e2e2',
     },
     text: {
@@ -86,7 +83,7 @@ const lightTheme = createTheme({
 });
 
 const App: React.FC = () => (
-  <ThemeProvider theme={lightTheme}>
+  <ThemeProvider theme={darkTheme}>
     <ToasterContextProvider>
       <Toaster />
       <GoogleOAuthProvider clientId="389428898545-0si1v4m7uojr1m4gfspehhvpn91120pb.apps.googleusercontent.com">
@@ -102,6 +99,8 @@ const App: React.FC = () => (
               <Route path='/add-fundraising' element={<AddPage />} />
               <Route path='/my-fundraisings' element={<MyFundraisingsPage />} />
               <Route path='/edit-fundraising' element={<EditFundraising />} />
+              <Route path='/users' element={<UsersPage />} />
+              <Route path='/reset-password' element={<ResetPasswordPage />} />
               <Route path="*" element={<h1 style={{ color: 'red' }} >Not Found</h1>} />
             </Routes>
           </BrowserRouter>

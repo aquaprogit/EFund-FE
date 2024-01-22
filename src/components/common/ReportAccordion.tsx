@@ -13,7 +13,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import Report from '../../models/Report';
-import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
 interface ReportAccordionProps {

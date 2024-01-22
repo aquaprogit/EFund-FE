@@ -142,84 +142,92 @@ const AddPage = () => {
         <PageWrapper>
             {
                 user && user.hasMonobankToken
-                    ? (<Box className='content-wrapper'>
-                        <Typography variant='h5'>Creating Fundraising</Typography>
+                    ? (<Box sx={{
+                        mt: 10,
+                    }} className='content-wrapper'>
                         <Card style={{
                             display: 'flex',
-                            flexDirection: 'row',
+                            flexDirection: 'column',
                             gap: '15px',
                             padding: '25px',
                             paddingLeft: '20px',
                             height: '100%',
                             width: 800,
                         }}>
-                            <UploadImage
-                                inputFile={inputFile}
-                                handleFileUpload={handleFileUpload}
-                                handleDeleteFile={handleDeleteFile}
-                                url={imageUrl}
-                            />
-                            <CardContent style={{
-                                flexGrow: 1,
-                                padding: 0,
+                            <Typography textAlign={'center'} variant='h5'>Creating Fundraising</Typography>
+                            <Box sx={{
                                 display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'flex-start',
-                                gap: 5
+                                flexDirection: 'row',
+                                gap: '15px',
                             }}>
-                                <LimitedTextField
-                                    label="Title"
-                                    maxChar={50}
-                                    value={title}
-                                    fullWidth
-                                    onChange={(value) => setTitle(value)}
+                                <UploadImage
+                                    inputFile={inputFile}
+                                    handleFileUpload={handleFileUpload}
+                                    handleDeleteFile={handleDeleteFile}
+                                    url={imageUrl}
                                 />
-                                <LimitedTextField
-                                    label="Description"
-                                    maxChar={500}
-                                    fullWidth
-                                    value={description}
-                                    onChange={(value) => setDescription(value)}
-                                    multiline
-                                />
-                                <FormControl sx={{ ml: 0, mb: 1, mt: 1, minWidth: 200 }} size="small">
-                                    <InputLabel id="monobank-jar-label">Monobank jar</InputLabel>
-                                    <Select
-                                        labelId="monobank-jar-label"
-                                        id="monobank-jar"
-                                        value={monobankJar}
-                                        label="Monobank jar"
-                                        onChange={(e) => setMonobankJar(e.target.value)}
-                                        open={Boolean(openJarsMenu)}
-                                        onClose={handleCloseJarsMenu}
-                                        onOpen={handleOpenJarsMenu}
-                                    >
-                                        {jars && jars.map((jar) => (
-                                            <MenuItem
-                                                key={jar.title}
-                                                value={jar.title}
-                                                onClick={() => setMonobankJarId(jar.id)}
-                                            >
-                                                {jar.title}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                                <MultiSelectWithChip
-                                    label='Tags'
-                                    width="250px"
-                                    values={tags}
-                                    freeSolo
-                                    limitTags={2}
-                                    onChange={handleTagsChange}
-                                />
-                                <Button size={'large'} onClick={onSubmit}>Create</Button>
-                            </CardContent>
+                                <CardContent style={{
+                                    flexGrow: 1,
+                                    padding: 0,
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'flex-start',
+                                    gap: 5
+                                }}>
+                                    <LimitedTextField
+                                        label="Title"
+                                        maxChar={50}
+                                        value={title}
+                                        fullWidth
+                                        onChange={(value) => setTitle(value)}
+                                    />
+                                    <LimitedTextField
+                                        label="Description"
+                                        maxChar={500}
+                                        fullWidth
+                                        value={description}
+                                        onChange={(value) => setDescription(value)}
+                                        multiline
+                                    />
+                                    <FormControl sx={{ ml: 0, mb: 1, mt: 1, minWidth: 200 }} size="small">
+                                        <InputLabel id="monobank-jar-label">Monobank jar</InputLabel>
+                                        <Select
+                                            labelId="monobank-jar-label"
+                                            id="monobank-jar"
+                                            value={monobankJar}
+                                            label="Monobank jar"
+                                            onChange={(e) => setMonobankJar(e.target.value)}
+                                            open={Boolean(openJarsMenu)}
+                                            onClose={handleCloseJarsMenu}
+                                            onOpen={handleOpenJarsMenu}
+                                        >
+                                            {jars && jars.map((jar) => (
+                                                <MenuItem
+                                                    key={jar.title}
+                                                    value={jar.title}
+                                                    onClick={() => setMonobankJarId(jar.id)}
+                                                >
+                                                    {jar.title}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                    <MultiSelectWithChip
+                                        label='Tags'
+                                        width="250px"
+                                        values={tags}
+                                        freeSolo
+                                        limitTags={2}
+                                        onChange={handleTagsChange}
+                                    />
+                                    <Button size={'large'} onClick={onSubmit}>Create</Button>
+                                </CardContent>
+                            </Box>
                         </Card>
                     </Box>)
                     : <>{navigate('/')}</>
             }
-        </PageWrapper>
+        </PageWrapper >
     );
 }
 

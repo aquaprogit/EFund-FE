@@ -10,4 +10,9 @@ export type SignInFormFields = {
     password: string;
 };
 
+export type ResetPasswordFormFields = {
+    password: string;
+    confirmPassword: string;
+};
+
 export { };

@@ -6,7 +6,9 @@ import { Avatar, Divider, ListItemIcon, Menu, MenuItem, Typography } from '@mui/
 import { useState } from "react";
 import { stringAvatar } from "../../services/utils/convert";
 import { useUser } from "../../contexts/UserContext";
-import {CallToAction} from "@mui/icons-material";
+import { CallToAction } from "@mui/icons-material";
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
+import EmailIcon from '@mui/icons-material/Email';
 
 interface MenuAvatarProps {
     onSignOut: () => void;
@@ -14,6 +16,8 @@ interface MenuAvatarProps {
     onProfile: () => void;
     onAdd: () => void;
     onMyFundraising: () => void;
+    onUsers: () => void;
+    onInviteUser: () => void;
 }
 
 const MenuAvatar = (props: MenuAvatarProps) => {
@@ -79,23 +83,42 @@ const MenuAvatar = (props: MenuAvatarProps) => {
                     Profile
                 </MenuItem>
                 <Divider />
-                <MenuItem onClick={props.onAdd}>
-                    <ListItemIcon>
-                        <AddIcon fontSize="small" />
-                    </ListItemIcon>
-                    Add fundraising
-                </MenuItem>
+                {
+                    !user?.isAdmin && <MenuItem onClick={props.onAdd}>
+                        <ListItemIcon>
+                            <AddIcon fontSize="small" />
+                        </ListItemIcon>
+                        Add fundraising
+                    </MenuItem>
+                }
                 <MenuItem onClick={props.onMyFundraising}>
                     <ListItemIcon>
-                        <CallToAction/>
+                        <CallToAction />
                     </ListItemIcon>
                     My fundraising
                 </MenuItem>
                 <Divider />
-                <MenuItem>
-                    <ListItemIcon>
-                    </ListItemIcon>
-                </MenuItem>
+                {
+                    user && user.isAdmin && (
+                        <>
+                            <MenuItem onClick={props.onUsers}>
+                                <ListItemIcon>
+                                    <PeopleAltIcon />
+                                </ListItemIcon>
+                                Users
+                            </MenuItem>
+                            <MenuItem onClick={props.onInviteUser}>
+                                <ListItemIcon>
+                                    <EmailIcon />
+                                </ListItemIcon>
+                                Invite admin
+                            </MenuItem>
+                        </>
+                    )
+                }
+                {
+                    user && user.isAdmin && <Divider />
+                }
                 <MenuItem onClick={props.onSettings}>
                     <ListItemIcon>
                         <Settings fontSize="small" />
@@ -108,9 +131,9 @@ const MenuAvatar = (props: MenuAvatarProps) => {
                     </ListItemIcon>
                     Logout
                 </MenuItem>
-            </Menu >
+            </Menu>
         </>
     );
-};
+}
 
 export default MenuAvatar;

@@ -17,6 +17,7 @@ import Fundraising from '../../models/Fundraising';
 import { useNavigate } from "react-router-dom";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import FundraisingMenu from './FundraisingMenu';
 
 interface FundraisingCardProps {
     fundraising: Fundraising;
@@ -24,6 +25,7 @@ interface FundraisingCardProps {
     selected?: boolean;
     onClick?: (id: string) => void;
     isUser?: boolean
+    onDelete?: () => void;
 }
 
 const FundraisingCard = (props: FundraisingCardProps) => {
@@ -128,6 +130,12 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                         width: '100%',
                     }}
                 >
+                    <FundraisingMenu
+                        onEdit={onEditClick}
+                        onDelete={props.onDelete ?? (() => { })}
+                        fundraisingId={props.fundraising.id}
+                        ownerId={props.fundraising.userId}
+                    />
                     <CardMedia
                         sx={{
                             height: 175,
@@ -143,15 +151,6 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                             src={props.fundraising.avatarUrl}
                             alt={props.fundraising.title}
                         />
-                        {/* <img
-                            style={{
-                                objectFit: 'fill',
-                                height: 175,
-                                width: 175,
-                            }}
-                            src={props.fundraising.avatarUrl}
-                            alt={props.fundraising.title}
-                        /> */}
                     </CardMedia>
                     <CardContent sx={{
                         flexGrow: 1,
