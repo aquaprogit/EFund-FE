@@ -150,7 +150,7 @@ const UserCard = ({ user, onAction }: { user: User, onAction: () => void }) => {
                                         action: async (user) => {
                                             const result = await Users.makeAdmin({ userId: user.id });
                                             if (result) {
-                                                window.location.reload();
+                                                handleAction(() => { });
                                             }
                                         }
                                     });

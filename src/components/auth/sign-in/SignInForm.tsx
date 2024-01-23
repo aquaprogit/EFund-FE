@@ -90,6 +90,7 @@ const SignInForm = (props: SignInFormProps) => {
                 <AuthGoogleButton type="sign-in" label="Sign in with Google" />
             </Box>
             <Dialog
+                onClose={() => setDialogOpened(false)}
                 open={dialogOpened}
             >
                 <Box sx={{

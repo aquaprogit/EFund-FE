@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import FundraisingsReports, { AddReportBody } from "../../services/api/FundraisingsReports/FundraisingsReports";
-import { useNavigate } from "react-router-dom";
 import useInfo from "../../hooks/useInfo";
 import FileUpload from 'react-material-file-upload';
 import LimitedTextField from '../../components/common/LimitedTextField';
@@ -11,7 +10,6 @@ const AddReport = ({ onClose, fundraisingId }: { onClose: () => void, fundraisin
     const [description, setDescription] = useState('')
     const [files, setFiles] = useState<Array<File>>([])
     const { sendNotification } = useInfo()
-    const navigate = useNavigate()
     const createFormData = () => {
         const formData = new FormData();
 

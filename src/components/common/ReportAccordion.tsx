@@ -39,7 +39,7 @@ const ReportAccordion = ({ report, onReportDelete, onAttachmentDelete, mode }: R
         setDialogueOpen('attachment');
     }
 
-    return (<Accordion sx={{ width: '100%', maxWidth: '550px' }}>
+    return (<Accordion sx={{ width: '100%', minWidth: '400px', maxWidth: '550px' }}>
         <AccordionSummary
             sx={{ display: 'flex', flexDirection: 'row', gap: '10px' }}
             expandIcon={<ExpandMoreIcon />}

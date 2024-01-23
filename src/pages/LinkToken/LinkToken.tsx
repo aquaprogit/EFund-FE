@@ -3,7 +3,7 @@ import ChangeCreds from "../../templates/ChangeCreds/ChangeCreds";
 import TextField from "@mui/material/TextField";
 import Monobank from "../../services/api/Monobank/Monobank";
 import useInfo from "../../hooks/useInfo";
-import { Typography } from '@mui/material';
+import { Link, Typography } from '@mui/material';
 import { useUser } from '../../contexts/UserContext';
 
 const LinkToken = (props: { onClose: () => void }) => {
@@ -42,7 +42,7 @@ const LinkToken = (props: { onClose: () => void }) => {
             />
             <Typography
                 variant={'caption'}
-                sx={{ color: 'text.secondary' }}>You can get token <a href='https://api.monobank.ua/' target='_blank' rel='noreferrer'>here</a>
+                sx={{ color: 'text.secondary' }}>You can get token <Link underline='hover' href='https://api.monobank.ua/' target='_blank' rel='noreferrer'>here</Link>
             </Typography>
         </ChangeCreds>
     );

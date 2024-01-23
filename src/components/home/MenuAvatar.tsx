@@ -119,12 +119,6 @@ const MenuAvatar = (props: MenuAvatarProps) => {
                 {
                     user && user.isAdmin && <Divider />
                 }
-                <MenuItem onClick={props.onSettings}>
-                    <ListItemIcon>
-                        <Settings fontSize="small" />
-                    </ListItemIcon>
-                    Settings
-                </MenuItem>
                 <MenuItem onClick={props.onSignOut}>
                     <ListItemIcon>
                         <Logout fontSize="small" />

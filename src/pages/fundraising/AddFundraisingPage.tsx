@@ -176,7 +176,7 @@ const AddPage = () => {
                                 }}>
                                     <LimitedTextField
                                         label="Title"
-                                        maxChar={50}
+                                        maxChar={70}
                                         value={title}
                                         fullWidth
                                         onChange={(value) => setTitle(value)}

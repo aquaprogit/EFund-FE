@@ -27,7 +27,7 @@ const UsersPage = () => {
         const users = await Users.getUsers(params)
 
         if (users && users?.items) {
-            setUsers(users?.items?.filter((user) => user.id !== currentUser!.id));
+            setUsers(loadingUser ? users?.items?.filter((user) => user.id !== currentUser!.id) : users!.items);
             setTotalPages(users!.totalPages);
         }
         else {
