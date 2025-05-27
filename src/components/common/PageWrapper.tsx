@@ -1,10 +1,11 @@
-import { Box, Card, Link } from "@mui/material";
+import { Box, Card, Dialog, Link, TextField, Button, Typography, DialogTitle } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MenuAvatar from "../home/MenuAvatar";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import '../../styles/page-wrapper.css';
 import { useUser } from "../../contexts/UserContext";
 import useInfo from "../../hooks/useInfo";
+import Users from "../../services/api/Users";
 
 interface PageWrapperProps {
     children: ReactNode;
@@ -13,7 +14,10 @@ interface PageWrapperProps {
 const PageWrapper = ({ children }: PageWrapperProps) => {
     const { user, loading, updateUser, refreshUser } = useUser();
     const navigate = useNavigate();
-    const { sendNotification: addInfo } = useInfo()
+    const { sendNotification } = useInfo()
+
+    const [open, setOpen] = useState(false);
+    const [email, setEmail] = useState('');
 
     useEffect(() => {
         refreshUser();
@@ -21,7 +25,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
 
     const onAdd = () => {
         if (!user!.hasMonobankToken) {
-            addInfo('warning', 'Please link monobank token to your account to get access to this functionality')
+            sendNotification('warning', 'Please link monobank token to your account to get access to this functionality')
         }
         else {
             navigate('/add-fundraising')
@@ -46,6 +50,8 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
                         ? <></>
                         : (user ?
                             <MenuAvatar
+                                onInviteUser={() => setOpen(true)}
+                                onUsers={() => navigate('/users')}
                                 onSignOut={() => updateUser(null)}
                                 onSettings={() => navigate('/settings')}
                                 onProfile={() => navigate('/profile')}
@@ -74,8 +80,53 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
             </Box>
             <Card
                 className='footer'>
-                Footer
+
             </Card>
+            <Dialog
+                open={open}
+                onClose={() => setOpen(false)}
+            >
+                <Typography
+                    sx={{
+                        paddingTop: '20px',
+                        textAlign: 'center',
+                    }}
+                    variant="h4">Invite admin</Typography>
+                <Box sx={{
+                    width: '500px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 2,
+                    padding: '50px'
+                }}>
+                    <TextField
+                        sx={{
+                            width: '100%'
+                        }}
+                        label="Email"
+                        value={email}
+                        error={!!email && email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i) === null}
+                        helperText={!!email && email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i) === null ? 'Invalid email' : ''}
+                        onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <Button
+                        variant="contained"
+                        onClick={async () => {
+                            const result = await Users.inviteAdmin({ email });
+                            if (result) {
+                                sendNotification('success', 'User invited successfully');
+                            }
+                            else {
+                                sendNotification('error', 'Error during inviting user');
+                            }
+                            setOpen(false);
+                        }}
+                    >
+                        Invite
+                    </Button>
+                </Box>
+            </Dialog>
         </Box>
     );
 };

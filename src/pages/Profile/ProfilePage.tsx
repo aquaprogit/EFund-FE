@@ -2,17 +2,17 @@ import React, { ChangeEvent, useEffect, useRef } from "react";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Dialog, Typography } from "@mui/material";
 import PageWrapper from "../../components/common/PageWrapper";
 import '../../styles/profile-page.css';
-import Users, { UpdateUserInfo } from "../../services/api/Users";
+import Users from "../../services/api/Users";
 import { useUser } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import styles from "./ProfilePage.module.css";
-import Edit from "../../components/profile/Edit/Edit";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import UploadImage from "../../components/profile/UploadImage/UploadImage";
 import ChangePassword from "../ChangePassword/ChangePassword";
 import AddPassword from "../AddPassword/AddPassword";
 import ChangeEmail from "../ChangeEmail/ChangeEmail";
 import LinkToken from "../LinkToken/LinkToken";
+import EditName from "../../components/common/EditName";
 
 const ProfilePage = () => {
     const [openedDialogue, setOpenedDialogue] = React.useState<string | false>(false);
@@ -23,11 +23,6 @@ const ProfilePage = () => {
     useEffect(() => {
         refreshUser();
     }, []);
-
-    const handleSaveClick = async (data: UpdateUserInfo) => {
-        await Users.updateInfo(data);
-        await refreshUser();
-    };
 
     const handleChange =
         (panel: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
@@ -82,10 +77,16 @@ const ProfilePage = () => {
                                 <Typography sx={{ color: 'text.secondary' }}>User data description here</Typography>
                             </AccordionSummary>
                             <AccordionDetails>
-                                <Edit
+                                <Box sx={{
+                                    display: 'flex',
+                                    flexDirection: 'row',
+                                    gap: 2,
+                                    alignItems: 'center',
+                                }}>
+                                </Box>
+                                <EditName
                                     initialName={user.name}
-                                    initialEmail={user.email}
-                                    handleSaveClick={handleSaveClick}
+                                    refreshUser={async () => await refreshUser()}
                                 />
                                 <Box sx={{
                                     display: 'flex',

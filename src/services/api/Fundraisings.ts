@@ -40,6 +40,16 @@ const Fundraisings = {
             console.error()
         }
     },
+
+    async deleteFundraising(id: string) {
+        try {
+            return await API.delete(`/fundraisings/${id}`)
+        }
+        catch (e) {
+            console.error()
+        }
+    },
+
     async uploadImage(id: string, file: File) {
         const formData = new FormData();
         formData.append('file', file);

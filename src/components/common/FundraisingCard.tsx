@@ -1,8 +1,23 @@
-import { Card, CardMedia, Typography, LinearProgress, Box, CardContent, Button, Chip, Link, Accordion, AccordionActions, AccordionDetails, AccordionSummary, Avatar } from '@mui/material';
+import {
+    Card,
+    CardMedia,
+    Typography,
+    LinearProgress,
+    Box,
+    CardContent,
+    Button,
+    Chip,
+    Link,
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Avatar
+} from '@mui/material';
 import Fundraising from '../../models/Fundraising';
 import { useNavigate } from "react-router-dom";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { useState } from 'react';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
+import FundraisingMenu from './FundraisingMenu';
 
 interface FundraisingCardProps {
     fundraising: Fundraising;
@@ -10,11 +25,10 @@ interface FundraisingCardProps {
     selected?: boolean;
     onClick?: (id: string) => void;
     isUser?: boolean
+    onDelete?: () => void;
 }
 
 const FundraisingCard = (props: FundraisingCardProps) => {
-
-    const [openedReport, setOpenedReport] = useState<string | false>(false);
     const { balance, goal, currencyCode, sendUrl } = props.fundraising.monobankJar;
     const textColor = props.selected ? 'primary.contrastText' : 'text.primary';
     const progress = (balance / goal) * 100;
@@ -54,15 +68,6 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                             src={props.fundraising.avatarUrl}
                             alt={props.fundraising.title}
                         />
-                        {/* <img
-                            style={{
-                                objectFit: 'fill',
-                                height: 100,
-                                width: 100,
-                            }}
-                            src={props.fundraising.avatarUrl}
-                            alt={props.fundraising.title}
-                        /> */}
                     </CardMedia>
                     <CardContent sx={{
                         flexGrow: 1,
@@ -70,11 +75,11 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                         flexDirection: 'column',
                         gap: 0.5
                     }}>
-                        <Typography variant="h5" textOverflow={'ellipsis'} overflow={'hidden'} maxHeight={'30px'} component="div" color={textColor}>
+                        <Typography variant="h5" noWrap component="div" color={textColor}>
                             {props.fundraising.title.length > 37 ? props.fundraising.title.substring(0, 37) + '...' : props.fundraising.title}
                         </Typography>
                         <Typography variant="body2" textOverflow={'ellipsis'} overflow={'hidden'} maxHeight={'20px'} color={textColor}>
-                            {props.fundraising.description.length > 69 ? props.fundraising.description.substring(0, 69) + '...' : props.fundraising.description}
+                            {props.fundraising.description.length > 66 ? props.fundraising.description.substring(0, 66) + '...' : props.fundraising.description}
                         </Typography>
                         <Box
                             sx={{
@@ -95,7 +100,7 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                             {
                                 props.isUser &&
                                 <Button
-                                    color={props.selected ? 'secondary' : 'primary'}
+                                    color='primary'
                                     variant="contained"
                                     onClick={onEditClick}>
                                     Edit
@@ -125,6 +130,12 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                         width: '100%',
                     }}
                 >
+                    <FundraisingMenu
+                        onEdit={onEditClick}
+                        onDelete={props.onDelete ?? (() => { })}
+                        fundraisingId={props.fundraising.id}
+                        ownerId={props.fundraising.userId}
+                    />
                     <CardMedia
                         sx={{
                             height: 175,
@@ -140,15 +151,6 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                             src={props.fundraising.avatarUrl}
                             alt={props.fundraising.title}
                         />
-                        {/* <img
-                            style={{
-                                objectFit: 'fill',
-                                height: 175,
-                                width: 175,
-                            }}
-                            src={props.fundraising.avatarUrl}
-                            alt={props.fundraising.title}
-                        /> */}
                     </CardMedia>
                     <CardContent sx={{
                         flexGrow: 1,
@@ -211,49 +213,47 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                             alignItems: 'center',
                             justifyContent: 'center',
                         }} mt={5}>
-                            <Accordion>
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel1-content"
-                                    id="panel1-header"
-                                >
-                                    Accordion 1
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                                    malesuada lacus ex, sit amet blandit leo lobortis eget.
-                                </AccordionDetails>
-                            </Accordion>
-                            <Accordion>
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel2-content"
-                                    id="panel2-header"
-                                >
-                                    Accordion 2
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                                    malesuada lacus ex, sit amet blandit leo lobortis eget.
-                                </AccordionDetails>
-                            </Accordion>
-                            <Accordion>
-                                <AccordionSummary
-                                    expandIcon={<ExpandMoreIcon />}
-                                    aria-controls="panel3-content"
-                                    id="panel3-header"
-                                >
-                                    Accordion Actions
-                                </AccordionSummary>
-                                <AccordionDetails>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                                    malesuada lacus ex, sit amet blandit leo lobortis eget.
-                                </AccordionDetails>
-                                <AccordionActions>
-                                    <Button>Cancel</Button>
-                                    <Button>Agree</Button>
-                                </AccordionActions>
-                            </Accordion>
+                            {
+                                props.fundraising.reports.map(report => {
+                                    return (<Accordion sx={{ width: '100%', maxWidth: '550px' }}>
+                                        <AccordionSummary
+                                            expandIcon={<ExpandMoreIcon />}
+                                            aria-controls={report.id}
+                                            id='panel-header'
+                                        >
+                                            {
+                                                report.description.length <= 21
+                                                    ? (<>
+                                                        <Typography sx={{ width: '33%', flexShrink: 0 }}>
+                                                            {report.title}
+                                                        </Typography>
+
+                                                        <Typography sx={{ color: 'text.secondary' }}>{report.description}</Typography>
+                                                    </>)
+                                                    : <>{report.title}</>
+                                            }
+                                        </AccordionSummary>
+                                        <AccordionDetails>
+                                            {
+                                                report.description.length > 21
+                                                    ? <Typography style={{ wordWrap: 'break-word' }} variant="body1" component="div" textOverflow={'ellipsis'} overflow={'hidden'} >
+                                                        {report.description}
+                                                    </Typography>
+                                                    : <></>
+                                            }
+                                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                                                {
+                                                    report.attachments.map(attachment => {
+                                                        return (
+                                                            <a href={attachment.fileUrl} download={attachment.name} target='_blank' rel='noreferrer'>
+                                                                <Chip clickable color='info' label={attachment.name} icon={<InsertDriveFileIcon />} />
+                                                            </a>)
+                                                    })
+                                                }
+                                            </Box>
+                                        </AccordionDetails>
+                                    </Accordion>)
+                                })}
                         </Box>
                     </CardContent>
                 </Card >

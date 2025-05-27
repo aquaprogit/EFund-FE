@@ -1,6 +1,6 @@
 import { Box, Pagination, Skeleton } from "@mui/material";
 import FundraisingCard from "../common/FundraisingCard";
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Tag } from "../../models/Tag";
 import Fundraising from "../../models/Fundraising";
 import useUser from "../../hooks/useUser";
@@ -34,23 +34,23 @@ const FundraisingList: React.FC<FundraisingListProps> = ({ loader, type = 'ALL' 
 
     const pageSize = 3;
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            const params = type === 'USER' ? { page, pageSize } : { page: page, pageSize: pageSize, tags: selectedTags, title: searchQuery }
-            const fundraisings = await loader(params)
-            // const fundraisings = await loadFunction({ page: page, pageSize: pageSize, tags: selectedTags, title: searchQuery });
-            if (fundraisings && fundraisings?.items) {
-                setFundraisings(fundraisings!.items);
-                setTotalPages(fundraisings!.totalPages);
-            }
-            else {
-                setFundraisings([]);
-                setTotalPages(1);
-            }
-            setLoading(false);
+    const fetchFundraisings = async () => {
+        setLoading(true);
+        const params = type === 'USER' ? { page, pageSize } : { page: page, pageSize: pageSize, tags: selectedTags, title: searchQuery }
+        const fundraisings = await loader(params)
+        if (fundraisings && fundraisings?.items) {
+            setFundraisings(fundraisings!.items);
+            setTotalPages(fundraisings!.totalPages);
         }
-        fetchData();
+        else {
+            setFundraisings([]);
+            setTotalPages(1);
+        }
+        setLoading(false);
+    }
+
+    useEffect(() => {
+        fetchFundraisings();
     }, [selectedTags, searchQuery, page]);
 
     useEffect(() => {
@@ -152,6 +152,11 @@ const FundraisingList: React.FC<FundraisingListProps> = ({ loader, type = 'ALL' 
                                 selectedFundraising &&
                                 <FundraisingCard
                                     fundraising={selectedFundraising}
+                                    onDelete={() => {
+                                        setSelectedFundraisingId(undefined);
+                                        setSelectedFundraising(undefined);
+                                        fetchFundraisings();
+                                    }}
                                     size="large" />
                             )
                     }

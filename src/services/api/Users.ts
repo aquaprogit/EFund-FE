@@ -1,6 +1,10 @@
+import { SearchUsersRequest } from '../../models/api/request/UsersRequest';
+import { APIResponseBase } from '../../models/api/response/base/APIResponseBase';
+import Paged from "../../models/api/response/base/Paged";
+import User from "../../models/user/User";
 import API from "./repository/API";
 
-export type UpdateUserInfo = { [key: string]: string }
+export type UpdateUserInfo = { name: string }
 export type AddPassword = {password: string}
 export type ChangePassword = {oldPassword: string, newPassword: string}
 
@@ -35,6 +39,31 @@ const Users = {
         catch (e) {
             console.error(e)
         }
+    },
+
+    async getUsers(request: SearchUsersRequest): Promise<Paged<User> | undefined> {
+        try {
+            const response = await API.postPaged<SearchUsersRequest, Paged<User>>('/users/search', request);
+            return response.data;
+        }
+        catch (e) {
+            console.error(e)
+        }
+    },
+
+    async makeAdmin(request: { userId: string }): Promise<boolean> {
+        const response = await API.post('/users/make-admin', request);
+        return response.success;
+    },
+
+    async action(request: { userId: string, action: 'block' | 'unblock' }): Promise<boolean> {
+        const response = await API.post('/users/action', request);
+        return response.success;
+    },
+
+    async inviteAdmin(request: { email: string }): Promise<boolean> {
+        const response = await API.post('/users/invite-admin', request);
+        return response.success;
     }
 }
 

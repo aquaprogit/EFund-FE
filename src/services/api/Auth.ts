@@ -81,21 +81,6 @@ const Auth = {
             return undefined;
         }
 
-
-        // if (retry) {
-
-        //     const tokens = {
-        //         accessToken: localStorage.getItem('accessToken') ?? '',
-        //         refreshToken: localStorage.getItem('refreshToken') ?? ''
-        //     };
-
-        //     if (!tokens.accessToken || !tokens.refreshToken)
-        //         return undefined;
-
-        //     Auth.silentRefresh(tokens);
-        //     return Auth.me(false);
-        // }
-
         return undefined;
     },
 
@@ -164,8 +149,25 @@ const Auth = {
         catch (e) {
             console.error(e);
         }
-    }
+    },
 
+    async forgotPassword(requestBody: {email: string}) {
+        try {
+            return await API.post('/auth/forgot-password', requestBody);
+        }
+        catch (e) {
+            console.error(e);
+        }
+    },
+
+    async resetPassword(requestBody: { email: string, token: string, newPassword: string }) {
+        try {
+            return await API.post('/auth/reset-password', requestBody);
+        }
+        catch (e) {
+            console.error(e);
+        }
+    }
 };
 
 export default Auth;

@@ -5,7 +5,7 @@ export type AddReportBody = {
     fundraisingId: string
 }
 class FundraisingsReports {
-    static async addReport (body: AddReportBody) {
+    static async addReport(body: AddReportBody) {
         try {
             return await API.post('/fundraising-reports', body)
         }
@@ -13,7 +13,7 @@ class FundraisingsReports {
             console.error(e)
         }
     }
-    static async addAttachments (id: string, body: FormData) {
+    static async addAttachments(id: string, body: FormData) {
         try {
             return await API.post(`/fundraising-reports/${id}/attachments`, body)
         }
@@ -21,7 +21,7 @@ class FundraisingsReports {
             console.error(e)
         }
     }
-    static async getReport (id: string) {
+    static async getReport(id: string) {
         try {
             return await API.get(`/fundraising-reports/${id}`)
         }
@@ -31,13 +31,22 @@ class FundraisingsReports {
         }
     }
 
-    static async deleteReport (id: string) {
+    static async deleteReport(id: string) {
         try {
             return await API.delete(`/fundraising-reports/${id}`)
         }
         catch (e) {
             console.error(e)
 
+        }
+    }
+
+    static async deleteAttachment(reportId: string, id: string) {
+        try {
+            return await API.delete(`/fundraising-reports/${reportId}/attachments/${id}`)
+        }
+        catch (e) {
+            console.error(e)
         }
     }
 }

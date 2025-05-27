@@ -3,7 +3,7 @@ import Auth from "../services/api/Auth";
 import SignUpForm from "../components/auth/sign-up/SignUpForm";
 import { Box, Paper, Step, StepLabel, Typography } from "@mui/material";
 import { ConfirmEmailRequest, SignUpRequest } from '../models/api/request/AuthRequests';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Stepper from '@mui/material/Stepper';
 import EmailConfirmForm from "../components/auth/sign-up/EmailConfirmForm";
 import useNotification from "../hooks/useNotification";
@@ -12,13 +12,17 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useUser } from "../contexts/UserContext";
 
 const SignUpPage = () => {
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const adminToken = queryParams.get('adminToken') ?? undefined;
+
     const { updateUser } = useUser();
     const navigate = useNavigate();
 
     const { notifyError, Notification } = useNotification();
 
     const signUp = async (request: SignUpRequest) => {
-        const response = await Auth.signUp(request);
+        const response = await Auth.signUp({ ...request, adminToken });
 
         if (response !== undefined)
             setUserId(response.userId);

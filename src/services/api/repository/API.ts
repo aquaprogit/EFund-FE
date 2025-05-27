@@ -3,7 +3,7 @@ import { APIRequestBase } from '../../../models/api/request/base/APIRequestBase'
 import { ErrorModel } from '../../../models/api/response/base/ErrorModel';
 import { PagedRequest } from '../../../models/api/request/base/PagedRequest';
 
-const API_URL = 'http://localhost:8080/api';
+const API_URL = 'https://localhost:7008/api';
 
 interface APIResponse<T> {
     success: boolean;
