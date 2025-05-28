@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const signUpSchema = z.object({
+const baseSchema = z.object({
     name: z.string()
         .min(2, 'Name must be at least 2 characters')
         .max(50, 'Name must not exceed 50 characters'),
@@ -15,6 +15,16 @@ export const signUpSchema = z.object({
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
-}).transform(({ confirmPassword, ...rest }) => rest); // Remove confirmPassword before sending to API
+});
 
-export type SignUpFormData = z.infer<typeof signUpSchema>; 
+export const signUpSchema = baseSchema;
+
+export type SignUpFormData = z.infer<typeof baseSchema>;
+
+export const transformSignUpData = (data: SignUpFormData) => {
+    const { confirmPassword, ...rest } = data;
+    return rest;
+};
+
+// If you need a type without confirmPassword for API calls
+export type SignUpRequestData = Omit<SignUpFormData, 'confirmPassword'>; 

@@ -9,7 +9,7 @@ import '../styles/sign-up.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useUser } from "../contexts/UserContext";
 import { useAuth } from "../store/auth.store";
-import { SignUpFormData } from "../schemas/auth/signUpSchema";
+import { transformSignUpData } from "../schemas/auth/signUpSchema";
 
 const SignUpPage = () => {
     const location = useLocation();
@@ -21,7 +21,7 @@ const SignUpPage = () => {
     const navigate = useNavigate();
     const { notifyError, Notification } = useNotification();
 
-    const handleSignUp = async (data: SignUpFormData) => {
+    const handleSignUp = async (data: ReturnType<typeof transformSignUpData>) => {
         const userId = await signUp({ ...data, adminToken });
         if (userId) {
             setUserId(userId);

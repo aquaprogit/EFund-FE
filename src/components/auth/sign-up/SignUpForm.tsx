@@ -1,10 +1,10 @@
 import { Box, TextField, Button } from "@mui/material";
 import AuthGoogleButton from '../../google/SignInGoogle';
 import { useZodForm } from "../../../hooks/useZodForm";
-import { SignUpFormData, signUpSchema } from "../../../schemas/auth/signUpSchema";
+import { SignUpFormData, signUpSchema, transformSignUpData } from "../../../schemas/auth/signUpSchema";
 
 interface SignUpFormProps {
-    onSubmit: (data: SignUpFormData) => void;
+    onSubmit: (data: ReturnType<typeof transformSignUpData>) => void;
 }
 
 const SignUpForm = (props: SignUpFormProps) => {
@@ -14,6 +14,10 @@ const SignUpForm = (props: SignUpFormProps) => {
         formState: { errors },
     } = useZodForm(signUpSchema);
 
+    const handleFormSubmit = (data: SignUpFormData) => {
+        props.onSubmit(transformSignUpData(data));
+    };
+
     return (
         <Box width='500px'>
             <Box
@@ -21,7 +25,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                 flexDirection={'column'}
                 sx={{ gap: 3, margin: 5, mt: 10, mb: 10 }}
                 component="form"
-                onSubmit={handleSubmit(props.onSubmit)}>
+                onSubmit={handleSubmit(handleFormSubmit)}>
                 <TextField
                     id="name"
                     label="Name"
