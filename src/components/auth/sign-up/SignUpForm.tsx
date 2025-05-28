@@ -1,12 +1,10 @@
-import { useForm } from 'react-hook-form';
 import { Box, TextField, Button } from "@mui/material";
-import { yupResolver } from '@hookform/resolvers/yup';
-import { SignUpFormFields } from '../../../models/form/auth/AuthFormFields';
-import signUpFormValidation from '../../../validation/forms/SignUpFormFieldsValidation';
 import AuthGoogleButton from '../../google/SignInGoogle';
+import { useZodForm } from "../../../hooks/useZodForm";
+import { SignUpFormData, signUpSchema } from "../../../schemas/auth/signUpSchema";
 
 interface SignUpFormProps {
-    onSubmit: (data: SignUpFormFields) => void;
+    onSubmit: (data: SignUpFormData) => void;
 }
 
 const SignUpForm = (props: SignUpFormProps) => {
@@ -14,11 +12,7 @@ const SignUpForm = (props: SignUpFormProps) => {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<SignUpFormFields>({
-        resolver: yupResolver(signUpFormValidation),
-        reValidateMode: 'onChange',
-        mode: 'onTouched'
-    });
+    } = useZodForm(signUpSchema);
 
     return (
         <Box width='500px'>
@@ -30,7 +24,6 @@ const SignUpForm = (props: SignUpFormProps) => {
                 onSubmit={handleSubmit(props.onSubmit)}>
                 <TextField
                     id="name"
-                    type="text"
                     label="Name"
                     {...register('name')}
                     error={!!errors.name}

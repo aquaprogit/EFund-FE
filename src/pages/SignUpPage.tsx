@@ -1,8 +1,6 @@
 import React from "react";
-import Auth from "../services/api/Auth";
 import SignUpForm from "../components/auth/sign-up/SignUpForm";
 import { Box, Paper, Step, StepLabel, Typography } from "@mui/material";
-import { ConfirmEmailRequest, SignUpRequest } from '../models/api/request/AuthRequests';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Stepper from '@mui/material/Stepper';
 import EmailConfirmForm from "../components/auth/sign-up/EmailConfirmForm";
@@ -10,129 +8,71 @@ import useNotification from "../hooks/useNotification";
 import '../styles/sign-up.css';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useUser } from "../contexts/UserContext";
+import { useAuth } from "../store/auth.store";
+import { SignUpFormData } from "../schemas/auth/signUpSchema";
 
 const SignUpPage = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const adminToken = queryParams.get('adminToken') ?? undefined;
 
-    const { updateUser } = useUser();
+    const { refreshUser } = useUser();
+    const { signUp, confirmEmail } = useAuth();
     const navigate = useNavigate();
-
     const { notifyError, Notification } = useNotification();
 
-    const signUp = async (request: SignUpRequest) => {
-        const response = await Auth.signUp({ ...request, adminToken });
-
-        if (response !== undefined)
-            setUserId(response.userId);
-        else
+    const handleSignUp = async (data: SignUpFormData) => {
+        const userId = await signUp({ ...data, adminToken });
+        if (userId) {
+            setUserId(userId);
+        } else {
             notifyError("Error during signing up");
+        }
     }
 
-    const confirmEmail = async (request: ConfirmEmailRequest) => {
-        const response = await Auth.confirmEmail(request);
+    const handleConfirmEmail = async (code: string) => {
+        if (!userId) return;
 
-        if (response === undefined) {
-            const user = await Auth.me();
+        const success = await confirmEmail({ userId, code });
+        if (success) {
+            const user = await refreshUser();
             if (user) {
-                updateUser(user);
                 navigate('/');
             } else {
                 notifyError('Error during signing in');
             }
-        }
-        else {
+        } else {
             notifyError("Error during confirming email");
         }
     }
 
     const [userId, setUserId] = React.useState<string | undefined>(undefined);
     const activeStep = userId ? 1 : 0;
-    const steps = [
-        {
-            label: 'Sign Up',
-            description: 'Enter your personal information',
-            content: (
-                <SignUpForm onSubmit={(fields) => signUp(fields)} />
-            ),
-        },
-        {
-            label: 'Email confirmation',
-            description: 'Enter the confirmation code sent to your email',
-            content: (
-                <EmailConfirmForm
-                    userId={userId!}
-                    onSubmit={(confirmationNumber) => {
-                        return confirmEmail({ code: confirmationNumber, userId: userId! });
-                    }} />
-            ),
-        },
-    ];
 
     return (
-        <>
-            <Paper
-                elevation={3}
-                className="sign-up-paper">
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: '15px',
-                        left: '15px',
-                        display: 'flex',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: '10px',
-                        cursor: 'pointer'
-                    }}
-                    onClick={() => navigate('/')}>
-                    <ArrowBackIcon />
-                </Box>
-                <Box>
-                    <Box className="sign-up-header">
-                        <Typography
-                            className="sign-up-title"
-                            variant='h4'>
-                            {steps[activeStep].label}
-                        </Typography>
-                        <Typography
-                            className="sign-up-description"
-                            variant='subtitle1'>
-                            {steps[activeStep].description}
-                        </Typography>
-                    </Box>
-                    <Box
-                        key={steps[activeStep].label}
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            textAlign: 'center'
-                        }}>
-                        {steps[activeStep].content}
-                    </Box>
-                </Box>
-                <Box sx={{
-                    width: '100%',
-                    position: 'absolute',
-                    bottom: '15px',
-                }}>
-                    <Stepper
-                        alternativeLabel
-                        activeStep={activeStep}
-                        orientation='horizontal'>
-                        <Step>
-                            <StepLabel>Info</StepLabel>
-                        </Step>
-                        <Step>
-                            <StepLabel>Email confirmation</StepLabel>
-                        </Step>
-                    </Stepper>
-                </Box>
-            </Paper >
+        <Box className="sign-up-page">
             <Notification />
-        </>
+            <Box className="back-button" onClick={() => navigate('/')}>
+                <ArrowBackIcon />
+                <Typography>Back to home</Typography>
+            </Box>
+            <Paper elevation={3} className="sign-up-container">
+                <Typography variant="h4" textAlign={'center'}>Sign Up</Typography>
+                <Stepper activeStep={activeStep}>
+                    <Step>
+                        <StepLabel>Sign Up</StepLabel>
+                    </Step>
+                    <Step>
+                        <StepLabel>Confirm Email</StepLabel>
+                    </Step>
+                </Stepper>
+                {!userId ? (
+                    <SignUpForm onSubmit={handleSignUp} />
+                ) : (
+                    <EmailConfirmForm onSubmit={handleConfirmEmail} />
+                )}
+            </Paper>
+        </Box>
     );
 };
 

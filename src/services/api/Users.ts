@@ -1,12 +1,11 @@
 import { SearchUsersRequest } from '../../models/api/request/UsersRequest';
-import { APIResponseBase } from '../../models/api/response/base/APIResponseBase';
 import Paged from "../../models/api/response/base/Paged";
 import User from "../../models/user/User";
-import API from "./repository/API";
+import API from "./repository/api";
 
 export type UpdateUserInfo = { name: string }
-export type AddPassword = {password: string}
-export type ChangePassword = {oldPassword: string, newPassword: string}
+export type AddPassword = { password: string }
+export type ChangePassword = { oldPassword: string, newPassword: string }
 
 const Users = {
     async uploadAvatar(file: File): Promise<boolean> {

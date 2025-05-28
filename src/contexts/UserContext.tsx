@@ -1,11 +1,13 @@
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
 import User from "../models/user/User";
-import Auth from "../services/api/Auth";
+import { useAuth } from "../store/auth.store";
+import { userRepository } from "../repository/userRepository";
 
-export type RefreshUser = () => Promise<User | null> ;
+export type RefreshUser = () => Promise<User | null>;
+
 interface UserContextProps {
     user: User | null;
-    updateUser: (newUser: User | null) => void;
+    updateUser: (user: User | null) => void;
     refreshUser: RefreshUser;
     loading: boolean;
 }
@@ -19,11 +21,11 @@ export const useUser = () => {
 export const UserProvider = ({ children }: PropsWithChildren) => {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
+    const { accessToken, refreshToken, signOut } = useAuth();
 
     const updateUser = (newUser: User | null) => {
         if (!newUser) {
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('refreshToken');
+            signOut();
             setUser(null);
         }
         else {
@@ -33,17 +35,24 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
 
     const refreshUser = async (): Promise<User | null> => {
         setLoading(true);
-        const user = await Auth.me();
+        const response = await userRepository.me();
         setLoading(false);
-        setUser(user ?? null);
-        return user ?? null;
+        
+        if (response.isSuccess && response.data) {
+            setUser(response.data);
+            return response.data;
+        }
+        
+        signOut();
+        setUser(null);
+        return null;
     }
 
     useEffect(() => {
-        if (!user) {
+        if (!user && accessToken && refreshToken) {
             refreshUser();
         }
-    }, [user]);
+    }, [user, accessToken, refreshToken]);
 
     return (
         <UserContext.Provider value={{ user, updateUser, refreshUser, loading }}>

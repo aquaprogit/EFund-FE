@@ -1,4 +1,4 @@
-import API from "../repository/API";
+import API from "../repository/api";
 export type AddReportBody = {
     title: string,
     description: string,

@@ -1,51 +1,33 @@
 import { Button } from "@mui/material"
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleIcon from '@mui/icons-material/Google';
-import Auth from "../../services/api/Auth";
 import useNotification from "../../hooks/useNotification";
 import { useUser } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../store/auth.store";
 
 const AuthGoogleButton = (props: { label: string, type: 'sign-in' | 'sign-up' }) => {
-
-    const { updateUser } = useUser();
+    const { refreshUser } = useUser();
+    const { googleSignIn } = useAuth();
     const { notifyError, Notification } = useNotification();
     const navigate = useNavigate();
 
-    const login = useGoogleLogin({
-        onSuccess: async codeResp => {
-            var error = await Auth.signInGoogle(codeResp.code);
-            if (!error) {
-                const user = await Auth.me();
-                if (user) {
-                    updateUser(user);
-                    navigate('/');
-                } else {
-                    notifyError('Error during signing in');
-                }
-            }
-            else {
-                notifyError(error?.message ?? 'Error during signing in');
-            }
-        },
-        flow: 'auth-code'
-    });
-
-    const register = useGoogleLogin({
-        onSuccess: async codeResp => {
-            var error = await Auth.signUpGoogle(codeResp.code);
-            if (!error) {
-                const user = await Auth.me();
-                if (user)
-                    updateUser(user);
-                else
-                    notifyError('Error during signing up');
+    const handleGoogleAuth = async (code: string) => {
+        try {
+            await googleSignIn(code);
+            const user = await refreshUser();
+            if (user) {
                 navigate('/');
+            } else {
+                notifyError('Error during Google authentication');
             }
-            else {
-                notifyError(error?.message ?? 'Error during signing up');
-            }
-        },
+        } catch (error) {
+            notifyError('Error during Google authentication');
+        }
+    };
+
+    const login = useGoogleLogin({
+        onSuccess: codeResp => handleGoogleAuth(codeResp.code),
         flow: 'auth-code'
     });
 
@@ -55,8 +37,10 @@ const AuthGoogleButton = (props: { label: string, type: 'sign-in' | 'sign-up' })
             <Button
                 startIcon={<GoogleIcon />}
                 variant="contained"
-                onClick={() => props.type === 'sign-in' ? login() : register()}
-            >{props.label}</Button>
+                onClick={() => login()}
+            >
+                {props.label}
+            </Button>
         </>
     );
 }

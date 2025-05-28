@@ -1,18 +1,18 @@
-import { Box, Button, Dialog, Divider, Link, TextField, Typography } from "@mui/material";
-import { useForm } from "react-hook-form";
-import { SignInFormFields } from "../../../models/form/auth/AuthFormFields";
-import AuthGoogleButton from "../../google/SignInGoogle";
+import { Box, Button, Dialog, Divider, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import AuthGoogleButton from "../../google/SignInGoogle";
+import { useZodForm } from "../../../hooks/useZodForm";
+import { SignInFormData, signInSchema } from "../../../schemas/auth/signInSchema";
 import Auth from "../../../services/api/Auth";
 import useInfo from "../../../hooks/useInfo";
 
 interface SignInFormProps {
-    onSubmit: (data: SignInFormFields) => void;
+    onSubmit: (data: SignInFormData) => void;
 }
 
 const SignInForm = (props: SignInFormProps) => {
-    const { register, handleSubmit, getValues, formState: { errors }, } = useForm<SignInFormFields>();
+    const { register, handleSubmit, getValues, formState: { errors } } = useZodForm(signInSchema);
 
     const { sendNotification } = useInfo();
     const [dialogOpened, setDialogOpened] = useState<boolean>(false);

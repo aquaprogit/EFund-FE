@@ -1,12 +1,12 @@
-import API from './repository/API';
 import { ConfirmEmailRequest, RefreshTokenRequest, SignInRequest, SignUpRequest } from '../../models/api/request/AuthRequests';
 import { AuthSuccessResponse, SignUpResponse } from '../../models/api/response/AuthResponses';
 import { ErrorModel } from '../../models/api/response/base/ErrorModel';
 import User from '../../models/user/User';
+import API from './repository/api';
 
-export type UpdateUserEmail = {newEmail: string}
-export type ConfirmChangeEmail = {newEmail: string, code: number}
-export type ResendCode = {userId: string}
+export type UpdateUserEmail = { newEmail: string }
+export type ConfirmChangeEmail = { newEmail: string, code: number }
+export type ResendCode = { userId: string }
 
 const Auth = {
     signUp: async (request: SignUpRequest): Promise<SignUpResponse | undefined> => {
@@ -55,7 +55,7 @@ const Auth = {
         if (response.error?.code === 5) {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
-        } 
+        }
 
         if (response.success) {
             const tokens = response.data as AuthSuccessResponse;
@@ -97,7 +97,7 @@ const Auth = {
     },
 
     signInGoogle: async (token: string): Promise<ErrorModel | undefined> => {
-        const response = await API.post<{}, AuthSuccessResponse>('/google-auth/sign-in', { }, { 'Authorization-Code': token });
+        const response = await API.post<{}, AuthSuccessResponse>('/google-auth/sign-in', {}, { 'Authorization-Code': token });
 
         if (response.success) {
             const tokens = response.data as AuthSuccessResponse;
@@ -112,7 +112,7 @@ const Auth = {
     },
 
     signUpGoogle: async (token: string): Promise<ErrorModel | undefined> => {
-        const response = await API.post<{}, AuthSuccessResponse>('/google-auth/sign-up', { }, { 'Authorization-Code': token });
+        const response = await API.post<{}, AuthSuccessResponse>('/google-auth/sign-up', {}, { 'Authorization-Code': token });
 
         if (response.success) {
             const { accessToken, refreshToken } = response.data as AuthSuccessResponse;
@@ -142,7 +142,7 @@ const Auth = {
             console.error(e);
         }
     },
-    async resendConfirmationCode (requestBody: ResendCode) {
+    async resendConfirmationCode(requestBody: ResendCode) {
         try {
             return await API.post('/auth/resend-confirmation-code', requestBody);
         }
@@ -151,7 +151,7 @@ const Auth = {
         }
     },
 
-    async forgotPassword(requestBody: {email: string}) {
+    async forgotPassword(requestBody: { email: string }) {
         try {
             return await API.post('/auth/forgot-password', requestBody);
         }

@@ -1,0 +1,65 @@
+import { isAxiosError } from 'axios';
+import { ApiResponse, BaseErrorResponse } from '../../models/api/BaseErrorResponse';
+import { PagedResponse } from '../../models/api/pagination/PagedResponse';
+import { PaginatedRequest } from '../../models/api/pagination/PaginatedRequest';
+import axios from './repository/axios';
+
+export const api = {
+    get: async <TResponse>(url: string, params?: any): Promise<ApiResponse<TResponse>> => {
+        try {
+            const response = await axios.get<TResponse>(url, { params: params });
+            return { isSuccess: true, data: response.data };
+        }
+        catch (error) {
+            return handleError(error);
+        }
+    },
+
+    getPaginated: async <TResponse>(url: string, pagination: PaginatedRequest, params?: any): Promise<ApiResponse<PagedResponse<TResponse>>> => {
+        try {
+            const response = await axios.get<PagedResponse<TResponse>>(url, {
+                params: {
+                    ...pagination,
+                    ...params
+                }
+            });
+            return { isSuccess: true, data: response.data };
+        }
+        catch (error) {
+            return handleError(error);
+        }
+    },
+
+    post: async <TRequest, TResponse>(url: string, request: TRequest, token?: string): Promise<ApiResponse<TResponse>> => {
+        try {
+            const response = await axios.post<TResponse>(url, request, {
+                headers: token ? { 'Authorization-Code': token } : undefined
+            });
+            return { isSuccess: true, data: response.data };
+        }
+        catch (error) {
+            return handleError(error);
+        }
+    },
+
+    delete: async (url: string): Promise<ApiResponse<{}>> => {
+        try {
+            await axios.delete(url);
+            return { isSuccess: true };
+        }
+        catch (error) {
+            return handleError(error);
+        }
+    }
+};
+
+const handleError = <T>(error: any): ApiResponse<T> => {
+    if (isAxiosError(error)) {
+        return { isSuccess: false, error: error.response?.data as BaseErrorResponse };
+    }
+
+    console.error(error);
+    throw error;
+};
+
+export default api; 
