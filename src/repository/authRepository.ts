@@ -1,18 +1,10 @@
 import { urls } from '../constants/urls';
 import { ApiResponse } from '../models/api/BaseErrorResponse';
+import { AuthResponse, SignUpResponse } from '../models/api/auth';
 import { ConfirmEmailRequest } from '../models/requests/ConfirmEmailRequest';
 import { SignInRequest } from '../models/requests/SignInRequest';
 import { SignUpRequest } from '../models/requests/SignUpRequest';
 import api from '../services/api/api';
-
-interface AuthResponse {
-    accessToken: string;
-    refreshToken: string;
-}
-
-interface SignUpResponse {
-    userId: string;
-}
 
 export const authRepository = {
     async signIn(request: SignInRequest): Promise<ApiResponse<AuthResponse>> {

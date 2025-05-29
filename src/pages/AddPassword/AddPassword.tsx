@@ -1,7 +1,7 @@
 import React from 'react';
 import ChangeCreds from "../../templates/ChangeCreds/ChangeCreds";
-import Users from "../../services/api/Users";
-import useInfo from "../../hooks/useInfo";
+import { userRepository } from "../../repository/userRepository";
+import { useToast } from "../../contexts/ToastContext";
 import PasswordInput from "./PasswordInput";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
@@ -11,7 +11,7 @@ import { useUser } from '../../contexts/UserContext';
 
 const AddPassword = (props: { onClose: () => void }) => {
     const { refreshUser } = useUser();
-    const { sendNotification } = useInfo();
+    const { showSuccess, showError } = useToast();
     const { handleSubmit, register, formState: { errors } } = useForm({
         resolver: yupResolver(addPasswordValidation),
         reValidateMode: 'onChange',
@@ -20,18 +20,18 @@ const AddPassword = (props: { onClose: () => void }) => {
 
     const onSubmit = async (data: { password: string; confirmPassword: string }) => {
         try {
-            const response = await Users.addPassword({ password: data.password });
+            const response = await userRepository.addPassword({ password: data.password });
 
-            if (response && response.success) {
-                sendNotification('success', 'Password has been successfully added');
+            if (response.isSuccess) {
+                showSuccess('Password has been successfully added');
                 await refreshUser();
                 props.onClose();
-            } else if (response && response.error) {
-                sendNotification('error', response.error.message);
+            } else if (response.error) {
+                showError(response.error.message);
             }
         } catch (error) {
             console.error('An error occurred:', error);
-            sendNotification('error', 'An error occurred while adding the password.');
+            showError('An error occurred while adding the password.');
         }
     };
 

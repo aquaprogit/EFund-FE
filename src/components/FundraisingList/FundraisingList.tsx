@@ -3,7 +3,7 @@ import FundraisingCard from "../common/FundraisingCard";
 import { useEffect, useState } from "react";
 import { Tag } from "../../models/Tag";
 import Fundraising from "../../models/Fundraising";
-import useUser from "../../hooks/useUser";
+import { useUser } from "../../contexts/UserContext";
 import Fundraisings from "../../services/api/Fundraisings";
 import Tags from "../../services/api/Tags";
 import Search from "../common/Search";

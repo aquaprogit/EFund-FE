@@ -6,11 +6,11 @@ import { useState } from 'react';
 import { Box, Button, Dialog, Typography } from '@mui/material';
 import { useUser } from '../../contexts/UserContext';
 import Fundraisings from '../../services/api/Fundraisings';
-import useInfo from '../../hooks/useInfo';
+import { useToast } from '../../contexts/ToastContext';
 
 const FundraisingMenu = ({ fundraisingId, ownerId, onDelete, onEdit }: { fundraisingId: string, ownerId: string, onDelete: () => void, onEdit: () => void }) => {
     const { user } = useUser();
-    const { sendNotification } = useInfo();
+    const { showSuccess, showError } = useToast();
 
     const [dialogOpen, setDialogOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -27,14 +27,14 @@ const FundraisingMenu = ({ fundraisingId, ownerId, onDelete, onEdit }: { fundrai
             const result = await Fundraisings.deleteFundraising(fundraisingId);
 
             if (result && result.success) {
-                sendNotification('success', 'Fundraising deleted successfully!');
+                showSuccess('Fundraising deleted successfully!');
                 onDelete();
             }
             else {
-                sendNotification('error', result?.error?.message ?? 'Failed to delete fundraising!');
+                showError(result?.error?.message ?? 'Failed to delete fundraising!');
             }
         } catch (error) {
-            sendNotification('error', 'Failed to delete fundraising!');
+            showError('Failed to delete fundraising!');
         }
         setDialogOpen(false);
     }

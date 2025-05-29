@@ -42,6 +42,16 @@ export const api = {
         }
     },
 
+    put: async <TRequest, TResponse>(url: string, request: TRequest): Promise<ApiResponse<TResponse>> => {
+        try {
+            const response = await axios.put<TResponse>(url, request);
+            return { isSuccess: true, data: response.data };
+        }
+        catch (error) {
+            return handleError(error);
+        }
+    },
+
     delete: async (url: string): Promise<ApiResponse<{}>> => {
         try {
             await axios.delete(url);

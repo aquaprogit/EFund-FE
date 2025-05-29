@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import ChangeCreds from "../../templates/ChangeCreds/ChangeCreds";
 import TextField from "@mui/material/TextField";
 import Auth from "../../services/api/Auth";
-import useInfo from "../../hooks/useInfo";
+import { useToast } from "../../contexts/ToastContext";
 import ConfirmChangeEmail from './ConfirmChangeEmail';
 
 const ChangeEmail = (props: { onClose: () => void }) => {
     const [newEmail, setNewEmail] = useState('');
     const error = !!newEmail && !!!newEmail.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/);
     const [confirmationSent, setConfirmationSent] = useState(false);
-    const { sendNotification: addInfo } = useInfo();
+    const { showError } = useToast();
     const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
         setNewEmail(event.target.value);
     }
@@ -19,17 +19,15 @@ const ChangeEmail = (props: { onClose: () => void }) => {
                 newEmail
             })
             if (response.error) {
-                addInfo('error', response.error.message);
+                showError(response.error.message);
             }
             else if (response.success || response.error.errorCode === 4) {
                 setConfirmationSent(true);
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error')
+            showError('Unexpected error')
         }
-
-
     }
     return (
         confirmationSent

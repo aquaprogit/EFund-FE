@@ -5,7 +5,7 @@ import AuthGoogleButton from "../../google/SignInGoogle";
 import { useZodForm } from "../../../hooks/useZodForm";
 import { SignInFormData, signInSchema } from "../../../schemas/auth/signInSchema";
 import Auth from "../../../services/api/Auth";
-import useInfo from "../../../hooks/useInfo";
+import { useToast } from "../../../contexts/ToastContext";
 
 interface SignInFormProps {
     onSubmit: (data: SignInFormData) => void;
@@ -14,7 +14,7 @@ interface SignInFormProps {
 const SignInForm = (props: SignInFormProps) => {
     const { register, handleSubmit, getValues, formState: { errors } } = useZodForm(signInSchema);
 
-    const { sendNotification } = useInfo();
+    const { showSuccess, showError } = useToast();
     const [dialogOpened, setDialogOpened] = useState<boolean>(false);
     const navigate = useNavigate();
 
@@ -119,10 +119,10 @@ const SignInForm = (props: SignInFormProps) => {
                         onClick={async () => {
                             const result = await Auth.forgotPassword({ email: getValues('email') });
                             if (result && result.success) {
-                                sendNotification('success', 'Check your email for further instructions');
+                                showSuccess('Check your email for further instructions');
                             }
                             else {
-                                sendNotification('error', result?.error?.message ?? 'Error during sending email');
+                                showError(result?.error?.message ?? 'Error during sending email');
                             }
                             setDialogOpened(false);
                         }}

@@ -10,8 +10,7 @@ import ProfilePage from './pages/Profile/ProfilePage';
 import { UserProvider } from './contexts/UserContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import AddPage from './pages/fundraising/AddFundraisingPage';
-import ToasterContextProvider from "./contexts/ToasterContext";
-import Toaster from "./components/Toaster/Toaster";
+import { ToastProvider } from "./contexts/ToastContext";
 import MyFundraisingsPage from "./pages/fundraising/MyFundraisingsPage";
 import EditFundraising from "./pages/fundraising/EditFundraising";
 import UsersPage from './pages/UsersPage';
@@ -84,8 +83,7 @@ const lightTheme = createTheme({
 
 const App: React.FC = () => (
   <ThemeProvider theme={darkTheme}>
-    <ToasterContextProvider>
-      <Toaster />
+    <ToastProvider>
       <GoogleOAuthProvider clientId="389428898545-0si1v4m7uojr1m4gfspehhvpn91120pb.apps.googleusercontent.com">
         <UserProvider>
           <CssBaseline />
@@ -106,10 +104,8 @@ const App: React.FC = () => (
           </BrowserRouter>
         </UserProvider>
       </GoogleOAuthProvider>
-    </ToasterContextProvider>
-
+    </ToastProvider>
   </ThemeProvider>
-
 );
 
 export default App;

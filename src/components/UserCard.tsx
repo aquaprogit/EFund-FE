@@ -2,7 +2,7 @@ import User from "../models/user/User";
 import { Card, Box, Avatar, Typography, Badge, Button, Dialog } from "@mui/material";
 import StarIcon from '@mui/icons-material/Star';
 import { useState } from "react";
-import Users from "../services/api/Users";
+import { userRepository } from "../repository/userRepository";
 
 const UserCard = ({ user, onAction }: { user: User, onAction: () => void }) => {
     const [dialogOpened, setDialogOpened] = useState<boolean>(false);
@@ -114,7 +114,7 @@ const UserCard = ({ user, onAction }: { user: User, onAction: () => void }) => {
                                         setDialogPayload({
                                             actionType: 'unblock',
                                             action: async (user) => {
-                                                const result = await Users.action({ userId: user.id, action: 'unblock' });
+                                                const result = await userRepository.userAction(user.id, 'unblock');
                                                 return result;
                                             }
                                         });
@@ -130,7 +130,7 @@ const UserCard = ({ user, onAction }: { user: User, onAction: () => void }) => {
                                         setDialogPayload({
                                             actionType: 'block',
                                             action: async (user) => {
-                                                const result = await Users.action({ userId: user.id, action: 'block' });
+                                                const result = await userRepository.userAction(user.id, 'block');
                                                 return result;
                                             }
                                         });
@@ -148,7 +148,7 @@ const UserCard = ({ user, onAction }: { user: User, onAction: () => void }) => {
                                     setDialogPayload({
                                         actionType: 'make admin',
                                         action: async (user) => {
-                                            const result = await Users.makeAdmin({ userId: user.id });
+                                            const result = await userRepository.makeAdmin(user.id);
                                             if (result) {
                                                 handleAction(() => { });
                                             }

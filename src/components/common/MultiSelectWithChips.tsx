@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import { Chip, FilterOptionsState } from '@mui/material';
-import useInfo from '../../hooks/useInfo';
+import { useToast } from '../../contexts/ToastContext';
 
 const MultiSelectWithChip = (props: {
     label: string,
@@ -13,12 +13,12 @@ const MultiSelectWithChip = (props: {
     width?: string,
     onChange: (selected: string[]) => void
 }) => {
-    const { sendNotification } = useInfo();
+    const { showError } = useToast();
     const [selectedOptions, setSelectedOptions] = useState<string[]>(props.defaultValues || []);
 
     const handleChange = (event: React.SyntheticEvent, value: string[]) => {
         if (value.length > 5) {
-            sendNotification('error', 'You can select up to 5 tags');
+            showError('You can select up to 5 tags');
             return;
         }
         props.onChange(value);

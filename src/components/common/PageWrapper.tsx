@@ -4,8 +4,8 @@ import MenuAvatar from "../home/MenuAvatar";
 import { ReactNode, useEffect, useState } from "react";
 import '../../styles/page-wrapper.css';
 import { useUser } from "../../contexts/UserContext";
-import useInfo from "../../hooks/useInfo";
-import Users from "../../services/api/Users";
+import { useToast } from "../../contexts/ToastContext";
+import { userRepository } from "../../repository/userRepository";
 
 interface PageWrapperProps {
     children: ReactNode;
@@ -14,7 +14,7 @@ interface PageWrapperProps {
 const PageWrapper = ({ children }: PageWrapperProps) => {
     const { user, loading, updateUser, refreshUser } = useUser();
     const navigate = useNavigate();
-    const { sendNotification } = useInfo()
+    const { showWarning, showSuccess, showError } = useToast();
 
     const [open, setOpen] = useState(false);
     const [email, setEmail] = useState('');
@@ -25,7 +25,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
 
     const onAdd = () => {
         if (!user!.hasMonobankToken) {
-            sendNotification('warning', 'Please link monobank token to your account to get access to this functionality')
+            showWarning('Please link monobank token to your account to get access to this functionality')
         }
         else {
             navigate('/add-fundraising')
@@ -113,12 +113,12 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
                     <Button
                         variant="contained"
                         onClick={async () => {
-                            const result = await Users.inviteAdmin({ email });
-                            if (result) {
-                                sendNotification('success', 'User invited successfully');
+                            const result = await userRepository.inviteAdmin(email);
+                            if (result.isSuccess) {
+                                showSuccess('User invited successfully');
                             }
                             else {
-                                sendNotification('error', 'Error during inviting user');
+                                showError('Error during inviting user');
                             }
                             setOpen(false);
                         }}

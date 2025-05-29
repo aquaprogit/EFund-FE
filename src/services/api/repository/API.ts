@@ -25,7 +25,12 @@ export const API = {
         headers?: { [key: string]: string }
     ): Promise<APIResponse<TResponse>> => {
         try {
-            const response = await axios.post<TResponse>(url, data, { headers });
+            const response = await axios.post<TResponse>(url, data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...headers
+                }
+            });
             return { success: true, data: response.data };
         } catch (error: any) {
             return { success: false, error: error.response?.data };

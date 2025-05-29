@@ -3,7 +3,7 @@ import PageWrapper from "../components/common/PageWrapper";
 import Search from "../components/common/Search";
 import { useEffect, useState } from "react";
 import User from "../models/user/User";
-import Users from "../services/api/Users";
+import { userRepository } from "../repository/userRepository";
 import UserCard from "../components/UserCard";
 import { useUser } from "../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
@@ -24,11 +24,11 @@ const UsersPage = () => {
     const fetchUsers = async () => {
         setLoading(true);
         const params = { page: page, pageSize: pageSize, query: searchQuery }
-        const users = await Users.getUsers(params)
+        const response = await userRepository.getUsers(params)
 
-        if (users && users?.items) {
-            setUsers(loadingUser ? users?.items?.filter((user) => user.id !== currentUser!.id) : users!.items);
-            setTotalPages(users!.totalPages);
+        if (response.isSuccess && response.data?.items) {
+            setUsers(loadingUser ? response.data.items.filter((user: User) => user.id !== currentUser!.id) : response.data.items);
+            setTotalPages(response.data.totalPages);
         }
         else {
             setUsers([]);

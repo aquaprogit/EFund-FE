@@ -3,7 +3,7 @@ import { Box, Button, Typography } from "@mui/material";
 import FundraisingsReports, {
 	AddReportBody,
 } from "../../services/api/FundraisingsReports/FundraisingsReports";
-import useInfo from "../../hooks/useInfo";
+import { useToast } from "../../contexts/ToastContext";
 import LimitedTextField from "../../components/common/LimitedTextField";
 
 const AddReport = ({
@@ -16,7 +16,7 @@ const AddReport = ({
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 	const [files, setFiles] = useState<Array<File>>([]);
-	const { sendNotification } = useInfo();
+	const { showSuccess, showError } = useToast();
 	const createFormData = () => {
 		const formData = new FormData();
 
@@ -36,7 +36,7 @@ const AddReport = ({
 			const response: any = await FundraisingsReports.addReport(body);
 			if (response) {
 				if (response.error) {
-					sendNotification("error", response.error.message);
+					showError(response.error.message);
 				} else if (response.success) {
 					const formData = createFormData();
 					const attachaments =
@@ -45,15 +45,15 @@ const AddReport = ({
 							formData
 						);
 					if (attachaments!.success) {
-						sendNotification("success", "Report has been added");
+						showSuccess("Report has been added");
 						onClose();
 					} else if (attachaments!.error) {
-						sendNotification("error", attachaments!.error.message);
+						showError(attachaments!.error.message);
 					}
 				}
 			}
 		} catch (e: any) {
-			sendNotification("error", e.message);
+			showError(e.message);
 		}
 	};
 	return (

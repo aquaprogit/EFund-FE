@@ -1,13 +1,13 @@
 import { Button, TextField, Typography, Box } from "@mui/material";
 import { useState } from "react";
-import Users from "../../services/api/Users";
+import { userRepository } from "../../repository/userRepository";
 
 const EditName = ({ initialName, refreshUser }: { initialName: string, refreshUser: () => void }) => {
     const [name, setName] = useState<string>(initialName);
     const [edit, setEdit] = useState<boolean>(false);
 
     const handleSaveClick = async () => {
-        await Users.updateInfo({ name });
+        await userRepository.updateInfo({ name });
         await refreshUser();
     }
 

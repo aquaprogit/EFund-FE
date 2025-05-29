@@ -8,5 +8,13 @@ export const urls = {
 
     // User
     me: '/users/me',
-    changeEmail: '/users/change-email'
+    changeEmail: '/users/change-email',
+    userAvatar: '/users/avatar',
+    userInfo: '/users/me',
+    addPassword: '/users/add-password',
+    changePassword: '/users/change-password',
+    searchUsers: '/users/search',
+    makeAdmin: '/users/make-admin',
+    userAction: '/users/action',
+    inviteAdmin: '/users/invite-admin'
 } as const; 

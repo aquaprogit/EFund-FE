@@ -1,6 +1,6 @@
 import ChangeCreds from "../../templates/ChangeCreds/ChangeCreds";
-import Users from "../../services/api/Users";
-import useInfo from "../../hooks/useInfo";
+import { userRepository } from "../../repository/userRepository";
+import { useToast } from "../../contexts/ToastContext";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useForm } from 'react-hook-form';
 
@@ -9,7 +9,7 @@ import changePasswordValidation from "../../validation/forms/ChangePasswordValid
 import { Box } from "@mui/material";
 
 const ChangePassword = (props: { onClose: () => void }) => {
-    const { sendNotification } = useInfo();
+    const { showSuccess, showError } = useToast();
     const { handleSubmit, register, formState: { errors } } = useForm({
         resolver: yupResolver(changePasswordValidation),
         reValidateMode: 'onChange',
@@ -18,17 +18,17 @@ const ChangePassword = (props: { onClose: () => void }) => {
 
     const onSubmit = async (data: { password: string; newPassword: string }) => {
         try {
-            const response = await Users.changePassword({ oldPassword: data.password, newPassword: data.newPassword });
+            const response = await userRepository.changePassword({ oldPassword: data.password, newPassword: data.newPassword });
 
-            if (response && response.success) {
-                sendNotification('success', 'Password has been successfully changed');
+            if (response.isSuccess) {
+                showSuccess('Password has been successfully changed');
                 props.onClose();
-            } else if (response && response.error) {
-                sendNotification('error', response.error.message);
+            } else if (response.error) {
+                showError(response.error.message);
             }
         } catch (error) {
             console.error('An error occurred:', error);
-            sendNotification('error', 'An error occurred while adding the password.');
+            showError('An error occurred while adding the password.');
         }
     };
     return (

@@ -2,13 +2,16 @@ import axios from 'axios';
 import { useAuth } from '../../../store/auth.store';
 
 axios.defaults.baseURL = process.env.REACT_APP_API_URL;
-axios.defaults.headers.post['Content-Type'] = 'application/json';
 
 axios.interceptors.request.use(request => {
     const accessToken = useAuth.getState().accessToken;
 
     if (accessToken) {
         request.headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
+    if (!(request.data instanceof FormData)) {
+        request.headers['Content-Type'] = 'application/json';
     }
 
     return request;

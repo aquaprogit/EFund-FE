@@ -1,8 +1,8 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import Jar from "../../models/Jar";
-import useInfo from "../../hooks/useInfo";
+import { useToast } from "../../contexts/ToastContext";
 import { useLocation, useNavigate } from "react-router-dom";
-import Monobank from "../../services/api/Monobank/Monobank";
+import { monobankApi } from "../../services/api/Monobank/Monobank";
 import Fundraisings from "../../services/api/Fundraisings";
 import PageWrapper from "../../components/common/PageWrapper";
 import { Backdrop, Box, Button, Card, CardContent, CircularProgress, Dialog, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
@@ -31,7 +31,7 @@ const EditFundraising = () => {
     const [jars, setJars] = useState<Jar[]>([])
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
     const [reports, setReports] = useState<Report[]>([])
-    const { sendNotification } = useInfo()
+    const { showError, showSuccess } = useToast();
     const inputFile = useRef<HTMLInputElement | null>(null)
     const navigate = useNavigate()
     const { state } = useLocation()
@@ -49,7 +49,7 @@ const EditFundraising = () => {
 
     const getMonobankJars = async () => {
         try {
-            const response = await Monobank.getJars();
+            const response = await monobankApi.getJars();
             if (response) {
                 if (response.data) {
                     // @ts-ignore
@@ -58,7 +58,7 @@ const EditFundraising = () => {
             }
         }
         catch (e) {
-            sendNotification('error', 'Unexpected error')
+            showError('Unexpected error')
         }
     }
 
@@ -71,7 +71,7 @@ const EditFundraising = () => {
             }
         }
         catch (e) {
-            sendNotification('error', 'Unexpected error')
+            showError('Unexpected error')
         }
     }
 
@@ -80,7 +80,7 @@ const EditFundraising = () => {
             const response = await FundraisingsReports.deleteReport(id);
             if (response) {
                 if (response.error) {
-                    sendNotification('error', response.error.message)
+                    showError(response.error.message)
                 }
                 else {
                     const newReports = reports.filter((report) => report.id !== id)
@@ -89,7 +89,7 @@ const EditFundraising = () => {
             }
         }
         catch (e) {
-            sendNotification('error', 'Unexpected error while deleting report')
+            showError('Unexpected error while deleting report')
         }
     }
 
@@ -98,7 +98,7 @@ const EditFundraising = () => {
             const response = await FundraisingsReports.deleteAttachment(reportId, id);
             if (response) {
                 if (response.error) {
-                    sendNotification('error', response.error.message)
+                    showError(response.error.message)
                 }
                 else {
                     const newReports = reports.map((report) => {
@@ -116,7 +116,7 @@ const EditFundraising = () => {
             }
         }
         catch (e) {
-            sendNotification('error', 'Unexpected error while deleting attachment')
+            showError('Unexpected error while deleting attachment')
         }
     }
 
@@ -124,11 +124,11 @@ const EditFundraising = () => {
         try {
             const response = await Fundraisings.uploadImage(fundraisingId, file)
             if (response.error) {
-                sendNotification('error', response.error.message)
+                showError(response.error.message)
             }
         }
         catch (e) {
-            sendNotification('error', 'Unexpected error while uploading image')
+            showError('Unexpected error while uploading image')
         }
     }
     const handleUploadFundraisingAvatar = (e: ChangeEvent<HTMLInputElement>) => {
@@ -145,7 +145,7 @@ const EditFundraising = () => {
             }
         }
         catch (e) {
-            sendNotification('error', 'Unexpected error while adding fundraising image')
+            showError('Unexpected error while adding fundraising image')
         }
     }
     const handleDeleteFundraisingAvatar = async () => {
@@ -167,7 +167,7 @@ const EditFundraising = () => {
             const response = await Fundraisings.updateFundraising(state.id, requestBody)
             if (response) {
                 if (response.error) {
-                    sendNotification('error', response.error.message)
+                    showError(response.error.message)
                 }
                 else {
                     const fundraisingId = response.data!.id
@@ -176,14 +176,13 @@ const EditFundraising = () => {
                     if (files && files.length > 0) {
                         await uploadImage(fundraisingId, files[0])
                     }
-                    sendNotification('success', 'Fundraising has been successfully edited')
+                    showSuccess('Fundraising has been successfully edited')
                     navigate('/my-fundraisings')
-
                 }
             }
         }
         catch (e) {
-            sendNotification('error', 'Unexpected error while editing fundraising')
+            showError('Unexpected error while editing fundraising')
         }
     }
     const fetchData = async () => {
@@ -199,7 +198,7 @@ const EditFundraising = () => {
             setLoading(false)
         }
         catch (e) {
-            sendNotification('error', 'Unexpected error')
+            showError('Unexpected error')
             setLoading(false)
         }
 

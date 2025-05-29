@@ -2,7 +2,7 @@ import React, { ChangeEvent, useEffect, useRef } from "react";
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Dialog, Typography } from "@mui/material";
 import PageWrapper from "../../components/common/PageWrapper";
 import '../../styles/profile-page.css';
-import Users from "../../services/api/Users";
+import { userRepository } from "../../repository/userRepository";
 import { useUser } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import styles from "./ProfilePage.module.css";
@@ -13,6 +13,7 @@ import AddPassword from "../AddPassword/AddPassword";
 import ChangeEmail from "../ChangeEmail/ChangeEmail";
 import LinkToken from "../LinkToken/LinkToken";
 import EditName from "../../components/common/EditName";
+import { ApiResponse } from "../../models/api/BaseErrorResponse";
 
 const ProfilePage = () => {
     const [openedDialogue, setOpenedDialogue] = React.useState<string | false>(false);
@@ -33,16 +34,16 @@ const ProfilePage = () => {
     const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
         const { files } = e.target;
         if (files && files.length) {
-            Users.uploadAvatar(files[0]).then((response) => {
-                if (response) {
+            userRepository.uploadAvatar(files[0]).then((response: ApiResponse<{}>) => {
+                if (response.isSuccess) {
                     refreshUser();
                 }
             });
         }
     };
     const handleDeleteFile = () => {
-        Users.deleteAvatar().then((response) => {
-            if (response) {
+        userRepository.deleteAvatar().then((response: ApiResponse<{}>) => {
+            if (response.isSuccess) {
                 refreshUser();
             }
         });

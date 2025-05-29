@@ -1,30 +1,29 @@
 import React, { useState } from 'react';
 import ChangeCreds from "../../templates/ChangeCreds/ChangeCreds";
 import TextField from "@mui/material/TextField";
-import Monobank from "../../services/api/Monobank/Monobank";
-import useInfo from "../../hooks/useInfo";
+import { monobankApi } from "../../services/api/Monobank/Monobank";
 import { Link, Typography } from '@mui/material';
 import { useUser } from '../../contexts/UserContext';
+import { useToast } from '../../contexts/ToastContext';
 
 const LinkToken = (props: { onClose: () => void }) => {
     const [token, setToken] = useState('')
     const { refreshUser } = useUser();
-    const { sendNotification: addInfo } = useInfo()
+    const { showError, showSuccess } = useToast();
     const onSubmit = async () => {
         try {
-            const response = await Monobank.linkToken(token);
+            const response = await monobankApi.linkToken(token);
             if (response && response.error) {
-                addInfo('error', response.error.message)
-
+                showError(response.error.message);
             }
             else if (response && response.success) {
-                addInfo('success', 'Token has been successfully linked')
+                showSuccess('Token has been successfully linked');
                 await refreshUser();
                 props.onClose();
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error')
+            showError('Unexpected error');
         }
     }
     const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {

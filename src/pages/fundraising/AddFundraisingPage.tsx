@@ -3,9 +3,9 @@ import PageWrapper from "../../components/common/PageWrapper";
 import '../../styles/pages/fundraising/add-page.css';
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import LimitedTextField from "../../components/common/LimitedTextField";
-import Monobank from "../../services/api/Monobank/Monobank";
+import { monobankApi } from "../../services/api/Monobank/Monobank";
 import Jar from "../../models/Jar";
-import useInfo from "../../hooks/useInfo";
+import { useToast } from "../../contexts/ToastContext";
 import UploadImage from "../../components/profile/UploadImage/UploadImage";
 import Fundraisings from "../../services/api/Fundraisings";
 import { useNavigate } from "react-router-dom";
@@ -24,7 +24,7 @@ const AddPage = () => {
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [jars, setJars] = useState<Jar[]>([])
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
-    const { sendNotification: addInfo } = useInfo()
+    const { showError, showSuccess } = useToast();
     const inputFile = useRef<HTMLInputElement | null>(null)
     const navigate = useNavigate()
 
@@ -40,7 +40,7 @@ const AddPage = () => {
 
     const getMonobankJars = async () => {
         try {
-            const response = await Monobank.getJars();
+            const response = await monobankApi.getJars();
             if (response) {
                 if (response.data) {
                     // @ts-ignore
@@ -49,7 +49,7 @@ const AddPage = () => {
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error')
+            showError('Unexpected error')
         }
     }
 
@@ -61,7 +61,7 @@ const AddPage = () => {
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error')
+            showError('Unexpected error')
         }
     }
 
@@ -72,11 +72,11 @@ const AddPage = () => {
         try {
             const response = await Fundraisings.uploadImage(fundraisingId, file)
             if (response.error) {
-                addInfo('error', response.error.message)
+                showError(response.error.message)
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error while uploading image')
+            showError('Unexpected error while uploading image')
         }
     }
     const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +93,7 @@ const AddPage = () => {
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error while adding fundraising image')
+            showError('Unexpected error while adding fundraising image')
         }
     }
     const handleDeleteFile = () => {
@@ -114,7 +114,7 @@ const AddPage = () => {
             const response = await Fundraisings.createFundraising(requestBody)
             if (response) {
                 if (response.error) {
-                    addInfo('error', response.error.message)
+                    showError(response.error.message)
                 }
                 else {
                     const fundraisingId = response.data!.id
@@ -123,14 +123,13 @@ const AddPage = () => {
                     if (files && files.length > 0) {
                         await uploadImage(fundraisingId, files[0])
                     }
-                    addInfo('success', 'Fundraising has been successfully created')
+                    showSuccess('Fundraising has been successfully created')
                     navigate('/')
-
                 }
             }
         }
         catch (e) {
-            addInfo('error', 'Unexpected error while creating fundraising')
+            showError('Unexpected error while creating fundraising')
         }
     }
     useEffect(() => {

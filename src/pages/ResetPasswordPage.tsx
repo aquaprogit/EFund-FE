@@ -3,7 +3,7 @@ import { ResetPasswordFormFields } from '../models/form/auth/AuthFormFields';
 import { Box, TextField, Button, Paper, Typography } from '@mui/material';
 import Auth from '../services/api/Auth';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import useInfo from '../hooks/useInfo';
+import { useToast } from '../contexts/ToastContext';
 import { yupResolver } from '@hookform/resolvers/yup';
 import ResetPasswordValidation from '../validation/forms/ResetPasswordValidation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
@@ -16,7 +16,7 @@ const ResetPasswordPage = () => {
     console.log({ email, token })
 
     const navigate = useNavigate();
-    const { sendNotification } = useInfo();
+    const { showSuccess, showError } = useToast();
 
     const { register, handleSubmit, getValues, formState: { errors } } = useForm<ResetPasswordFormFields>({
         resolver: yupResolver(ResetPasswordValidation),
@@ -68,10 +68,10 @@ const ResetPasswordPage = () => {
                         const request = { newPassword: getValues('password'), email, token };
                         const result = await Auth.resetPassword(request);
                         if (result && result.success) {
-                            sendNotification('success', 'Password changed successfully');
+                            showSuccess('Password changed successfully');
                         }
                         else {
-                            sendNotification('error', result?.error?.message ?? 'Error during changing password');
+                            showError(result?.error?.message ?? 'Error during changing password');
                         }
                         navigate('/sign-in');
                     })}>
