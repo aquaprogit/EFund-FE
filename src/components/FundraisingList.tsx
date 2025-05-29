@@ -1,14 +1,14 @@
 import { Box, Pagination, Skeleton } from "@mui/material";
-import FundraisingCard from "../common/FundraisingCard";
+import FundraisingCard from "./common/FundraisingCard";
 import { useEffect, useState } from "react";
-import { Tag } from "../../models/Tag";
-import Fundraising from "../../models/Fundraising";
-import { useUser } from "../../contexts/UserContext";
-import Fundraisings from "../../services/api/Fundraisings";
-import Tags from "../../services/api/Tags";
-import Search from "../common/Search";
-import MultiSelectWithChips from "../../components/common/MultiSelectWithChips";
-import PageWrapper from "../common/PageWrapper";
+import { Tag } from "../models/Tag";
+import Fundraising from "../models/Fundraising";
+import { useUser } from "../contexts/UserContext";
+import fundraisingsRepository from "../repository/fundraisingsRepository";
+import tagsRepository from "../repository/tagsRepository";
+import Search from "./common/Search";
+import MultiSelectWithChips from "./common/MultiSelectWithChips";
+import PageWrapper from "./common/PageWrapper";
 
 type FundraisingListProps = {
     loader: Function;
@@ -59,7 +59,7 @@ const FundraisingList: React.FC<FundraisingListProps> = ({ loader, type = 'ALL' 
 
     useEffect(() => {
         const fetchData = async () => {
-            const tags = await Tags.getTags();
+            const tags = await tagsRepository.getTags();
             if (tags) {
                 setTags(tags);
             }
@@ -72,9 +72,9 @@ const FundraisingList: React.FC<FundraisingListProps> = ({ loader, type = 'ALL' 
         const fetchData = async () => {
             setSelectedLoading(true);
             if (selectedFundraisingId) {
-                const fundraising = await Fundraisings.getFundraising(selectedFundraisingId);
+                const fundraising = await fundraisingsRepository.getFundraising(selectedFundraisingId);
                 if (fundraising) {
-                    setSelectedFundraising(fundraising);
+                    setSelectedFundraising(fundraising.data);
                 }
             }
             setSelectedLoading(false);

@@ -4,11 +4,16 @@ export const urls = {
     signUp: '/auth/sign-up',
     confirmEmail: '/auth/confirm-email',
     refresh: '/auth/refresh-token',
-    googleAuth: '/auth/google',
+    signInGoogle: '/google-auth/sign-in',
+    signUpGoogle: '/google-auth/sign-up',
 
     // User
     me: '/users/me',
     changeEmail: '/users/change-email',
+    confirmChangeEmail: '/users/confirm-change-email',
+    resendConfirmationCode: '/auth/resend-confirmation-code',
+    forgotPassword: '/auth/forgot-password',
+    resetPassword: '/auth/reset-password',
     userAvatar: '/users/avatar',
     userInfo: '/users/me',
     addPassword: '/users/add-password',

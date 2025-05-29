@@ -2,20 +2,20 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import Jar from "../../models/Jar";
 import { useToast } from "../../contexts/ToastContext";
 import { useLocation, useNavigate } from "react-router-dom";
-import { monobankApi } from "../../services/api/Monobank/Monobank";
-import Fundraisings from "../../services/api/Fundraisings";
+import fundraisingsRepository from "../../repository/fundraisingsRepository";
 import PageWrapper from "../../components/common/PageWrapper";
 import { Backdrop, Box, Button, Card, CardContent, CircularProgress, Dialog, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
-import UploadImage from "../../components/profile/UploadImage/UploadImage";
+import UploadImage from "../../components/UploadImage";
 import LimitedTextField from "../../components/common/LimitedTextField";
 import MultiSelectWithChips from '../../components/common/MultiSelectWithChips';
-import Tags from '../../services/api/Tags';
+import tagsRepository from '../../repository/tagsRepository';
 import Report from '../../models/Report';
 import ReportAccordion from '../../components/common/ReportAccordion';
-import FundraisingsReports from '../../services/api/FundraisingsReports/FundraisingsReports';
 import AddReport from '../Report/AddReport';
 import AddIcon from '@mui/icons-material/Add';
 import { useUser } from '../../contexts/UserContext';
+import { monobankRepository } from '../../repository/monobankRepository';
+import { fundraisingsReportsRepository } from '../../repository/fundraisingsReportsRepository';
 
 const EditFundraising = () => {
     const defaultImage = 'http://localhost:8080/Uploads/Default/Fundraisings/avatar.png'
@@ -49,7 +49,7 @@ const EditFundraising = () => {
 
     const getMonobankJars = async () => {
         try {
-            const response = await monobankApi.getJars();
+            const response = await monobankRepository.getJars();
             if (response) {
                 if (response.data) {
                     // @ts-ignore
@@ -65,7 +65,7 @@ const EditFundraising = () => {
     const getTags = async () => {
         try {
             setLoading(true)
-            const response = await Tags.getTags();
+            const response = await tagsRepository.getTags();
             if (response) {
                 setExistingTags(response.map((tag) => tag.name))
             }
@@ -77,7 +77,7 @@ const EditFundraising = () => {
 
     const handleDeleteReport = async (id: string) => {
         try {
-            const response = await FundraisingsReports.deleteReport(id);
+            const response = await fundraisingsReportsRepository.deleteReport(id);
             if (response) {
                 if (response.error) {
                     showError(response.error.message)
@@ -95,7 +95,7 @@ const EditFundraising = () => {
 
     const handleDeleteAttachment = async (reportId: string, id: string) => {
         try {
-            const response = await FundraisingsReports.deleteAttachment(reportId, id);
+            const response = await fundraisingsReportsRepository.deleteAttachment(reportId, id);
             if (response) {
                 if (response.error) {
                     showError(response.error.message)
@@ -122,7 +122,7 @@ const EditFundraising = () => {
 
     const uploadImage = async (fundraisingId: string, file: File) => {
         try {
-            const response = await Fundraisings.uploadImage(fundraisingId, file)
+            const response = await fundraisingsRepository.uploadImage(fundraisingId, file)
             if (response.error) {
                 showError(response.error.message)
             }
@@ -154,7 +154,7 @@ const EditFundraising = () => {
             inputFile.current.value = '';
             inputFile.current.files = new DataTransfer().files;
         }
-        await Fundraisings.deleteImage(state.id)
+        await fundraisingsRepository.deleteImage(state.id)
     }
     const onSubmit = async () => {
         const requestBody = {
@@ -164,7 +164,7 @@ const EditFundraising = () => {
             tags: selectedTags,
         }
         try {
-            const response = await Fundraisings.updateFundraising(state.id, requestBody)
+            const response = await fundraisingsRepository.updateFundraising(state.id, requestBody)
             if (response) {
                 if (response.error) {
                     showError(response.error.message)
@@ -187,7 +187,16 @@ const EditFundraising = () => {
     }
     const fetchData = async () => {
         try {
-            const { avatarUrl, title, description, monobankJarId, monobankJar, tags, reports } = (await Fundraisings.getFundraising(state.id))!
+            const response = await fundraisingsRepository.getFundraising(state.id)
+
+            if (!response || !response.data) {
+                showError('Unexpected error while fetching fundraising')
+                setLoading(false)
+                return
+            }
+
+            const { avatarUrl, title, description, monobankJarId, monobankJar, tags, reports } = response.data
+
             setImageUrl(avatarUrl)
             setTitle(title)
             setDescription(description)
@@ -346,8 +355,12 @@ const EditFundraising = () => {
                     >
                         <AddReport
                             onClose={async () => {
-                                const { reports } = (await Fundraisings.getFundraising(state.id))!
-                                setReports(reports)
+                                const response = await fundraisingsRepository.getFundraising(state.id)
+                                if (response) {
+                                    if (response.data) {
+                                        setReports(response.data.reports)
+                                    }
+                                }
                                 setDialogueOpen(false);
                             }}
                             fundraisingId={state.id}

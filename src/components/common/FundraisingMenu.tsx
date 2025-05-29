@@ -5,7 +5,7 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useState } from 'react';
 import { Box, Button, Dialog, Typography } from '@mui/material';
 import { useUser } from '../../contexts/UserContext';
-import Fundraisings from '../../services/api/Fundraisings';
+import fundraisingsRepository from '../../repository/fundraisingsRepository';
 import { useToast } from '../../contexts/ToastContext';
 
 const FundraisingMenu = ({ fundraisingId, ownerId, onDelete, onEdit }: { fundraisingId: string, ownerId: string, onDelete: () => void, onEdit: () => void }) => {
@@ -24,9 +24,9 @@ const FundraisingMenu = ({ fundraisingId, ownerId, onDelete, onEdit }: { fundrai
 
     const handleDelete = async () => {
         try {
-            const result = await Fundraisings.deleteFundraising(fundraisingId);
+            const result = await fundraisingsRepository.deleteFundraising(fundraisingId);
 
-            if (result && result.success) {
+            if (result && result.isSuccess) {
                 showSuccess('Fundraising deleted successfully!');
                 onDelete();
             }

@@ -1,11 +1,11 @@
 import React from 'react';
-import FundraisingList from "../../components/FundraisingList/FundraisingList";
-import Fundraisings from "../../services/api/Fundraisings";
+import FundraisingList from "../../components/FundraisingList";
+import fundraisingsRepository from "../../repository/fundraisingsRepository";
 
 const MyFundraisingsPage = () => {
-    const loader = (params: {pageSize: number, page: number}) => Fundraisings.getMyFundraising(params)
+    const loader = (params: { pageSize: number, page: number }) => fundraisingsRepository.getMyFundraising(params)
     return (
-        <FundraisingList loader={loader} type={'USER'}/>
+        <FundraisingList loader={loader} type={'USER'} />
     );
 };
 

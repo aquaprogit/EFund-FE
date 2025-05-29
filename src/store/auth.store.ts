@@ -10,9 +10,9 @@ type AuthState = {
     accessToken: string | null;
     refreshToken: string | null;
     userId: string | null;
-    signIn: (request: SignInRequest) => Promise<boolean>;
-    signUp: (request: SignUpRequest) => Promise<string | null>;
-    confirmEmail: (request: ConfirmEmailRequest) => Promise<boolean>;
+    signIn: (request: SignInRequest) => Promise<string | undefined>;
+    signUp: (request: SignUpRequest) => Promise<{ userId: string | undefined, error: string | undefined }>;
+    confirmEmail: (request: ConfirmEmailRequest) => Promise<{ success: boolean, error: string | undefined }>;
     signOut: () => void;
     refresh: (accessToken: string, refreshToken: string) => Promise<void>;
     googleSignIn: (token: string) => Promise<void>;
@@ -34,9 +34,9 @@ export const useAuth = create<AuthState>()(
                         accessToken: response.data.accessToken,
                         refreshToken: response.data.refreshToken
                     });
-                    return true;
+                    return undefined;
                 }
-                return false;
+                return response.error?.message;
             },
             signOut: () => {
                 set({
@@ -53,9 +53,9 @@ export const useAuth = create<AuthState>()(
                     set({
                         userId: response.data.userId
                     });
-                    return response.data.userId;
+                    return { userId: response.data.userId, error: undefined };
                 }
-                return null;
+                return { userId: undefined, error: response.error?.message };
             },
             confirmEmail: async (request: ConfirmEmailRequest) => {
                 const response = await authRepository.confirmEmail(request);
@@ -66,9 +66,9 @@ export const useAuth = create<AuthState>()(
                         refreshToken: response.data.refreshToken,
                         isAuth: true
                     });
-                    return true;
+                    return { success: true, error: undefined };
                 }
-                return false;
+                return { success: false, error: response.error?.message };
             },
             refresh: async (accessToken: string, refreshToken: string) => {
                 const response = await authRepository.refresh(accessToken, refreshToken);

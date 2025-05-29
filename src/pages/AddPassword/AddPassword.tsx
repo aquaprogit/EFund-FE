@@ -3,22 +3,17 @@ import ChangeCreds from "../../templates/ChangeCreds/ChangeCreds";
 import { userRepository } from "../../repository/userRepository";
 import { useToast } from "../../contexts/ToastContext";
 import PasswordInput from "./PasswordInput";
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useForm } from 'react-hook-form';
-import addPasswordValidation from "../../validation/forms/AddPasswordValidation";
 import { Box } from '@mui/material';
 import { useUser } from '../../contexts/UserContext';
+import { addPasswordSchema, type AddPasswordFormData } from '../../models/auth/schemas';
+import { useZodForm } from '../../hooks/useZodForm';
 
 const AddPassword = (props: { onClose: () => void }) => {
     const { refreshUser } = useUser();
     const { showSuccess, showError } = useToast();
-    const { handleSubmit, register, formState: { errors } } = useForm({
-        resolver: yupResolver(addPasswordValidation),
-        reValidateMode: 'onChange',
-        mode: 'onTouched'
-    });
+    const { handleSubmit, register, formState: { errors } } = useZodForm(addPasswordSchema);
 
-    const onSubmit = async (data: { password: string; confirmPassword: string }) => {
+    const onSubmit = async (data: AddPasswordFormData) => {
         try {
             const response = await userRepository.addPassword({ password: data.password });
 
@@ -44,7 +39,6 @@ const AddPassword = (props: { onClose: () => void }) => {
                         placeholder={'Password'}
                         error={errors['password']}
                     />
-
                     <PasswordInput
                         register={register('confirmPassword')}
                         placeholder={'Confirm password'}

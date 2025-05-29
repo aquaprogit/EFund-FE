@@ -1,12 +1,10 @@
-import { useForm } from 'react-hook-form';
-import { ResetPasswordFormFields } from '../models/form/auth/AuthFormFields';
 import { Box, TextField, Button, Paper, Typography } from '@mui/material';
-import Auth from '../services/api/Auth';
+import { userRepository } from '../repository/userRepository';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '../contexts/ToastContext';
-import { yupResolver } from '@hookform/resolvers/yup';
-import ResetPasswordValidation from '../validation/forms/ResetPasswordValidation';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { resetPasswordSchema, type ResetPasswordFormData } from '../models/auth/schemas';
+import { useZodForm } from '../hooks/useZodForm';
 
 const ResetPasswordPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
@@ -18,11 +16,7 @@ const ResetPasswordPage = () => {
     const navigate = useNavigate();
     const { showSuccess, showError } = useToast();
 
-    const { register, handleSubmit, getValues, formState: { errors } } = useForm<ResetPasswordFormFields>({
-        resolver: yupResolver(ResetPasswordValidation),
-        reValidateMode: 'onChange',
-        mode: 'onTouched',
-    });
+    const { register, handleSubmit, getValues, formState: { errors } } = useZodForm(resetPasswordSchema);
 
     return (
         <Paper
@@ -66,12 +60,11 @@ const ResetPasswordPage = () => {
                     component="form"
                     onSubmit={handleSubmit(async (formFields) => {
                         const request = { newPassword: getValues('password'), email, token };
-                        const result = await Auth.resetPassword(request);
-                        if (result && result.success) {
+                        const result = await userRepository.resetPassword(request);
+                        if (result.isSuccess) {
                             showSuccess('Password changed successfully');
-                        }
-                        else {
-                            showError(result?.error?.message ?? 'Error during changing password');
+                        } else {
+                            showError(result.error?.message ?? 'Error during changing password');
                         }
                         navigate('/sign-in');
                     })}>

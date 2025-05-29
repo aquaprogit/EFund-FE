@@ -1,11 +1,11 @@
 import { Box, Button, Dialog, Divider, TextField, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import AuthGoogleButton from "../../google/SignInGoogle";
-import { useZodForm } from "../../../hooks/useZodForm";
-import { SignInFormData, signInSchema } from "../../../schemas/auth/signInSchema";
-import Auth from "../../../services/api/Auth";
-import { useToast } from "../../../contexts/ToastContext";
+import AuthGoogleButton from "./SignInGoogle";
+import { useZodForm } from "../../hooks/useZodForm";
+import { SignInFormData, signInSchema } from "../../schemas/auth/signInSchema";
+import { userRepository } from "../../repository/userRepository";
+import { useToast } from "../../contexts/ToastContext";
 
 interface SignInFormProps {
     onSubmit: (data: SignInFormData) => void;
@@ -117,12 +117,11 @@ const SignInForm = (props: SignInFormProps) => {
                         color="primary"
                         size="medium"
                         onClick={async () => {
-                            const result = await Auth.forgotPassword({ email: getValues('email') });
-                            if (result && result.success) {
+                            const result = await userRepository.forgotPassword(getValues('email'));
+                            if (result.isSuccess) {
                                 showSuccess('Check your email for further instructions');
-                            }
-                            else {
-                                showError(result?.error?.message ?? 'Error during sending email');
+                            } else {
+                                showError(result.error?.message ?? 'Error during sending email');
                             }
                             setDialogOpened(false);
                         }}

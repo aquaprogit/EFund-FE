@@ -1,9 +1,9 @@
 import '../styles/home-page.css';
-import FundraisingList from "../components/FundraisingList/FundraisingList";
-import Fundraisings from "../services/api/Fundraisings";
+import FundraisingList from "../components/FundraisingList";
+import fundraisingsRepository from "../repository/fundraisingsRepository";
 
 const HomePage = () => {
-    const loader = (body: any) => Fundraisings.getFundraisings(body)
+    const loader = (body: any) => fundraisingsRepository.getFundraisings(body)
     return (
         <FundraisingList loader={loader} />
     );

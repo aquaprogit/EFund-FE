@@ -27,6 +27,10 @@ export const authRepository = {
     },
 
     async googleSignIn(token: string): Promise<ApiResponse<AuthResponse>> {
-        return await api.post<{ token: string }, AuthResponse>(urls.googleAuth, { token });
+        return await api.post<{}, AuthResponse>(urls.signInGoogle, {}, { 'Authorization-Code': token });
+    },
+
+    async googleSignUp(token: string): Promise<ApiResponse<AuthResponse>> {
+        return await api.post<{}, AuthResponse>(urls.signUpGoogle, {}, { 'Authorization-Code': token });
     }
 }; 

@@ -1,15 +1,15 @@
 import { Button } from "@mui/material"
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleIcon from '@mui/icons-material/Google';
-import useNotification from "../../hooks/useNotification";
 import { useUser } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../store/auth.store";
+import { useToast } from "../../contexts/ToastContext";
 
 const AuthGoogleButton = (props: { label: string, type: 'sign-in' | 'sign-up' }) => {
     const { refreshUser } = useUser();
     const { googleSignIn } = useAuth();
-    const { notifyError, Notification } = useNotification();
+    const { showError } = useToast();
     const navigate = useNavigate();
 
     const handleGoogleAuth = async (code: string) => {
@@ -19,10 +19,10 @@ const AuthGoogleButton = (props: { label: string, type: 'sign-in' | 'sign-up' })
             if (user) {
                 navigate('/');
             } else {
-                notifyError('Error during Google authentication');
+                showError('Error during Google authentication');
             }
         } catch (error) {
-            notifyError('Error during Google authentication');
+            showError('Error during Google authentication');
         }
     };
 
@@ -33,7 +33,6 @@ const AuthGoogleButton = (props: { label: string, type: 'sign-in' | 'sign-up' })
 
     return (
         <>
-            <Notification />
             <Button
                 startIcon={<GoogleIcon />}
                 variant="contained"

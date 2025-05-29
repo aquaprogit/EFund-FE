@@ -7,7 +7,7 @@ import { useUser } from "../../contexts/UserContext";
 import { useNavigate } from "react-router-dom";
 import styles from "./ProfilePage.module.css";
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import UploadImage from "../../components/profile/UploadImage/UploadImage";
+import UploadImage from "../../components/UploadImage";
 import ChangePassword from "../ChangePassword/ChangePassword";
 import AddPassword from "../AddPassword/AddPassword";
 import ChangeEmail from "../ChangeEmail/ChangeEmail";

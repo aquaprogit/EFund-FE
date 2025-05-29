@@ -1,6 +1,6 @@
-import api from "../repository/api";
+import { api } from "../services/api/api";
 
-export const monobankApi = {
+export const monobankRepository = {
     linkToken: async (token: string) => {
         try {
             return await api.post('/monobank/link-token', {}, {

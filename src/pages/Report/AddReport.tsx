@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
-import FundraisingsReports, {
-	AddReportBody,
-} from "../../services/api/FundraisingsReports/FundraisingsReports";
+import { AddReportBody, fundraisingsReportsRepository } from "../../repository/fundraisingsReportsRepository";
 import { useToast } from "../../contexts/ToastContext";
 import LimitedTextField from "../../components/common/LimitedTextField";
 
@@ -33,18 +31,18 @@ const AddReport = ({
 				description,
 				fundraisingId: fundraisingId,
 			};
-			const response: any = await FundraisingsReports.addReport(body);
+			const response: any = await fundraisingsReportsRepository.addReport(body);
 			if (response) {
 				if (response.error) {
 					showError(response.error.message);
 				} else if (response.success) {
 					const formData = createFormData();
 					const attachaments =
-						await FundraisingsReports.addAttachments(
+						await fundraisingsReportsRepository.addAttachments(
 							response.data.id,
 							formData
 						);
-					if (attachaments!.success) {
+					if (attachaments!.isSuccess) {
 						showSuccess("Report has been added");
 						onClose();
 					} else if (attachaments!.error) {

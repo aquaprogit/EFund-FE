@@ -1,6 +1,6 @@
 import { Box, Card, Dialog, Link, TextField, Button, Typography, DialogTitle } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import MenuAvatar from "../home/MenuAvatar";
+import MenuAvatar from "../MenuAvatar";
 import { ReactNode, useEffect, useState } from "react";
 import '../../styles/page-wrapper.css';
 import { useUser } from "../../contexts/UserContext";

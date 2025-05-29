@@ -8,6 +8,8 @@ import api from '../services/api/api';
 export type UpdateUserInfo = { name: string };
 export type AddPassword = { password: string };
 export type ChangePassword = { oldPassword: string; newPassword: string };
+export type ConfirmChangeEmail = { newEmail: string, code: number };
+export type ResendCode = { userId: string };
 
 export const userRepository = {
     async me(): Promise<ApiResponse<User>> {
@@ -16,6 +18,22 @@ export const userRepository = {
 
     async changeEmail(newEmail: string): Promise<ApiResponse<{}>> {
         return await api.post<{ newEmail: string }, {}>(urls.changeEmail, { newEmail });
+    },
+
+    async confirmChangeEmail(request: ConfirmChangeEmail): Promise<ApiResponse<{}>> {
+        return await api.post<ConfirmChangeEmail, {}>(urls.confirmChangeEmail, request);
+    },
+
+    async resendConfirmationCode(request: ResendCode): Promise<ApiResponse<{}>> {
+        return await api.post<ResendCode, {}>(urls.resendConfirmationCode, request);
+    },
+
+    async forgotPassword(email: string): Promise<ApiResponse<{}>> {
+        return await api.post<{ email: string }, {}>(urls.forgotPassword, { email });
+    },
+
+    async resetPassword(request: { email: string, token: string, newPassword: string }): Promise<ApiResponse<{}>> {
+        return await api.post<typeof request, {}>(urls.resetPassword, request);
     },
 
     async uploadAvatar(file: File): Promise<ApiResponse<{}>> {

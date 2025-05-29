@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ChangeCreds from "../../templates/ChangeCreds/ChangeCreds";
 import TextField from "@mui/material/TextField";
-import Auth from "../../services/api/Auth";
+import { userRepository } from "../../repository/userRepository";
 import { useToast } from "../../contexts/ToastContext";
 import ConfirmChangeEmail from './ConfirmChangeEmail';
 
@@ -15,13 +15,10 @@ const ChangeEmail = (props: { onClose: () => void }) => {
     }
     const onSubmit = async () => {
         try {
-            const response = await Auth.changeEmail({
-                newEmail
-            })
-            if (response.error) {
-                showError(response.error.message);
-            }
-            else if (response.success || response.error.errorCode === 4) {
+            const response = await userRepository.changeEmail(newEmail);
+            if (!response.isSuccess) {
+                showError(response.error?.message || 'Failed to change email');
+            } else {
                 setConfirmationSent(true);
             }
         }

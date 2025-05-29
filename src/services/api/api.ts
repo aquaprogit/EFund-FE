@@ -30,10 +30,10 @@ export const api = {
         }
     },
 
-    post: async <TRequest, TResponse>(url: string, request: TRequest, token?: string): Promise<ApiResponse<TResponse>> => {
+    post: async <TRequest, TResponse>(url: string, request: TRequest, headers?: { [key: string]: string }): Promise<ApiResponse<TResponse>> => {
         try {
             const response = await axios.post<TResponse>(url, request, {
-                headers: token ? { 'Authorization-Code': token } : undefined
+                headers: headers
             });
             return { isSuccess: true, data: response.data };
         }

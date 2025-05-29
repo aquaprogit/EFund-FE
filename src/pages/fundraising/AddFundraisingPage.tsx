@@ -3,14 +3,14 @@ import PageWrapper from "../../components/common/PageWrapper";
 import '../../styles/pages/fundraising/add-page.css';
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 import LimitedTextField from "../../components/common/LimitedTextField";
-import { monobankApi } from "../../services/api/Monobank/Monobank";
+import { monobankRepository } from "../../repository/monobankRepository";
 import Jar from "../../models/Jar";
 import { useToast } from "../../contexts/ToastContext";
-import UploadImage from "../../components/profile/UploadImage/UploadImage";
-import Fundraisings from "../../services/api/Fundraisings";
+import UploadImage from "../../components/UploadImage";
+import fundraisingsRepository from "../../repository/fundraisingsRepository";
 import { useNavigate } from "react-router-dom";
 import MultiSelectWithChip from "../../components/common/MultiSelectWithChips";
-import Tags from "../../services/api/Tags";
+import tagsRepository from "../../repository/tagsRepository";
 import { useUser } from "../../contexts/UserContext";
 
 const AddPage = () => {
@@ -40,7 +40,7 @@ const AddPage = () => {
 
     const getMonobankJars = async () => {
         try {
-            const response = await monobankApi.getJars();
+            const response = await monobankRepository.getJars();
             if (response) {
                 if (response.data) {
                     // @ts-ignore
@@ -55,7 +55,7 @@ const AddPage = () => {
 
     const getTags = async () => {
         try {
-            const response = await Tags.getTags();
+            const response = await tagsRepository.getTags();
             if (response) {
                 setTags(response.map((tag) => tag.name))
             }
@@ -70,7 +70,7 @@ const AddPage = () => {
     }
     const uploadImage = async (fundraisingId: string, file: File) => {
         try {
-            const response = await Fundraisings.uploadImage(fundraisingId, file)
+            const response = await fundraisingsRepository.uploadImage(fundraisingId, file)
             if (response.error) {
                 showError(response.error.message)
             }
@@ -111,7 +111,7 @@ const AddPage = () => {
             tags: selectedTags,
         }
         try {
-            const response = await Fundraisings.createFundraising(requestBody)
+            const response = await fundraisingsRepository.createFundraising(requestBody)
             if (response) {
                 if (response.error) {
                     showError(response.error.message)

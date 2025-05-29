@@ -1,11 +1,10 @@
 import Logout from "@mui/icons-material/Logout";
-import Settings from "@mui/icons-material/Settings";
 import AddIcon from '@mui/icons-material/Add';
 import Person2Icon from '@mui/icons-material/Person2';
 import { Avatar, Divider, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import { useState } from "react";
-import { stringAvatar } from "../../services/utils/convert";
-import { useUser } from "../../contexts/UserContext";
+import { stringAvatar } from "../services/utils/convert";
+import { useUser } from "../contexts/UserContext";
 import { CallToAction } from "@mui/icons-material";
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import EmailIcon from '@mui/icons-material/Email';

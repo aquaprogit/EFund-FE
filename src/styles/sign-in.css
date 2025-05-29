@@ -10,9 +10,17 @@
     align-items: center;
 }
 
+.sign-in-container {
+    padding: 40px 15px;
+}
+
 .sign-in-header{
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+
+.sign-in-page {
+    margin: auto;
 }

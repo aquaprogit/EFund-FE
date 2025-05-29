@@ -1,6 +1,6 @@
 import { Box, Button, TextField } from "@mui/material";
-import { useZodForm } from "../../../hooks/useZodForm";
-import { ConfirmEmailFormData, confirmEmailSchema } from "../../../schemas/auth/confirmEmailSchema";
+import { useZodForm } from "../../hooks/useZodForm";
+import { confirmEmailSchema } from "../../schemas/auth/confirmEmailSchema";
 
 interface EmailConfirmFormProps {
     onSubmit: (code: string) => void;
@@ -13,7 +13,7 @@ const EmailConfirmForm = (props: EmailConfirmFormProps) => {
         <Box
             display={'flex'}
             flexDirection={'column'}
-            sx={{ gap: 3, margin: 5, mt: 2, mb: 2 }}
+            sx={{ gap: 6, margin: 5, mt: 5, mb: 2 }}
             component="form"
             onSubmit={handleSubmit((data) => props.onSubmit(data.code))}>
             <TextField

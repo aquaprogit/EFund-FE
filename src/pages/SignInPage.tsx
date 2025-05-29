@@ -1,46 +1,42 @@
 import { Paper, Typography, Box } from "@mui/material";
-import useNotification from "../hooks/useNotification";
-import '../styles/sign-in.css';
-import SignInForm from "../components/auth/sign-in/SignInForm";
+import '../styles/sign-in.css'
+import SignInForm from "../components/auth/SignInForm";
 import { SignInFormFields } from "../models/form/auth/AuthFormFields";
 import { useNavigate } from "react-router-dom";
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useUser } from "../contexts/UserContext";
 import { useAuth } from "../store/auth.store";
+import { useToast } from "../contexts/ToastContext";
+import BackButton from "../components/common/BackButton";
 
 const SignInPage = () => {
-    const { updateUser, refreshUser } = useUser();
+    const { refreshUser } = useUser();
     const { signIn } = useAuth();
-    const { notifyError, Notification } = useNotification();
+    const { showError } = useToast();
     const navigate = useNavigate();
 
     const onSubmit = async (fields: SignInFormFields) => {
-        const success = await signIn(fields);
-        if (success) {
+        const error = await signIn(fields);
+        if (error) {
+            showError(error);
+        } else {
             const user = await refreshUser();
             if (user) {
                 navigate('/');
             } else {
-                notifyError('Error during signing in');
+                showError('Error during signing in');
             }
-        } else {
-            notifyError('Error during signing in');
         }
     };
 
     return (
         <Box className="sign-in-page">
-            <Notification />
-            <Box className="back-button" onClick={() => navigate('/')}>
-                <ArrowBackIcon />
-                <Typography>Back to home</Typography>
-            </Box>
             <Paper elevation={3} className="sign-in-container">
+                <BackButton />
                 <Typography variant="h4" textAlign={'center'}>Sign In</Typography>
                 <SignInForm onSubmit={onSubmit} />
             </Paper>
         </Box>
     );
-}
+};
 
 export default SignInPage;

@@ -1,24 +1,21 @@
 import ChangeCreds from "../../templates/ChangeCreds/ChangeCreds";
 import { userRepository } from "../../repository/userRepository";
 import { useToast } from "../../contexts/ToastContext";
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useForm } from 'react-hook-form';
-
 import PasswordInput from "../AddPassword/PasswordInput";
-import changePasswordValidation from "../../validation/forms/ChangePasswordValidation";
 import { Box } from "@mui/material";
+import { changePasswordSchema, type ChangePasswordFormData } from "../../models/auth/schemas";
+import { useZodForm } from "../../hooks/useZodForm";
 
 const ChangePassword = (props: { onClose: () => void }) => {
     const { showSuccess, showError } = useToast();
-    const { handleSubmit, register, formState: { errors } } = useForm({
-        resolver: yupResolver(changePasswordValidation),
-        reValidateMode: 'onChange',
-        mode: 'onTouched'
-    });
+    const { register, handleSubmit, formState: { errors } } = useZodForm(changePasswordSchema);
 
-    const onSubmit = async (data: { password: string; newPassword: string }) => {
+    const onSubmit = async (data: ChangePasswordFormData) => {
         try {
-            const response = await userRepository.changePassword({ oldPassword: data.password, newPassword: data.newPassword });
+            const response = await userRepository.changePassword({ 
+                oldPassword: data.oldPassword,
+                newPassword: data.newPassword 
+            });
 
             if (response.isSuccess) {
                 showSuccess('Password has been successfully changed');
@@ -28,25 +25,40 @@ const ChangePassword = (props: { onClose: () => void }) => {
             }
         } catch (error) {
             console.error('An error occurred:', error);
-            showError('An error occurred while adding the password.');
+            showError('An error occurred while changing the password.');
         }
     };
+
     return (
-        <ChangeCreds buttonLabel="Change password" title='Change password' buttonHandler={handleSubmit(onSubmit)}>
-            <form>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }} >
-                    <PasswordInput
-                        register={register('password')}
-                        placeholder={'Old password'}
-                        error={errors['password']}
-                    />
-                    <PasswordInput
-                        register={register('newPassword')}
-                        placeholder={'New Password'}
-                        error={errors['newPassword']}
-                    />
-                </Box>
-            </form>
+        <ChangeCreds 
+            buttonLabel="Change password" 
+            title='Change password' 
+            buttonHandler={handleSubmit(onSubmit)}
+        >
+            <Box 
+                component="form" 
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)(e);
+                }}
+                sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+            >
+                <PasswordInput
+                    register={register('oldPassword')}
+                    placeholder={'Old password'}
+                    error={errors['oldPassword']}
+                />
+                <PasswordInput
+                    register={register('newPassword')}
+                    placeholder={'New Password'}
+                    error={errors['newPassword']}
+                />
+                <PasswordInput
+                    register={register('confirmPassword')}
+                    placeholder={'Confirm password'}
+                    error={errors['confirmPassword']}
+                />
+            </Box>
         </ChangeCreds>
     );
 };

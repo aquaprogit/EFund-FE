@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { Box, Button, Typography } from "@mui/material";
 import styles from './ChangeEmail.module.css';
 import TextField from "@mui/material/TextField";
-
-import Auth from "../../services/api/Auth";
+import { userRepository } from "../../repository/userRepository";
 import { useToast } from "../../contexts/ToastContext";
 import { useUser } from "../../contexts/UserContext";
 
@@ -17,11 +16,10 @@ const ConfirmChangeEmail = (props: { newEmail: string, onClose: () => void }) =>
     }
     const onSubmit: React.MouseEventHandler<HTMLButtonElement> = async () => {
         try {
-            const response = await Auth.confirmChangeEmail({ newEmail: props.newEmail, code: parseInt(code, 10) })
-            if (response && response.error) {
-                showError(response.error.message)
-            }
-            else {
+            const response = await userRepository.confirmChangeEmail({ newEmail: props.newEmail, code: parseInt(code, 10) });
+            if (!response.isSuccess) {
+                showError(response.error?.message || 'Failed to confirm email change');
+            } else {
                 showSuccess('Email has been successfully changed');
                 await refreshUser();
                 props.onClose();
@@ -33,14 +31,11 @@ const ConfirmChangeEmail = (props: { newEmail: string, onClose: () => void }) =>
     }
     const resendConfirmationCode = async () => {
         try {
-            const response = await Auth.resendConfirmationCode({ userId: user!.id })
-            if (response) {
-                if (response.success) {
-                    showSuccess('Confirmation code has been resent')
-                }
-                else if (response.error) {
-                    showError(response.error.message)
-                }
+            const response = await userRepository.resendConfirmationCode({ userId: user!.id });
+            if (response.isSuccess) {
+                showSuccess('Confirmation code has been resent');
+            } else {
+                showError(response.error?.message || 'Failed to resend confirmation code');
             }
         }
         catch (e) {
