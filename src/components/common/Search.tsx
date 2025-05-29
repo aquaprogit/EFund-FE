@@ -1,25 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import TextField from '@mui/material/TextField';
-import IconButton from '@mui/material/IconButton';
+import TextField, { TextFieldProps } from '@mui/material/TextField';
 import SearchIcon from '@mui/icons-material/Search';
-import { Box } from '@mui/material';
+import { Box, InputAdornment, useTheme } from '@mui/material';
 
-interface SearchProps {
+interface SearchProps extends Omit<TextFieldProps, 'onChange'> {
     onSearch: (query: string) => void;
 }
 
-const Search: React.FC<SearchProps> = ({ onSearch }) => {
+const Search: React.FC<SearchProps> = ({ onSearch, InputProps, sx, ...props }) => {
     const [searchQuery, setSearchQuery] = useState<string>('');
-
-    const handleSearch = () => {
-        onSearch(searchQuery);
-    };
-
-    const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter') {
-            handleSearch();
-        }
-    };
+    const theme = useTheme();
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -30,22 +20,42 @@ const Search: React.FC<SearchProps> = ({ onSearch }) => {
     }, [searchQuery, onSearch]);
 
     return (
-        <Box sx={{
-            display: 'flex',
-            gap: 1
-        }}>
-            <TextField
-                id="input-with-sx"
-                variant="standard"
-                placeholder='Search...'
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={handleKeyPress}
-            />
-            <IconButton onClick={handleSearch} color='primary' aria-label="search">
-                <SearchIcon sx={{ color: 'action.active', m: -0.5 }} />
-            </IconButton>
-        </Box>
+        <TextField
+            {...props}
+            fullWidth
+            variant="standard"
+            placeholder="Search..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            InputProps={{
+                ...InputProps,
+                endAdornment: (
+                    <InputAdornment position="end">
+                        <SearchIcon
+                            sx={{
+                                color: 'text.secondary',
+                                fontSize: 20
+                            }}
+                        />
+                    </InputAdornment>
+                ),
+                sx: {
+                    '&:before': {
+                        borderColor: theme.palette.divider,
+                    },
+                    '&:hover:not(.Mui-disabled):before': {
+                        borderColor: theme.palette.primary.main,
+                    },
+                    '&.Mui-focused:after': {
+                        borderColor: theme.palette.primary.main,
+                    },
+                    ...InputProps?.sx
+                }
+            }}
+            sx={{
+                ...sx
+            }}
+        />
     );
 };
 

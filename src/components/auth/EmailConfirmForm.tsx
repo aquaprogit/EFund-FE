@@ -7,29 +7,56 @@ interface EmailConfirmFormProps {
 }
 
 const EmailConfirmForm = (props: EmailConfirmFormProps) => {
-    const { register, handleSubmit, formState: { errors } } = useZodForm(confirmEmailSchema);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors, isSubmitting }
+    } = useZodForm(confirmEmailSchema);
 
     return (
         <Box
-            display={'flex'}
-            flexDirection={'column'}
-            sx={{ gap: 6, margin: 5, mt: 5, mb: 2 }}
             component="form"
-            onSubmit={handleSubmit((data) => props.onSubmit(data.code))}>
+            onSubmit={handleSubmit((data) => props.onSubmit(data.code))}
+            sx={{
+                width: '100%',
+                maxWidth: 450,
+                mx: 'auto',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: 3
+            }}
+        >
             <TextField
+                fullWidth
                 id="code"
                 label="Confirmation Code"
                 {...register('code')}
                 error={!!errors.code}
                 helperText={errors.code?.message}
-                variant="standard"
+                variant="outlined"
+                sx={{
+                    '& .MuiOutlinedInput-root': {
+                        borderRadius: 1
+                    }
+                }}
             />
             <Button
                 type="submit"
                 variant="contained"
                 color="primary"
-                size="medium"
-                sx={{ width: 'max-content', alignSelf: 'center' }}>
+                size="large"
+                disabled={isSubmitting}
+                fullWidth
+                sx={{
+                    py: 1.5,
+                    textTransform: 'none',
+                    fontWeight: 600,
+                    boxShadow: 'none',
+                    '&:hover': {
+                        boxShadow: 'none'
+                    }
+                }}
+            >
                 Confirm Email
             </Button>
         </Box>

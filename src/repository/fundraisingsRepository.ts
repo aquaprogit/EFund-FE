@@ -12,15 +12,15 @@ type AddFundraisingBody = {
 }
 
 const fundraisingsRepository = {
-    async getFundraisings(request: SearchFundraisingsRequest): Promise<ApiResponse<PagedResponse<Fundraising>> | undefined> {
+    async getFundraisings(request: SearchFundraisingsRequest, page: number, pageSize: number): Promise<ApiResponse<PagedResponse<Fundraising>> | undefined> {
         // TODO: fix type
-        const response = await api.getPaginated<Fundraising>('/fundraisings/search', { page: request.page, pageSize: 1 });
+        const response = await api.postPaginated<SearchFundraisingsRequest, Fundraising>('/fundraisings/search', { page, pageSize, request });
 
         return response;
     },
-    getMyFundraising: async (params: { page: number, pageSize: number }): Promise<ApiResponse<PagedResponse<Fundraising>> | undefined> => {
+    getMyFundraising: async (page: number, pageSize: number): Promise<ApiResponse<PagedResponse<Fundraising>> | undefined> => {
         try {
-            const response = await api.getPaginated<Fundraising>('/fundraisings/', params)
+            const response = await api.getPaginated<Fundraising>('/fundraisings/', { page, pageSize, request: {} })
             return response
         }
         catch (e) {

@@ -1,4 +1,4 @@
-import { Box, Card, Dialog, Link, TextField, Button, Typography, DialogTitle } from "@mui/material";
+import { Box, Card, Dialog, Link, TextField, Button, Typography, DialogTitle, Container, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MenuAvatar from "../MenuAvatar";
 import { ReactNode, useEffect, useState } from "react";
@@ -15,6 +15,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
     const { user, loading, updateUser, refreshUser } = useUser();
     const navigate = useNavigate();
     const { showWarning, showSuccess, showError } = useToast();
+    const theme = useTheme();
 
     const [open, setOpen] = useState(false);
     const [email, setEmail] = useState('');
@@ -36,74 +37,124 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
     }
 
     return (
-        <Box
-            className='page-wrapper'>
-            <Card className='header'>
-                <Link
-                    href='/'
-                    variant="h6"
-                    color="inherit"
-                    underline="none">EFund</Link>
-                <Box
-                    className='header-actions'>
-                    {loading
-                        ? <></>
-                        : (user ?
-                            <MenuAvatar
-                                onInviteUser={() => setOpen(true)}
-                                onUsers={() => navigate('/users')}
-                                onSignOut={() => updateUser(null)}
-                                onSettings={() => navigate('/settings')}
-                                onProfile={() => navigate('/profile')}
-                                onAdd={onAdd}
-                                onMyFundraising={onMyFundraising}
-                            />
-                            :
-                            <>
-                                <Link
-                                    href='/sign-in'
-                                    variant="h6"
-                                    color="inherit"
-                                    underline="none">Sign In</Link>
-                                <Link
-                                    href='/sign-up'
-                                    variant="h6"
-                                    color="inherit"
-                                    underline="none">Sign Up</Link>
-                            </>
-                        )}
-                </Box>
-            </Card>
+        <Box className='page-wrapper'>
             <Box
-                sx={{ flexGrow: 1 }}>
+                component="header"
+                sx={{
+                    backgroundColor: theme.palette.background.paper,
+                    borderBottom: `1px solid ${theme.palette.divider}`,
+                    position: 'sticky',
+                    top: 0,
+                    zIndex: 1100,
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+                }}
+            >
+                <Container maxWidth="lg">
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            py: 2
+                        }}
+                    >
+                        <Link
+                            href='/'
+                            variant="h5"
+                            color="primary"
+                            sx={{
+                                fontWeight: 'bold',
+                                textDecoration: 'none',
+                                '&:hover': {
+                                    color: theme.palette.primary.dark
+                                }
+                            }}
+                        >
+                            EFund
+                        </Link>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                            {loading ? (
+                                <></>
+                            ) : (
+                                user ? (
+                                    <MenuAvatar
+                                        onInviteUser={() => setOpen(true)}
+                                        onUsers={() => navigate('/users')}
+                                        onSignOut={() => updateUser(null)}
+                                        onSettings={() => navigate('/settings')}
+                                        onProfile={() => navigate('/profile')}
+                                        onAdd={onAdd}
+                                        onMyFundraising={onMyFundraising}
+                                    />
+                                ) : (
+                                    <>
+                                        <Button
+                                            color="primary"
+                                            onClick={() => navigate('/sign-in')}
+                                        >
+                                            Sign In
+                                        </Button>
+                                        <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => navigate('/sign-up')}
+                                        >
+                                            Sign Up
+                                        </Button>
+                                    </>
+                                )
+                            )}
+                        </Box>
+                    </Box>
+                </Container>
+            </Box>
+
+            <Box component="main" sx={{ flexGrow: 1 }}>
                 {children}
             </Box>
-            <Card
-                className='footer'>
 
-            </Card>
+            <Box
+                component="footer"
+                sx={{
+                    backgroundColor: theme.palette.grey[100],
+                    py: 4,
+                    mt: 'auto'
+                }}
+            >
+                <Container maxWidth="lg">
+                    <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        align="center"
+                    >
+                        © {new Date().getFullYear()} EFund. All rights reserved.
+                    </Typography>
+                </Container>
+            </Box>
+
             <Dialog
                 open={open}
                 onClose={() => setOpen(false)}
+                PaperProps={{
+                    sx: {
+                        borderRadius: 2,
+                        p: 2
+                    }
+                }}
             >
-                <Typography
-                    sx={{
-                        paddingTop: '20px',
-                        textAlign: 'center',
-                    }}
-                    variant="h4">Invite admin</Typography>
+                <DialogTitle sx={{ textAlign: 'center' }}>
+                    Invite Admin
+                </DialogTitle>
                 <Box sx={{
                     width: '500px',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    gap: 2,
-                    padding: '50px'
+                    gap: 3,
+                    p: 4
                 }}>
                     <TextField
-                        sx={{
-                            width: '100%'
-                        }}
+                        fullWidth
                         label="Email"
                         value={email}
                         error={!!email && email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i) === null}
@@ -112,6 +163,7 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
                     />
                     <Button
                         variant="contained"
+                        fullWidth
                         onClick={async () => {
                             const result = await userRepository.inviteAdmin(email);
                             if (result.isSuccess) {

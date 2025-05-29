@@ -1,7 +1,7 @@
 import Logout from "@mui/icons-material/Logout";
 import AddIcon from '@mui/icons-material/Add';
 import Person2Icon from '@mui/icons-material/Person2';
-import { Avatar, Divider, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import { Avatar, Divider, ListItemIcon, Menu, MenuItem, Typography, Box, useTheme } from '@mui/material';
 import { useState } from "react";
 import { stringAvatar } from "../services/utils/convert";
 import { useUser } from "../contexts/UserContext";
@@ -21,6 +21,7 @@ interface MenuAvatarProps {
 
 const MenuAvatar = (props: MenuAvatarProps) => {
     const { user } = useUser();
+    const theme = useTheme();
 
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
@@ -33,30 +34,52 @@ const MenuAvatar = (props: MenuAvatarProps) => {
     };
 
     return (
-        <>
-            <Typography mr={-1} variant="h6">{user?.name}</Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Typography
+                variant="subtitle1"
+                sx={{
+                    color: theme.palette.text.primary,
+                    fontWeight: 500
+                }}
+            >
+                {user?.name}
+            </Typography>
             <Avatar
                 onClick={handleClick}
                 {...stringAvatar(user?.name)}
                 src={user?.avatarUrl}
+                sx={{
+                    cursor: 'pointer',
+                    width: 40,
+                    height: 40,
+                    border: `2px solid ${theme.palette.primary.main}`,
+                    '&:hover': {
+                        borderColor: theme.palette.primary.dark
+                    }
+                }}
             />
             <Menu
                 anchorEl={anchorEl}
                 id="account-menu"
                 open={open}
                 onClose={handleClose}
-                sx={{ width: '220px !important' }}
+                onClick={handleClose}
                 PaperProps={{
-                    elevation: 0,
+                    elevation: 3,
                     sx: {
+                        width: 220,
                         overflow: 'visible',
-                        filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.32))',
                         mt: 1.5,
-                        '& .MuiAvatar-root': {
-                            width: 32,
-                            height: 32,
-                            ml: -0.5,
-                            mr: 1,
+                        '& .MuiMenuItem-root': {
+                            px: 2,
+                            py: 1.5,
+                            '&:hover': {
+                                backgroundColor: theme.palette.action.hover
+                            }
+                        },
+                        '& .MuiListItemIcon-root': {
+                            color: theme.palette.primary.main,
+                            minWidth: 36
                         },
                         '&:before': {
                             content: '""',
@@ -79,53 +102,49 @@ const MenuAvatar = (props: MenuAvatarProps) => {
                     <ListItemIcon>
                         <Person2Icon fontSize="small" />
                     </ListItemIcon>
-                    Profile
+                    <Typography variant="body2">Profile</Typography>
                 </MenuItem>
                 <Divider />
-                {
-                    !user?.isAdmin && <MenuItem onClick={props.onAdd}>
+                {!user?.isAdmin && (
+                    <MenuItem onClick={props.onAdd}>
                         <ListItemIcon>
                             <AddIcon fontSize="small" />
                         </ListItemIcon>
-                        Add fundraising
+                        <Typography variant="body2">Add fundraising</Typography>
                     </MenuItem>
-                }
+                )}
                 <MenuItem onClick={props.onMyFundraising}>
                     <ListItemIcon>
-                        <CallToAction />
+                        <CallToAction fontSize="small" />
                     </ListItemIcon>
-                    My fundraising
+                    <Typography variant="body2">My fundraising</Typography>
                 </MenuItem>
+                {user?.isAdmin && (
+                    <>
+                        <Divider />
+                        <MenuItem onClick={props.onUsers}>
+                            <ListItemIcon>
+                                <PeopleAltIcon fontSize="small" />
+                            </ListItemIcon>
+                            <Typography variant="body2">Users</Typography>
+                        </MenuItem>
+                        <MenuItem onClick={props.onInviteUser}>
+                            <ListItemIcon>
+                                <EmailIcon fontSize="small" />
+                            </ListItemIcon>
+                            <Typography variant="body2">Invite admin</Typography>
+                        </MenuItem>
+                    </>
+                )}
                 <Divider />
-                {
-                    user && user.isAdmin && (
-                        <>
-                            <MenuItem onClick={props.onUsers}>
-                                <ListItemIcon>
-                                    <PeopleAltIcon />
-                                </ListItemIcon>
-                                Users
-                            </MenuItem>
-                            <MenuItem onClick={props.onInviteUser}>
-                                <ListItemIcon>
-                                    <EmailIcon />
-                                </ListItemIcon>
-                                Invite admin
-                            </MenuItem>
-                        </>
-                    )
-                }
-                {
-                    user && user.isAdmin && <Divider />
-                }
                 <MenuItem onClick={props.onSignOut}>
                     <ListItemIcon>
                         <Logout fontSize="small" />
                     </ListItemIcon>
-                    Logout
+                    <Typography variant="body2">Logout</Typography>
                 </MenuItem>
             </Menu>
-        </>
+        </Box>
     );
 }
 

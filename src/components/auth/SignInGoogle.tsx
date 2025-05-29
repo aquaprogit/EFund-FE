@@ -1,4 +1,4 @@
-import { Button } from "@mui/material"
+import { Button, useTheme } from "@mui/material"
 import { useGoogleLogin } from '@react-oauth/google';
 import GoogleIcon from '@mui/icons-material/Google';
 import { useUser } from "../../contexts/UserContext";
@@ -11,6 +11,7 @@ const AuthGoogleButton = (props: { label: string, type: 'sign-in' | 'sign-up' })
     const { googleSignIn } = useAuth();
     const { showError } = useToast();
     const navigate = useNavigate();
+    const theme = useTheme();
 
     const handleGoogleAuth = async (code: string) => {
         try {
@@ -32,15 +33,26 @@ const AuthGoogleButton = (props: { label: string, type: 'sign-in' | 'sign-up' })
     });
 
     return (
-        <>
-            <Button
-                startIcon={<GoogleIcon />}
-                variant="contained"
-                onClick={() => login()}
-            >
-                {props.label}
-            </Button>
-        </>
+        <Button
+            fullWidth
+            startIcon={<GoogleIcon />}
+            variant="outlined"
+            onClick={() => login()}
+            sx={{
+                py: 1.5,
+                borderColor: theme.palette.divider,
+                color: theme.palette.text.primary,
+                backgroundColor: theme.palette.background.paper,
+                textTransform: 'none',
+                fontWeight: 500,
+                '&:hover': {
+                    backgroundColor: theme.palette.action.hover,
+                    borderColor: theme.palette.divider
+                }
+            }}
+        >
+            {props.label}
+        </Button>
     );
 }
 

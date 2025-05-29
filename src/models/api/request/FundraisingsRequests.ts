@@ -1,7 +1,6 @@
-import { PagedRequest } from "./base/PagedRequest";
-
-export interface SearchFundraisingsRequest extends PagedRequest {
+export interface SearchFundraisingsRequest {
     title?: string;
     tags?: string[];
-    includeClosed?: boolean;
+    statuses?: number[];
+    userId?: string;
 }

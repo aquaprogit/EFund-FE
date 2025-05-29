@@ -15,7 +15,7 @@ export const api = {
         }
     },
 
-    getPaginated: async <TResponse>(url: string, pagination: PaginatedRequest, params?: any): Promise<ApiResponse<PagedResponse<TResponse>>> => {
+    getPaginated: async <TResponse>(url: string, pagination: PaginatedRequest<any>, params?: any): Promise<ApiResponse<PagedResponse<TResponse>>> => {
         try {
             const response = await axios.get<PagedResponse<TResponse>>(url, {
                 params: {
@@ -29,6 +29,19 @@ export const api = {
             return handleError(error);
         }
     },
+
+    postPaginated: async <TRequest, TResponse>(url: string, request: PaginatedRequest<TRequest>): Promise<ApiResponse<PagedResponse<TResponse>>> => {
+        try {
+            const queryParams = new URLSearchParams({ page: request.page.toString(), pageSize: request.pageSize.toString() });
+
+            const response = await axios.post<PagedResponse<TResponse>>(url + '?' + queryParams.toString(), request.request);
+            return { isSuccess: true, data: response.data };
+        }
+        catch (error) {
+            return handleError(error);
+        }
+    },
+
 
     post: async <TRequest, TResponse>(url: string, request: TRequest, headers?: { [key: string]: string }): Promise<ApiResponse<TResponse>> => {
         try {

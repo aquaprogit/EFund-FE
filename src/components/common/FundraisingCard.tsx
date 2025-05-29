@@ -8,256 +8,176 @@ import {
     Button,
     Chip,
     Link,
-    Accordion,
-    AccordionDetails,
-    AccordionSummary,
-    Avatar
+    useTheme,
+    Stack
 } from '@mui/material';
 import Fundraising from '../../models/Fundraising';
 import { useNavigate } from "react-router-dom";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import FundraisingMenu from './FundraisingMenu';
 
 interface FundraisingCardProps {
     fundraising: Fundraising;
-    size: 'small' | 'large';
-    selected?: boolean;
-    onClick?: (id: string) => void;
-    isUser?: boolean
-    onDelete?: () => void;
+    isUser?: boolean;
 }
 
 const FundraisingCard = (props: FundraisingCardProps) => {
+    const theme = useTheme();
     const { balance, goal, currencyCode, sendUrl } = props.fundraising.monobankJar;
-    const textColor = props.selected ? 'primary.contrastText' : 'text.primary';
     const progress = (balance / goal) * 100;
-    const navigate = useNavigate()
-    const onEditClick = () => {
-        navigate('/edit-fundraising', { state: { id: props.fundraising.id } })
-    }
+    const navigate = useNavigate();
+
+    const handleClick = () => {
+        navigate(`/fundraising/${props.fundraising.id}`);
+    };
+
     return (
-        props.size === 'small' ?
-            <>
-                <Card
-                    sx={{
-                        bgcolor: props.selected ? 'primary.light' : 'background.paper',
-                        display: 'flex',
-                        position: 'relative',
-                        flexDirection: 'row',
-                        alignItems: 'center',
-                        gap: '15px',
-                        padding: '10px',
-                        paddingLeft: '20px',
-                        height: '100%',
-                        width: 600,
-                    }}
-                >
-                    <CardMedia
+        <Card
+            onClick={handleClick}
+            elevation={0}
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%',
+                borderRadius: 2,
+                border: `1px solid ${theme.palette.divider}`,
+                transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
+                cursor: 'pointer',
+                '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: theme.shadows[4],
+                }
+            }}
+        >
+            <CardMedia
+                component="img"
+                height="200"
+                image={props.fundraising.avatarUrl}
+                alt={props.fundraising.title}
+                sx={{
+                    objectFit: 'cover',
+                }}
+            />
+            <CardContent sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+                <Box sx={{ position: 'relative', mb: 2 }}>
+                    {props.isUser && (
+                        <Box sx={{ position: 'absolute', right: 0, top: -1 }}>
+                            <FundraisingMenu
+                                onEdit={() => navigate('/edit-fundraising', { state: { id: props.fundraising.id } })}
+                                onDelete={() => { }}
+                                fundraisingId={props.fundraising.id}
+                                ownerId={props.fundraising.userId}
+                            />
+                        </Box>
+                    )}
+                    <Typography
+                        variant="h6"
                         sx={{
-                            height: 100,
-                            width: 100,
+                            fontWeight: 600,
+                            mb: 1,
+                            color: theme.palette.text.primary,
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            pr: props.isUser ? 4 : 0
                         }}
                     >
-                        <Avatar
-                            style={{
-                                objectFit: 'fill',
-                                height: 100,
-                                width: 100,
-                            }}
-                            src={props.fundraising.avatarUrl}
-                            alt={props.fundraising.title}
-                        />
-                    </CardMedia>
-                    <CardContent sx={{
-                        flexGrow: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 0.5
-                    }}>
-                        <Typography variant="h5" noWrap component="div" color={textColor}>
-                            {props.fundraising.title.length > 37 ? props.fundraising.title.substring(0, 37) + '...' : props.fundraising.title}
-                        </Typography>
-                        <Typography variant="body2" textOverflow={'ellipsis'} overflow={'hidden'} maxHeight={'20px'} color={textColor}>
-                            {props.fundraising.description.length > 66 ? props.fundraising.description.substring(0, 66) + '...' : props.fundraising.description}
-                        </Typography>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                gap: '10px',
-                                marginTop: '10px',
-                            }}
-                        >
-                            <Typography variant="body2" color={textColor}>
-                                {balance} {currencyCode}
-                            </Typography>
-                            <LinearProgress sx={{ flexGrow: 1 }} variant="determinate" value={progress} />
-                            <Typography variant="body2" color={textColor}>
-                                {goal} {currencyCode}
-                            </Typography>
-                            {
-                                props.isUser &&
-                                <Button
-                                    color='primary'
-                                    variant="contained"
-                                    onClick={onEditClick}>
-                                    Edit
-                                </Button>
-                            }
-                            <Button
-                                color={props.selected ? 'secondary' : 'primary'}
-                                variant="contained"
-                                onClick={() => props.onClick && props.onClick(props.fundraising.id)}>
-                                More Info
-                            </Button>
-                        </Box>
-                    </CardContent>
-                </Card >
-            </>
-            :
-            <>
-                <Card
+                        {props.fundraising.title}
+                    </Typography>
+                </Box>
+
+                <Typography
+                    variant="body2"
+                    color="text.secondary"
                     sx={{
-                        display: 'flex',
-                        position: 'relative',
-                        flexDirection: 'row',
-                        alignItems: 'stretch',
-                        gap: '15px',
-                        padding: '10px',
-                        height: '100%',
-                        width: '100%',
+                        mb: 2,
+                        display: '-webkit-box',
+                        WebkitLineClamp: 3,
+                        WebkitBoxOrient: 'vertical',
+                        overflow: 'hidden',
+                        flexGrow: 1
                     }}
                 >
-                    <FundraisingMenu
-                        onEdit={onEditClick}
-                        onDelete={props.onDelete ?? (() => { })}
-                        fundraisingId={props.fundraising.id}
-                        ownerId={props.fundraising.userId}
-                    />
-                    <CardMedia
+                    {props.fundraising.description}
+                </Typography>
+
+                {props.fundraising.tags.length > 0 && (
+                    <Stack
+                        direction="row"
+                        spacing={1}
                         sx={{
-                            height: 175,
-                            width: 175,
+                            mb: 2,
+                            flexWrap: 'wrap',
+                            gap: 1
                         }}
                     >
-                        <Avatar
-                            style={{
-                                objectFit: 'fill',
-                                height: 175,
-                                width: 175,
+                        {props.fundraising.tags.map((tag, index) => (
+                            <Chip
+                                key={index}
+                                label={tag.toLowerCase()}
+                                size="small"
+                                sx={{
+                                    backgroundColor: theme.palette.primary.light,
+                                    color: theme.palette.text.primary,
+                                    fontWeight: 500,
+                                    fontSize: '0.75rem'
+                                }}
+                            />
+                        ))}
+                    </Stack>
+                )}
+
+                <Box sx={{ mt: 'auto' }}>
+                    <Box sx={{ mb: 1 }}>
+                        <LinearProgress
+                            variant="determinate"
+                            value={progress}
+                            sx={{
+                                height: 8,
+                                borderRadius: 1,
+                                backgroundColor: theme.palette.action.hover,
+                                mb: 1,
+                                '& .MuiLinearProgress-bar': {
+                                    borderRadius: 1,
+                                }
                             }}
-                            src={props.fundraising.avatarUrl}
-                            alt={props.fundraising.title}
                         />
-                    </CardMedia>
-                    <CardContent sx={{
-                        flexGrow: 1,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 0.5
-                    }}>
-                        <Typography style={{ wordWrap: 'break-word' }} variant="h4" component="div" textOverflow={'ellipsis'} overflow={'hidden'} color={textColor}>
-                            {props.fundraising.title}
-                        </Typography>
-                        <Box sx={{ display: 'flex', gap: 1 }}>
-                            {props.fundraising.tags.map((tag, index) => (
-                                <Chip
-                                    key={index}
-                                    label={tag}
-                                    color='primary'
-                                    variant='filled'
-                                />
-                            ))}
-                        </Box>
-                        <Typography variant="body1" textOverflow={'ellipsis'} overflow={'hidden'} color={textColor}>
-                            {props.fundraising.description}
-                        </Typography>
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                flexDirection: 'row',
-                                alignItems: 'center',
-                                alignSelf: 'center',
-                                gap: '10px',
-                                width: '70%',
-                                marginTop: '10px',
-                            }}
-                        >
-                            <Typography variant="body2">
-                                {balance} {currencyCode}
-                            </Typography>
-                            <LinearProgress color='primary' sx={{ flexGrow: 1 }} variant="determinate" value={progress} />
-                            <Typography variant="body2" color={textColor}>
-                                {goal} {currencyCode}
-                            </Typography>
-                        </Box>
-                        <Link
-                            href={sendUrl}
-                            sx={{
-                                alignSelf: 'center',
-                                marginTop: '10px',
-                                textDecoration: 'none',
-                            }}
-                            target='_blank'
-                            rel="noopener noreferrer"
-                        >
-                            <Button variant="contained" color="primary" style={{ fontWeight: 'bold' }}>
-                                Go to Monobank
-                            </Button>
-                        </Link>
                         <Box sx={{
                             display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                        }} mt={5}>
-                            {
-                                props.fundraising.reports.map(report => {
-                                    return (<Accordion sx={{ width: '100%', maxWidth: '550px' }}>
-                                        <AccordionSummary
-                                            expandIcon={<ExpandMoreIcon />}
-                                            aria-controls={report.id}
-                                            id='panel-header'
-                                        >
-                                            {
-                                                report.description.length <= 21
-                                                    ? (<>
-                                                        <Typography sx={{ width: '33%', flexShrink: 0 }}>
-                                                            {report.title}
-                                                        </Typography>
-
-                                                        <Typography sx={{ color: 'text.secondary' }}>{report.description}</Typography>
-                                                    </>)
-                                                    : <>{report.title}</>
-                                            }
-                                        </AccordionSummary>
-                                        <AccordionDetails>
-                                            {
-                                                report.description.length > 21
-                                                    ? <Typography style={{ wordWrap: 'break-word' }} variant="body1" component="div" textOverflow={'ellipsis'} overflow={'hidden'} >
-                                                        {report.description}
-                                                    </Typography>
-                                                    : <></>
-                                            }
-                                            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                                                {
-                                                    report.attachments.map(attachment => {
-                                                        return (
-                                                            <a href={attachment.fileUrl} download={attachment.name} target='_blank' rel='noreferrer'>
-                                                                <Chip clickable color='info' label={attachment.name} icon={<InsertDriveFileIcon />} />
-                                                            </a>)
-                                                    })
-                                                }
-                                            </Box>
-                                        </AccordionDetails>
-                                    </Accordion>)
-                                })}
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                        }}>
+                            <Typography variant="body2" color="text.secondary">
+                                {balance} {currencyCode}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                                {goal} {currencyCode}
+                            </Typography>
                         </Box>
-                    </CardContent>
-                </Card >
-            </>
+                    </Box>
+
+                    <Link
+                        href={sendUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        sx={{ textDecoration: 'none' }}
+                    >
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            sx={{
+                                py: 1,
+                                textTransform: 'none',
+                                fontWeight: 600
+                            }}
+                        >
+                            Support
+                        </Button>
+                    </Link>
+                </Box>
+            </CardContent>
+        </Card>
     );
 };
 

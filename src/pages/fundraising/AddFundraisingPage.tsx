@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, Typography, } from "@mui/material";
+import { Box, Button, Card, Container, FormControl, FormHelperText, InputLabel, MenuItem, Select, Typography, useTheme } from "@mui/material";
 import PageWrapper from "../../components/common/PageWrapper";
 import '../../styles/pages/fundraising/add-page.css';
 import { ChangeEvent, useEffect, useRef, useState } from "react";
@@ -12,23 +12,23 @@ import { useNavigate } from "react-router-dom";
 import MultiSelectWithChip from "../../components/common/MultiSelectWithChips";
 import tagsRepository from "../../repository/tagsRepository";
 import { useUser } from "../../contexts/UserContext";
+import { useZodForm } from "../../hooks/useZodForm";
+import { createFundraisingSchema } from "../../schemas/fundraising/createFundraisingSchema";
 
 const AddPage = () => {
+    const theme = useTheme();
     const defaultImage = 'http://localhost:8080/Uploads/Default/Fundraisings/avatar.png'
     const [imageUrl, setImageUrl] = useState<string>(defaultImage);
-    const [title, setTitle] = useState<string>('');
-    const [description, setDescription] = useState<string>('');
-    const [monobankJar, setMonobankJar] = useState<string>('');
-    const [monobankJarId, setMonobankJarId] = useState('');
-    const [tags, setTags] = useState<string[]>([]);
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [jars, setJars] = useState<Jar[]>([])
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
+    const [tags, setTags] = useState<string[]>([]);
     const { showError, showSuccess } = useToast();
     const inputFile = useRef<HTMLInputElement | null>(null)
     const navigate = useNavigate()
-
     const { user } = useUser();
+
+    const { register, handleSubmit, setValue, formState: { errors }, watch } = useZodForm(createFundraisingSchema);
+    const selectedTags = watch('tags') || [];
 
     const handleOpenJarsMenu = (event: any) => {
         setOpenJarsMenu(event.currentTarget);
@@ -66,8 +66,9 @@ const AddPage = () => {
     }
 
     const handleTagsChange = (newTags: Array<string>) => {
-        setSelectedTags(newTags)
+        setValue('tags', newTags);
     }
+
     const uploadImage = async (fundraisingId: string, file: File) => {
         try {
             const response = await fundraisingsRepository.uploadImage(fundraisingId, file)
@@ -79,6 +80,7 @@ const AddPage = () => {
             showError('Unexpected error while uploading image')
         }
     }
+
     const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
         try {
             const { files } = e.target;
@@ -96,6 +98,7 @@ const AddPage = () => {
             showError('Unexpected error while adding fundraising image')
         }
     }
+
     const handleDeleteFile = () => {
         setImageUrl(defaultImage)
         if (inputFile.current) {
@@ -103,15 +106,15 @@ const AddPage = () => {
             inputFile.current.files = new DataTransfer().files;
         }
     }
-    const onSubmit = async () => {
-        const requestBody = {
-            title,
-            description,
-            monobankJarId,
-            tags: selectedTags,
-        }
+
+    const onSubmit = async (data: { title: string, description: string, monobankJarId: string, tags?: string[] | undefined }) => {
         try {
-            const response = await fundraisingsRepository.createFundraising(requestBody)
+            const response = await fundraisingsRepository.createFundraising({
+                title: data.title,
+                description: data.description,
+                monobankJarId: data.monobankJarId,
+                tags: data.tags || []
+            })
             if (response) {
                 if (response.error) {
                     showError(response.error.message)
@@ -132,6 +135,7 @@ const AddPage = () => {
             showError('Unexpected error while creating fundraising')
         }
     }
+
     useEffect(() => {
         getMonobankJars();
         getTags();
@@ -139,94 +143,161 @@ const AddPage = () => {
 
     return (
         <PageWrapper>
-            {
-                user && user.hasMonobankToken
-                    ? (<Box sx={{
-                        mt: 10,
-                    }} className='content-wrapper'>
-                        <Card style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            gap: '15px',
-                            padding: '25px',
-                            paddingLeft: '20px',
-                            height: '100%',
-                            width: 800,
-                        }}>
-                            <Typography textAlign={'center'} variant='h5'>Creating Fundraising</Typography>
-                            <Box sx={{
+            {user && user.hasMonobankToken ? (
+                <Container maxWidth="md" sx={{ py: 4 }}>
+                    <Card
+                        elevation={0}
+                        sx={{
+                            p: 4,
+                            borderRadius: 2,
+                            backgroundColor: theme.palette.background.paper,
+                            border: `1px solid ${theme.palette.divider}`,
+                        }}
+                    >
+                        <Typography
+                            variant="h4"
+                            textAlign="center"
+                            sx={{
+                                mb: 4,
+                                fontWeight: 600,
+                                color: theme.palette.text.primary
+                            }}
+                        >
+                            Create Fundraising
+                        </Typography>
+                        <Box
+                            component="form"
+                            onSubmit={handleSubmit(onSubmit)}
+                            sx={{
                                 display: 'flex',
-                                flexDirection: 'row',
-                                gap: '15px',
+                                flexDirection: { xs: 'column', md: 'row' },
+                                gap: 3,
+                            }}
+                        >
+                            <UploadImage
+                                inputFile={inputFile}
+                                handleFileUpload={handleFileUpload}
+                                handleDeleteFile={handleDeleteFile}
+                                url={imageUrl}
+                            />
+                            <Box sx={{
+                                flexGrow: 1,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: 3
                             }}>
-                                <UploadImage
-                                    inputFile={inputFile}
-                                    handleFileUpload={handleFileUpload}
-                                    handleDeleteFile={handleDeleteFile}
-                                    url={imageUrl}
+                                <LimitedTextField
+                                    label="Title"
+                                    maxChar={70}
+                                    value={watch('title') || ''}
+                                    onChange={(value) => setValue('title', value)}
+                                    fullWidth
+                                    error={!!errors.title}
+                                    helperText={errors.title?.message}
                                 />
-                                <CardContent style={{
-                                    flexGrow: 1,
-                                    padding: 0,
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    alignItems: 'flex-start',
-                                    gap: 5
-                                }}>
-                                    <LimitedTextField
-                                        label="Title"
-                                        maxChar={70}
-                                        value={title}
-                                        fullWidth
-                                        onChange={(value) => setTitle(value)}
-                                    />
-                                    <LimitedTextField
-                                        label="Description"
-                                        maxChar={500}
-                                        fullWidth
-                                        value={description}
-                                        onChange={(value) => setDescription(value)}
-                                        multiline
-                                    />
-                                    <FormControl sx={{ ml: 0, mb: 1, mt: 1, minWidth: 200 }} size="small">
-                                        <InputLabel id="monobank-jar-label">Monobank jar</InputLabel>
-                                        <Select
-                                            labelId="monobank-jar-label"
-                                            id="monobank-jar"
-                                            value={monobankJar}
-                                            label="Monobank jar"
-                                            onChange={(e) => setMonobankJar(e.target.value)}
-                                            open={Boolean(openJarsMenu)}
-                                            onClose={handleCloseJarsMenu}
-                                            onOpen={handleOpenJarsMenu}
-                                        >
-                                            {jars && jars.map((jar) => (
-                                                <MenuItem
-                                                    key={jar.title}
-                                                    value={jar.title}
-                                                    onClick={() => setMonobankJarId(jar.id)}
-                                                >
-                                                    {jar.title}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
+                                <LimitedTextField
+                                    label="Description"
+                                    maxChar={500}
+                                    value={watch('description') || ''}
+                                    onChange={(value) => setValue('description', value)}
+                                    multiline
+                                    fullWidth
+                                    error={!!errors.description}
+                                    helperText={errors.description?.message}
+                                />
+                                <FormControl fullWidth error={!!errors.monobankJarId}>
+                                    <InputLabel id="monobank-jar-label">Monobank Jar</InputLabel>
+                                    <Select
+                                        labelId="monobank-jar-label"
+                                        id="monobank-jar"
+                                        value={watch('monobankJarId') || ''}
+                                        label="Monobank Jar"
+                                        onChange={(e) => setValue('monobankJarId', e.target.value)}
+                                        open={Boolean(openJarsMenu)}
+                                        onClose={handleCloseJarsMenu}
+                                        onOpen={handleOpenJarsMenu}
+                                        sx={{
+                                            borderRadius: 1,
+                                            '& .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: theme.palette.divider,
+                                            },
+                                            '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: theme.palette.primary.main,
+                                            },
+                                            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                borderColor: theme.palette.primary.main,
+                                            }
+                                        }}
+                                        MenuProps={{
+                                            PaperProps: {
+                                                elevation: 0,
+                                                sx: {
+                                                    maxHeight: 300,
+                                                    border: `1px solid ${theme.palette.divider}`,
+                                                    borderRadius: 1,
+                                                    mt: 1,
+                                                    '& .MuiMenuItem-root': {
+                                                        py: 1,
+                                                        px: 2,
+                                                        '&:hover': {
+                                                            backgroundColor: theme.palette.action.hover,
+                                                        },
+                                                        '&.Mui-selected': {
+                                                            backgroundColor: theme.palette.primary.light,
+                                                            '&:hover': {
+                                                                backgroundColor: theme.palette.primary.light,
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                    >
+                                        {jars && jars.map((jar) => (
+                                            <MenuItem
+                                                key={jar.title}
+                                                value={jar.id}
+                                            >
+                                                {jar.title}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                    {errors.monobankJarId && (
+                                        <FormHelperText>{errors.monobankJarId.message}</FormHelperText>
+                                    )}
+                                </FormControl>
+                                <Box sx={{ position: 'relative', width: '100%' }}>
                                     <MultiSelectWithChip
                                         label='Tags'
-                                        width="250px"
+                                        width="100%"
                                         values={tags}
                                         freeSolo
                                         limitTags={2}
+                                        value={selectedTags}
                                         onChange={handleTagsChange}
                                     />
-                                    <Button size={'large'} onClick={onSubmit}>Create</Button>
-                                </CardContent>
+                                </Box>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    size="large"
+                                    sx={{
+                                        mt: 2,
+                                        py: 1.5,
+                                        textTransform: 'none',
+                                        fontWeight: 600
+                                    }}
+                                >
+                                    Create Fundraising
+                                </Button>
                             </Box>
-                        </Card>
-                    </Box>)
-                    : <>{navigate('/')}</>
-            }
-        </PageWrapper >
+                        </Box>
+                    </Card>
+                </Container>
+            ) : (
+                <>{navigate('/')}</>
+            )}
+        </PageWrapper>
     );
 }
 

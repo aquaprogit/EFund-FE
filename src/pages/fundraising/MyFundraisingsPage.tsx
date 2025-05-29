@@ -3,9 +3,9 @@ import FundraisingList from "../../components/FundraisingList";
 import fundraisingsRepository from "../../repository/fundraisingsRepository";
 
 const MyFundraisingsPage = () => {
-    const loader = (params: { pageSize: number, page: number }) => fundraisingsRepository.getMyFundraising(params)
+    const loader = (pageSize: number, page: number) => fundraisingsRepository.getMyFundraising(page, pageSize)
     return (
-        <FundraisingList loader={loader} type={'USER'} />
+        <FundraisingList type={'USER'} />
     );
 };
 

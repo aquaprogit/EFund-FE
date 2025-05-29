@@ -1,4 +1,4 @@
-import { Paper, Typography, Box } from "@mui/material";
+import { Paper, Typography, Box, Container, useTheme } from "@mui/material";
 import '../styles/sign-in.css'
 import SignInForm from "../components/auth/SignInForm";
 import { SignInFormFields } from "../models/form/auth/AuthFormFields";
@@ -7,12 +7,14 @@ import { useUser } from "../contexts/UserContext";
 import { useAuth } from "../store/auth.store";
 import { useToast } from "../contexts/ToastContext";
 import BackButton from "../components/common/BackButton";
+import PageWrapper from "../components/common/PageWrapper";
 
 const SignInPage = () => {
     const { refreshUser } = useUser();
     const { signIn } = useAuth();
     const { showError } = useToast();
     const navigate = useNavigate();
+    const theme = useTheme();
 
     const onSubmit = async (fields: SignInFormFields) => {
         const error = await signIn(fields);
@@ -29,13 +31,41 @@ const SignInPage = () => {
     };
 
     return (
-        <Box className="sign-in-page">
-            <Paper elevation={3} className="sign-in-container">
-                <BackButton />
-                <Typography variant="h4" textAlign={'center'}>Sign In</Typography>
-                <SignInForm onSubmit={onSubmit} />
-            </Paper>
-        </Box>
+        <PageWrapper>
+            <Container
+                maxWidth="sm"
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    py: 2
+                }}
+            >
+                <Paper
+                    elevation={0}
+                    sx={{
+                        p: 4,
+                        borderRadius: 2,
+                        backgroundColor: theme.palette.background.paper,
+                        border: `1px solid ${theme.palette.divider}`,
+                    }}
+                >
+                    <Box sx={{ position: 'relative', mb: 3 }}>
+                        <Typography
+                            variant="h4"
+                            textAlign="center"
+                            sx={{
+                                fontWeight: 600,
+                                color: theme.palette.text.primary
+                            }}
+                        >
+                            Sign In
+                        </Typography>
+                    </Box>
+                    <SignInForm onSubmit={onSubmit} />
+                </Paper>
+            </Container>
+        </PageWrapper>
     );
 };
 

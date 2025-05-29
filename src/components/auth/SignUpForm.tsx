@@ -1,17 +1,19 @@
-import { Box, TextField, Button } from "@mui/material";
+import { Box, TextField, Button, useTheme } from "@mui/material";
 import AuthGoogleButton from './SignInGoogle';
 import { useZodForm } from "../../hooks/useZodForm";
 import { SignUpFormData, signUpSchema, transformSignUpData } from "../../schemas/auth/signUpSchema";
+import PasswordInput from "../common/PasswordInput";
 
 interface SignUpFormProps {
     onSubmit: (data: ReturnType<typeof transformSignUpData>) => void;
 }
 
 const SignUpForm = (props: SignUpFormProps) => {
+    const theme = useTheme();
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: { errors, isSubmitting },
     } = useZodForm(signUpSchema);
 
     const handleFormSubmit = (data: SignUpFormData) => {
@@ -19,55 +21,76 @@ const SignUpForm = (props: SignUpFormProps) => {
     };
 
     return (
-        <Box width='450px'>
+        <Box
+            sx={{
+                width: '100%',
+                maxWidth: 450,
+                mx: 'auto'
+            }}
+        >
             <Box
-                display={'flex'}
-                flexDirection={'column'}
-                sx={{ gap: 3, margin: 5, mt: 3, mb: 5 }}
                 component="form"
-                onSubmit={handleSubmit(handleFormSubmit)}>
+                onSubmit={handleSubmit(handleFormSubmit)}
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 3
+                }}
+            >
                 <TextField
+                    fullWidth
                     id="name"
                     label="Name"
                     {...register('name')}
                     error={!!errors.name}
                     helperText={errors.name?.message}
-                    variant="standard"
+                    variant="outlined"
                     autoComplete='off'
+                    sx={{
+                        '& .MuiOutlinedInput-root': {
+                            borderRadius: 1
+                        }
+                    }}
                 />
                 <TextField
+                    fullWidth
                     id="email"
                     label="Email"
                     {...register('email')}
                     error={!!errors.email}
                     helperText={errors.email?.message}
-                    variant="standard"
+                    variant="outlined"
                     autoComplete='off'
+                    sx={{
+                        '& .MuiOutlinedInput-root': {
+                            borderRadius: 1
+                        }
+                    }}
                 />
-                <TextField
+                <PasswordInput
+                    fullWidth
                     id="password"
-                    type="password"
                     label="Password"
-                    {...register('password')}
+                    registration={register('password')}
                     error={!!errors.password}
                     helperText={errors.password?.message}
-                    variant="standard"
+                    variant="outlined"
                 />
-                <TextField
+                <PasswordInput
+                    fullWidth
                     id="passwordConfirm"
-                    type="password"
                     label="Confirm Password"
-                    {...register('confirmPassword')}
+                    registration={register('confirmPassword')}
                     error={!!errors.confirmPassword}
                     helperText={errors.confirmPassword?.message}
-                    variant="standard"
+                    variant="outlined"
                 />
                 <Box
                     sx={{
                         display: 'flex',
-                        marginTop: 2,
-                        flexDirection: 'row',
-                        justifyContent: 'space-evenly',
+                        flexDirection: { xs: 'column', sm: 'row' },
+                        gap: 2,
+                        mt: 1
                     }}
                 >
                     <Button
@@ -75,7 +98,18 @@ const SignUpForm = (props: SignUpFormProps) => {
                         variant="contained"
                         color="primary"
                         size="large"
-                        sx={{ width: 'max-content', alignSelf: 'center' }}>
+                        disabled={isSubmitting}
+                        fullWidth
+                        sx={{
+                            py: 1.5,
+                            textTransform: 'none',
+                            fontWeight: 600,
+                            boxShadow: 'none',
+                            '&:hover': {
+                                boxShadow: 'none'
+                            }
+                        }}
+                    >
                         Sign Up
                     </Button>
                     <AuthGoogleButton type="sign-up" label="Sign up with Google" />

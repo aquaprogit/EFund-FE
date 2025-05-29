@@ -1,167 +1,165 @@
-import { Box, Pagination, Skeleton } from "@mui/material";
+import { Box, Container, Divider, Paper, Pagination, Skeleton, Typography, useTheme } from "@mui/material";
 import FundraisingCard from "./common/FundraisingCard";
-import { useEffect, useState } from "react";
-import { Tag } from "../models/Tag";
-import Fundraising from "../models/Fundraising";
-import { useUser } from "../contexts/UserContext";
-import fundraisingsRepository from "../repository/fundraisingsRepository";
-import tagsRepository from "../repository/tagsRepository";
+import { useState } from "react";
 import Search from "./common/Search";
-import MultiSelectWithChips from "./common/MultiSelectWithChips";
+import MultiSelectWithChip from "./common/MultiSelectWithChips";
 import PageWrapper from "./common/PageWrapper";
+import { useFundraisingSearch } from "../hooks/useFundraisingSearch";
+import FilterSection from "./fundraising/FilterSection";
 
 type FundraisingListProps = {
-    loader: Function;
     type?: 'USER' | 'ALL'
 }
 
-const FundraisingList: React.FC<FundraisingListProps> = ({ loader, type = 'ALL' }) => {
-    const [tags, setTags] = useState<Tag[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
-    const [selectedLoading, setSelectedLoading] = useState<boolean>(false);
+const FundraisingList: React.FC<FundraisingListProps> = ({ type = 'ALL' }) => {
+    const theme = useTheme();
+    const pageSize = 6;
 
-    const [fundraisings, setFundraisings] = useState<Fundraising[]>([]);
-    const [selectedFundraisingId, setSelectedFundraisingId] = useState<string | undefined>();
-    const [selectedFundraising, setSelectedFundraising] = useState<Fundraising | undefined>();
-
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const [searchQuery, setSearchQuery] = useState<string>('');
-
-    const [page, setPage] = useState<number>(1);
-    const [totalPages, setTotalPages] = useState<number>(1);
-
-    const { user } = useUser();
-
-    const pageSize = 3;
-
-    const fetchFundraisings = async () => {
-        setLoading(true);
-        const params = type === 'USER' ? { page, pageSize } : { page: page, pageSize: pageSize, tags: selectedTags, title: searchQuery }
-        const fundraisings = await loader(params)
-        if (fundraisings && fundraisings?.items) {
-            setFundraisings(fundraisings!.items);
-            setTotalPages(fundraisings!.totalPages);
-        }
-        else {
-            setFundraisings([]);
-            setTotalPages(1);
-        }
-        setLoading(false);
-    }
-
-    useEffect(() => {
-        fetchFundraisings();
-    }, [selectedTags, searchQuery, page]);
-
-    useEffect(() => {
-        setPage(1);
-    }, [selectedTags, searchQuery]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            const tags = await tagsRepository.getTags();
-            if (tags) {
-                setTags(tags);
-            }
-        }
-
-        fetchData();
-    }, [user]);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            setSelectedLoading(true);
-            if (selectedFundraisingId) {
-                const fundraising = await fundraisingsRepository.getFundraising(selectedFundraisingId);
-                if (fundraising) {
-                    setSelectedFundraising(fundraising.data);
-                }
-            }
-            setSelectedLoading(false);
-        }
-
-        fetchData();
-    }, [selectedFundraisingId]);
+    const {
+        fundraisings,
+        loading,
+        page,
+        totalPages,
+        allTags,
+        setPage,
+        setSearchQuery,
+        setSelectedTags,
+        totalFundraisings
+    } = useFundraisingSearch({ initialSearchQuery: '', pageSize: pageSize });
 
     return (
         <PageWrapper>
-            <Box className='home-page-content'>
+            <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 4 } }}>
                 <Box sx={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: '20px'
+                    gap: { xs: 2, sm: 3 }
                 }}>
-                    <Box sx={
-                        {
+                    <FilterSection
+                        onSearchChange={setSearchQuery}
+                        onTagsChange={setSelectedTags}
+                        allTags={allTags}
+                    />
+
+                    <Box>
+                        <Box sx={{
                             display: 'flex',
+                            justifyContent: 'space-between',
                             alignItems: 'center',
-                            flexDirection: 'row',
-                            gap: '25px',
-                            justifyContent: 'space-evenly',
-                        }
-                    }>
-                        <Search onSearch={(query) => setSearchQuery(query)} />
-                        <MultiSelectWithChips
-                            limitTags={2}
-                            width="350px"
-                            label="Tags"
-                            values={tags.map((tag) => tag.name)}
-                            onChange={setSelectedTags} />
-                    </Box >
-                    <Box className='search-result-container'>
-                        <div style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                            minWidth: 650,
-                            gap: '20px',
+                            mb: { xs: 2, sm: 3 },
+                            flexWrap: 'wrap',
+                            gap: 2
                         }}>
-                            {
-                                loading
-                                    ? (Array(pageSize).fill(0).map((_, index) => (
-                                        <Skeleton key={index} sx={{ transform: 'scale(1, 0.90)', height: '130px', width: 600 }} />
-                                    )))
-                                    : (
-                                        !loading && fundraisings.length === 0
-                                            ? <h3>No fundraisings found</h3>
-                                            : (fundraisings.map((fundraising, index) => (
-                                                <Box height={'130px'} key={index}>
-                                                    <FundraisingCard
-                                                        selected={fundraising.id === selectedFundraisingId}
-                                                        key={index}
-                                                        onClick={(setSelectedFundraisingId)}
-                                                        fundraising={fundraising}
-                                                        size="small"
-                                                        isUser={type === 'USER'}
-                                                    />
-                                                </Box>
-                                            ))))
-                            }
-                        </div>
-                        <Pagination sx={{
-                            display: totalPages >= 1 ? 'flex' : 'none',
-                            justifyContent: 'center',
-                        }} count={totalPages} page={page} onChange={(_, value) => setPage(value)} />
+                            <Typography
+                                variant="h6"
+                                sx={{
+                                    fontWeight: 600,
+                                    color: theme.palette.text.primary
+                                }}
+                            >
+                                Results
+                            </Typography>
+                            {!loading && (
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                >
+                                    {fundraisings.length === 0
+                                        ? 'No fundraisings found'
+                                        : `Showing ${(page - 1) * pageSize + 1}-${(page - 1) * pageSize + fundraisings.length} of ${totalFundraisings} fundraisings`
+                                    }
+                                </Typography>
+                            )}
+                        </Box>
+                        <Box sx={{
+                            display: 'grid',
+                            gridTemplateColumns: {
+                                xs: '1fr',
+                                sm: 'repeat(auto-fill, minmax(300px, 1fr))',
+                                md: 'repeat(auto-fill, minmax(350px, 1fr))'
+                            },
+                            gap: { xs: 2, sm: 3 },
+                            mb: { xs: 3, sm: 4 }
+                        }}>
+                            {loading ? (
+                                Array(pageSize).fill(0).map((_, index) => (
+                                    <Skeleton
+                                        key={index}
+                                        variant="rounded"
+                                        sx={{
+                                            height: 400,
+                                            borderRadius: 2
+                                        }}
+                                    />
+                                ))
+                            ) : fundraisings.length === 0 ? (
+                                <Box
+                                    sx={{
+                                        gridColumn: '1/-1',
+                                        textAlign: 'center',
+                                        py: { xs: 6, sm: 8 },
+                                        px: 2
+                                    }}
+                                >
+                                    <Typography
+                                        variant="h6"
+                                        color="text.secondary"
+                                        sx={{ mb: 1 }}
+                                    >
+                                        No fundraisings found
+                                    </Typography>
+                                    <Typography
+                                        variant="body2"
+                                        color="text.secondary"
+                                    >
+                                        Try adjusting your filters or search query
+                                    </Typography>
+                                </Box>
+                            ) : (
+                                fundraisings.map((fundraising) => (
+                                    <FundraisingCard
+                                        key={fundraising.id}
+                                        fundraising={fundraising}
+                                        isUser={type === 'USER'}
+                                    />
+                                ))
+                            )}
+                        </Box>
+
+                        {totalPages > 1 && (
+                            <Paper
+                                elevation={0}
+                                sx={{
+                                    p: { xs: 2, sm: 3 },
+                                    borderRadius: 2,
+                                    backgroundColor: theme.palette.background.paper,
+                                    border: `1px solid ${theme.palette.divider}`,
+                                }}
+                            >
+                                <Box sx={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                }}>
+                                    <Pagination
+                                        count={totalPages}
+                                        page={page}
+                                        onChange={(_, value) => setPage(value)}
+                                        color="primary"
+                                        size="large"
+                                        showFirstButton
+                                        showLastButton
+                                        sx={{
+                                            '& .MuiPaginationItem-root': {
+                                                borderRadius: 1,
+                                            }
+                                        }}
+                                    />
+                                </Box>
+                            </Paper>
+                        )}
                     </Box>
                 </Box>
-                <Box className='selected-fundraising-container'>
-                    {
-                        selectedLoading
-                            ? <Skeleton sx={{ height: '100%', width: '100%', transform: 'scale(1, 0.95)' }} />
-                            : (
-                                selectedFundraising &&
-                                <FundraisingCard
-                                    fundraising={selectedFundraising}
-                                    onDelete={() => {
-                                        setSelectedFundraisingId(undefined);
-                                        setSelectedFundraising(undefined);
-                                        fetchFundraisings();
-                                    }}
-                                    size="large" />
-                            )
-                    }
-                </Box>
-            </Box>
+            </Container>
         </PageWrapper>
     );
 };

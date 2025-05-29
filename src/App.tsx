@@ -15,6 +15,7 @@ import MyFundraisingsPage from "./pages/fundraising/MyFundraisingsPage";
 import EditFundraising from "./pages/fundraising/EditFundraising";
 import UsersPage from './pages/UsersPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import FundraisingList from './components/FundraisingList';
 
 const darkTheme = createTheme({
   palette: {
@@ -82,7 +83,7 @@ const lightTheme = createTheme({
 });
 
 const App: React.FC = () => (
-  <ThemeProvider theme={darkTheme}>
+  <ThemeProvider theme={lightTheme}>
     <ToastProvider>
       <GoogleOAuthProvider clientId="389428898545-0si1v4m7uojr1m4gfspehhvpn91120pb.apps.googleusercontent.com">
         <UserProvider>
@@ -93,6 +94,7 @@ const App: React.FC = () => (
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/sign-up" element={<SignUpPage />} />
               <Route path='/sign-in' element={<SignInPage />} />
+              <Route path='/search' element={<FundraisingList type='ALL' />} />
               <Route path='/settings' element={(<SettingsPage />)} />
               <Route path='/add-fundraising' element={<AddPage />} />
               <Route path='/my-fundraisings' element={<MyFundraisingsPage />} />

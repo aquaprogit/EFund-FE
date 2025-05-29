@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, Divider, TextField, Typography } from "@mui/material";
+import { Box, Button, Dialog, Divider, TextField, Typography, useTheme, DialogContent, DialogTitle } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import AuthGoogleButton from "./SignInGoogle";
@@ -6,6 +6,7 @@ import { useZodForm } from "../../hooks/useZodForm";
 import { SignInFormData, signInSchema } from "../../schemas/auth/signInSchema";
 import { userRepository } from "../../repository/userRepository";
 import { useToast } from "../../contexts/ToastContext";
+import PasswordInput from "../common/PasswordInput";
 
 interface SignInFormProps {
     onSubmit: (data: SignInFormData) => void;
@@ -13,122 +14,196 @@ interface SignInFormProps {
 
 const SignInForm = (props: SignInFormProps) => {
     const { register, handleSubmit, getValues, formState: { errors } } = useZodForm(signInSchema);
-
+    const theme = useTheme();
     const { showSuccess, showError } = useToast();
     const [dialogOpened, setDialogOpened] = useState<boolean>(false);
     const navigate = useNavigate();
 
     return (
-        <Box width='400px'>
+        <Box sx={{ width: '100%' }}>
             <Box
-                display={'flex'}
-                flexDirection={'column'}
-                sx={{ gap: 3, margin: 5, mt: 2, mb: 2 }}
+                display="flex"
+                flexDirection="column"
+                gap={3}
                 component="form"
-                onSubmit={handleSubmit(props.onSubmit)}>
+                onSubmit={handleSubmit(props.onSubmit)}
+            >
                 <TextField
+                    fullWidth
                     id="email"
                     label="Email"
                     {...register('email')}
                     error={!!errors.email}
                     helperText={errors.email?.message}
-                    variant="standard"
+                    variant="outlined"
+                    sx={{
+                        '& .MuiOutlinedInput-root': {
+                            borderRadius: 1
+                        }
+                    }}
                 />
-                <TextField
+                <PasswordInput
+                    fullWidth
                     id="password"
-                    type="password"
                     label="Password"
                     {...register('password')}
                     error={!!errors.password}
                     helperText={errors.password?.message}
-                    variant="standard"
+                    variant="outlined"
+                    sx={{
+                        '& .MuiOutlinedInput-root': {
+                            borderRadius: 1
+                        }
+                    }}
                 />
                 <Button
                     type="submit"
                     variant="contained"
                     color="primary"
-                    size="medium"
-                    sx={{ width: 'max-content', alignSelf: 'center' }}>
+                    size="large"
+                    fullWidth
+                    sx={{
+                        py: 1.5,
+                        textTransform: 'none',
+                        fontWeight: 600
+                    }}
+                >
                     Sign In
                 </Button>
             </Box>
-            <Divider />
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 2,
-                margin: 5,
-                mt: 2,
-                mb: 2
-            }}>
-                <Button
-                    style={{ textTransform: 'none' }}
-                    variant="text"
-                    onClick={() => navigate('/sign-up')} >
-                    <Typography variant="caption" color={'text.primary'}>Don't have an account?</Typography>
-                </Button>
-                <Button
-                    style={{ textTransform: 'none' }}
-                    variant="text"
-                    onClick={() => setDialogOpened(true)}>
-                    <Typography variant="caption" color={'text.primary'}>Forgot password?</Typography>
-                </Button>
+
+            <Box sx={{ my: 3 }}>
+                <Divider>
+                    <Typography
+                        variant="body2"
+                        sx={{
+                            color: theme.palette.text.secondary,
+                            px: 2
+                        }}
+                    >
+                        Or continue with
+                    </Typography>
+                </Divider>
             </Box>
-            <Divider />
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 2,
-                margin: 5,
-                mt: 2,
-                mb: 2
-            }}>
+
+            <Box sx={{ mb: 3 }}>
                 <AuthGoogleButton type="sign-in" label="Sign in with Google" />
             </Box>
+
+            <Divider />
+
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: 2,
+                mt: 3
+            }}>
+                <Button
+                    sx={{
+                        textTransform: 'none',
+                        '&:hover': {
+                            backgroundColor: 'transparent',
+                            textDecoration: 'underline'
+                        }
+                    }}
+                    variant="text"
+                    onClick={() => navigate('/sign-up')}
+                >
+                    <Typography
+                        variant="body2"
+                        color="primary"
+                        fontWeight={500}
+                    >
+                        Don't have an account?
+                    </Typography>
+                </Button>
+                <Button
+                    sx={{
+                        textTransform: 'none',
+                        '&:hover': {
+                            backgroundColor: 'transparent',
+                            textDecoration: 'underline'
+                        }
+                    }}
+                    variant="text"
+                    onClick={() => setDialogOpened(true)}
+                >
+                    <Typography
+                        variant="body2"
+                        color="primary"
+                        fontWeight={500}
+                    >
+                        Forgot password?
+                    </Typography>
+                </Button>
+            </Box>
+
             <Dialog
                 onClose={() => setDialogOpened(false)}
                 open={dialogOpened}
+                PaperProps={{
+                    sx: {
+                        borderRadius: 2,
+                        width: '100%',
+                        maxWidth: 400
+                    }
+                }}
             >
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 2,
-                    margin: 5,
-                    mt: 2,
-                    mb: 2
-                }}>
-                    <Typography variant="h6">Forgot password?</Typography>
-                    <Typography variant="body1">Enter your email address and we will send you a link to reset your password.</Typography>
-                    <TextField
-                        id="email"
-                        label="Email"
-                        {...register('email')}
-                        error={!!errors.email}
-                        helperText={errors.email?.message}
-                        variant="standard"
-                    />
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        size="medium"
-                        onClick={async () => {
-                            const result = await userRepository.forgotPassword(getValues('email'));
-                            if (result.isSuccess) {
-                                showSuccess('Check your email for further instructions');
-                            } else {
-                                showError(result.error?.message ?? 'Error during sending email');
-                            }
-                            setDialogOpened(false);
-                        }}
-                        sx={{ width: 'max-content', alignSelf: 'center' }}>
-                        Send
-                    </Button>
-                </Box>
+                <DialogTitle sx={{ textAlign: 'center', pb: 1 }}>
+                    Forgot Password
+                </DialogTitle>
+                <DialogContent>
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 3,
+                        pt: 1
+                    }}>
+                        <Typography
+                            variant="body2"
+                            color="text.secondary"
+                            textAlign="center"
+                        >
+                            Enter your email address and we will send you a link to reset your password.
+                        </Typography>
+                        <TextField
+                            fullWidth
+                            id="email"
+                            label="Email"
+                            {...register('email')}
+                            error={!!errors.email}
+                            helperText={errors.email?.message}
+                            variant="outlined"
+                            sx={{
+                                '& .MuiOutlinedInput-root': {
+                                    borderRadius: 1
+                                }
+                            }}
+                        />
+                        <Button
+                            fullWidth
+                            variant="contained"
+                            color="primary"
+                            size="large"
+                            onClick={async () => {
+                                const result = await userRepository.forgotPassword(getValues('email'));
+                                if (result.isSuccess) {
+                                    showSuccess('Check your email for further instructions');
+                                } else {
+                                    showError(result.error?.message ?? 'Error during sending email');
+                                }
+                                setDialogOpened(false);
+                            }}
+                            sx={{
+                                py: 1.5,
+                                textTransform: 'none',
+                                fontWeight: 600
+                            }}
+                        >
+                            Send Reset Link
+                        </Button>
+                    </Box>
+                </DialogContent>
             </Dialog>
         </Box>
     );
