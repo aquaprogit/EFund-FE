@@ -46,7 +46,7 @@ const SignInForm = (props: SignInFormProps) => {
                     fullWidth
                     id="password"
                     label="Password"
-                    {...register('password')}
+                    registration={register('password')}
                     error={!!errors.password}
                     helperText={errors.password?.message}
                     variant="outlined"
