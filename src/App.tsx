@@ -1,21 +1,23 @@
 import './App.css';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import HomePage from './pages/HomePage';
-import SignUpPage from './pages/SignUpPage';
-import SignInPage from './pages/SignInPage';
+import HomePage from './features/home/pages/HomePage';
+import SignUpPage from './features/auth/pages/SignUpPage';
+import SignInPage from './features/auth/pages/SignInPage';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
-import SettingsPage from './pages/SettingsPage';
-import ProfilePage from './pages/Profile/ProfilePage';
+import SettingsPage from './features/users/pages/SettingsPage';
+import ProfilePage from './features/users/components/ProfilePage';
 import { UserProvider } from './contexts/UserContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import AddPage from './pages/fundraising/AddFundraisingPage';
+import AddPage from './features/fundraising/components/AddFundraisingPage';
 import { ToastProvider } from "./contexts/ToastContext";
-import MyFundraisingsPage from "./pages/fundraising/MyFundraisingsPage";
-import EditFundraising from "./pages/fundraising/EditFundraising";
-import UsersPage from './pages/UsersPage';
-import ResetPasswordPage from './pages/ResetPasswordPage';
-import FundraisingList from './components/FundraisingList';
+import EditFundraising from "./features/fundraising/components/EditFundraising";
+import UsersPage from './features/users/pages/UsersPage';
+import ResetPasswordPage from './features/auth/pages/ResetPasswordPage';
+import FundraisingPage from './features/fundraising/pages/FundraisingPage';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { UserDetailsPage } from './features/users/pages/UserDetailsPage';
+import FundraisingListPage from './features/fundraising/pages/FundraisingListPage';
 
 const darkTheme = createTheme({
   palette: {
@@ -82,32 +84,44 @@ const lightTheme = createTheme({
   },
 });
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+    },
+  },
+});
+
 const App: React.FC = () => (
-  <ThemeProvider theme={lightTheme}>
-    <ToastProvider>
-      <GoogleOAuthProvider clientId="389428898545-0si1v4m7uojr1m4gfspehhvpn91120pb.apps.googleusercontent.com">
-        <UserProvider>
-          <CssBaseline />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/sign-up" element={<SignUpPage />} />
-              <Route path='/sign-in' element={<SignInPage />} />
-              <Route path='/search' element={<FundraisingList type='ALL' />} />
-              <Route path='/settings' element={(<SettingsPage />)} />
-              <Route path='/add-fundraising' element={<AddPage />} />
-              <Route path='/my-fundraisings' element={<MyFundraisingsPage />} />
-              <Route path='/edit-fundraising' element={<EditFundraising />} />
-              <Route path='/users' element={<UsersPage />} />
-              <Route path='/reset-password' element={<ResetPasswordPage />} />
-              <Route path="*" element={<h1 style={{ color: 'red' }} >Not Found</h1>} />
-            </Routes>
-          </BrowserRouter>
-        </UserProvider>
-      </GoogleOAuthProvider>
-    </ToastProvider>
-  </ThemeProvider>
+  <QueryClientProvider client={queryClient}>
+    <ThemeProvider theme={lightTheme}>
+      <ToastProvider>
+        <GoogleOAuthProvider clientId="389428898545-0si1v4m7uojr1m4gfspehhvpn91120pb.apps.googleusercontent.com">
+          <UserProvider>
+            <CssBaseline />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/sign-up" element={<SignUpPage />} />
+                <Route path='/sign-in' element={<SignInPage />} />
+                <Route path='/search' element={<FundraisingListPage />} />
+                <Route path='/fundraising/:id' element={<FundraisingPage />} />
+                <Route path='/user/:userId' element={<UserDetailsPage />} />
+                <Route path='/settings' element={<SettingsPage />} />
+                <Route path='/add-fundraising' element={<AddPage />} />
+                <Route path='/edit-fundraising' element={<EditFundraising />} />
+                <Route path='/users' element={<UsersPage />} />
+                <Route path='/reset-password' element={<ResetPasswordPage />} />
+                <Route path="*" element={<h1 style={{ color: 'red' }} >Not Found</h1>} />
+              </Routes>
+            </BrowserRouter>
+          </UserProvider>
+        </GoogleOAuthProvider>
+      </ToastProvider>
+    </ThemeProvider>
+  </QueryClientProvider>
 );
 
 export default App;

@@ -1,7 +1,7 @@
 import { PropsWithChildren, createContext, useContext, useEffect, useState } from "react";
-import User from "../models/user/User";
-import { useAuth } from "../store/auth.store";
-import { userRepository } from "../repository/userRepository";
+import User from "../features/users/models/User";
+import { useAuth } from "../features/auth/store/auth.store";
+import { userRepository } from "../features/users/api/userRepository";
 
 export type RefreshUser = () => Promise<User | null>;
 
@@ -37,12 +37,12 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
         setLoading(true);
         const response = await userRepository.me();
         setLoading(false);
-        
+
         if (response.isSuccess && response.data) {
             setUser(response.data);
             return response.data;
         }
-        
+
         signOut();
         setUser(null);
         return null;
