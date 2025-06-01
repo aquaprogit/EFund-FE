@@ -5,6 +5,7 @@ import PasswordInput from "./PasswordInput";
 import { Box } from "@mui/material";
 import { changePasswordSchema, type ChangePasswordFormData } from "../../auth/schemas/schemas";
 import { useZodForm } from "../../../shared/hooks/useZodForm";
+import LockIcon from '@mui/icons-material/Lock';
 
 const ChangePassword = (props: { onClose: () => void }) => {
     const { showSuccess, showError } = useToast();
@@ -31,9 +32,12 @@ const ChangePassword = (props: { onClose: () => void }) => {
 
     return (
         <ChangeCreds
-            buttonLabel="Change password"
-            title='Change password'
+            buttonLabel="Change Password"
+            title="Change Password"
+            description="Enter your current password and choose a new one"
             buttonHandler={handleSubmit(onSubmit)}
+            onClose={props.onClose}
+            icon={<LockIcon />}
         >
             <Box
                 component="form"
@@ -45,17 +49,20 @@ const ChangePassword = (props: { onClose: () => void }) => {
             >
                 <PasswordInput
                     register={register('oldPassword')}
-                    placeholder={'Old password'}
+                    label="Current Password"
+                    placeholder="Enter your current password"
                     error={errors['oldPassword']}
                 />
                 <PasswordInput
                     register={register('newPassword')}
-                    placeholder={'New Password'}
+                    label="New Password"
+                    placeholder="Enter your new password"
                     error={errors['newPassword']}
                 />
                 <PasswordInput
                     register={register('confirmPassword')}
-                    placeholder={'Confirm password'}
+                    label="Confirm New Password"
+                    placeholder="Confirm your new password"
                     error={errors['confirmPassword']}
                 />
             </Box>

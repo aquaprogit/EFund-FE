@@ -1,7 +1,6 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import Jar from "../../monobank/models/Jar";
-import { useToast } from "../../../contexts/ToastContext";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "../../../contexts/ToastContext";
 import { fundraisingsRepository } from '../repository/fundraisingsRepository';
 import PageWrapper from "../../../shared/components/PageWrapper";
 import {
@@ -18,145 +17,32 @@ import {
     MenuItem,
     Select,
     Typography,
-    Divider,
-    Stack
+    Stack,
+    Grid,
+    Paper,
+    IconButton
 } from "@mui/material";
 import UploadImage from "../../users/components/UploadImage";
 import LimitedTextField from "../../../shared/components/LimitedTextField";
 import MultiSelectWithChips from '../../../shared/components/MultiSelectWithChips';
-import { tagsRepository } from '../../tags/repository/tagsRepository';
 import Report from '../../reports/models/Report';
-import ReportAccordion from '../../reports/components/ReportAccordion';
-import AddReport from '../../reports/components/AddReport';
 import AddIcon from '@mui/icons-material/Add';
-import { useUser } from '../../../contexts/UserContext';
-import { monobankRepository } from '../../monobank/repository/monobankRepository';
+import EditIcon from '@mui/icons-material/Edit';
+import PhotoCameraIcon from '@mui/icons-material/PhotoCamera';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import TagIcon from '@mui/icons-material/Tag';
+import AssessmentIcon from '@mui/icons-material/Assessment';
+import SaveIcon from '@mui/icons-material/Save';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { fundraisingsReportsRepository } from '../../reports/repository/fundraisingsReportsRepository';
-import { Tag } from '../../tags/models/Tag';
-import { useAuth } from '../../auth/store/auth.store';
 
-// Custom hook for fundraising data
-const useFundraisingData = (fundraisingId: string) => {
-    const [data, setData] = useState({
-        imageUrl: '',
-        title: '',
-        description: '',
-        monobankJar: '',
-        monobankJarId: '',
-        defaultTags: [] as string[],
-        reports: [] as Report[],
-        createdByUserId: ''
-    });
-    const [loading, setLoading] = useState(true);
-    const { showError } = useToast();
-
-    const fetchFundraisingData = async () => {
-        try {
-            setLoading(true);
-            const response = await fundraisingsRepository.getFundraising(fundraisingId);
-
-            if (!response?.data) {
-                showError(response?.error?.message || 'Failed to fetch fundraising data');
-                return;
-            }
-
-            const { avatarUrl, title, description, monobankJarId, monobankJar, tags, reports, userId } = response.data;
-
-            setData({
-                imageUrl: avatarUrl,
-                title,
-                description,
-                monobankJar: monobankJar.title,
-                monobankJarId,
-                defaultTags: tags,
-                reports,
-                createdByUserId: userId
-            });
-        } catch (error) {
-            showError('Unexpected error while fetching fundraising');
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchFundraisingData();
-    }, [fundraisingId]);
-
-    return { data, loading, refetch: fetchFundraisingData };
-};
-
-// Custom hook for monobank jars
-const useMonobankJars = () => {
-    const [jars, setJars] = useState<Jar[]>([]);
-    const { showError } = useToast();
-
-    const fetchJars = async () => {
-        try {
-            const response = await monobankRepository.getJars();
-            if (response?.data) {
-                setJars(response.data);
-            } else {
-                showError(response?.error?.message || 'Failed to fetch Monobank jars');
-            }
-        } catch (error) {
-            showError('Unexpected error while fetching jars');
-        }
-    };
-
-    useEffect(() => {
-        fetchJars();
-    }, []);
-
-    return jars;
-};
-
-// Custom hook for tags
-const useTags = () => {
-    const [existingTags, setExistingTags] = useState<string[]>([]);
-    const { showError } = useToast();
-
-    const fetchTags = async () => {
-        try {
-            const response = await tagsRepository.getTags();
-            if (response?.data) {
-                setExistingTags(response.data.map((tag: Tag) => tag.name));
-            }
-        } catch (error) {
-            showError('Unexpected error while fetching tags');
-        }
-    };
-
-    useEffect(() => {
-        fetchTags();
-    }, []);
-
-    return existingTags;
-};
-
-// Custom hook for authorization
-const useAuthorizationCheck = (createdByUserId: string, fundraisingId: string, loading: boolean) => {
-    const { user, loading: userLoading } = useUser();
-    const { isAuth } = useAuth();
-    const { showError } = useToast();
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (!isAuth) {
-            showError('You are not allowed to edit this fundraising');
-            navigate(`/fundraising/${fundraisingId}`);
-        }
-
-        if (!userLoading && createdByUserId && !loading && user) {
-            if (user.id !== createdByUserId) {
-                showError('You are not allowed to edit this fundraising');
-                navigate(`/fundraising/${fundraisingId}`);
-            }
-        }
-    }, [user, createdByUserId, userLoading, loading]);
-
-    return user;
-};
+// Import separated components and hooks
+import ReportCard from './ReportCard';
+import AddReportForm from './AddReportForm';
+import { useFundraisingData } from '../hooks/useFundraisingData';
+import { useMonobankJars } from '../hooks/useMonobankJars';
+import { useTags } from '../hooks/useTags';
+import { useAuthorizationCheck } from '../hooks/useAuthorizationCheck';
 
 interface EditFundraisingProps {
     fundraisingId: string;
@@ -165,7 +51,6 @@ interface EditFundraisingProps {
 const EditFundraising = ({ fundraisingId }: EditFundraisingProps) => {
     const defaultImage = 'http://localhost:8080/Uploads/Default/Fundraisings/avatar.png';
 
-    // Custom hooks
     const { data: fundraisingData, loading: dataLoading, refetch } = useFundraisingData(fundraisingId);
     const jars = useMonobankJars();
     const existingTags = useTags();
@@ -221,32 +106,26 @@ const EditFundraising = ({ fundraisingId }: EditFundraisingProps) => {
         }));
     };
 
-    const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleImageUpload = async (e: ChangeEvent<HTMLInputElement>) => {
         const { files } = e.target;
-        if (files?.length) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if (event.target?.result) {
-                    setFormData(prev => ({
-                        ...prev,
-                        imageUrl: event.target!.result as string
-                    }));
-                }
-            };
-            reader.readAsDataURL(files[0]);
+        if (files && files.length) {
+            const response = await fundraisingsRepository.uploadImage(fundraisingId, files[0]);
+            if (response.isSuccess) {
+                showSuccess('Image uploaded successfully');
+                refetch();
+            } else {
+                showError(response.error?.message || 'Failed to upload image');
+            }
         }
     };
 
     const handleImageDelete = async () => {
-        setFormData(prev => ({ ...prev, imageUrl: defaultImage }));
-        if (inputFile.current) {
-            inputFile.current.value = '';
-            inputFile.current.files = new DataTransfer().files;
-        }
-        try {
-            await fundraisingsRepository.deleteImage(fundraisingId);
-        } catch (error) {
-            showError('Failed to delete image');
+        const response = await fundraisingsRepository.deleteImage(fundraisingId);
+        if (response.isSuccess) {
+            showSuccess('Image removed successfully');
+            refetch();
+        } else {
+            showError(response.error?.message || 'Failed to remove image');
         }
     };
 
@@ -257,6 +136,7 @@ const EditFundraising = ({ fundraisingId }: EditFundraisingProps) => {
                 showError(response.error.message);
             } else {
                 setReports(prev => prev.filter(report => report.id !== reportId));
+                showSuccess('Report deleted successfully');
             }
         } catch (error) {
             showError('Unexpected error while deleting report');
@@ -278,9 +158,62 @@ const EditFundraising = ({ fundraisingId }: EditFundraisingProps) => {
                     }
                     return report;
                 }));
+                showSuccess('Attachment deleted successfully');
             }
         } catch (error) {
             showError('Unexpected error while deleting attachment');
+        }
+    };
+
+    const handleAttachmentAdd = async (reportId: string, files: FileList) => {
+        try {
+            const formData = new FormData();
+            Array.from(files).forEach(file => {
+                formData.append('files', file);
+            });
+
+            const response = await fundraisingsReportsRepository.addAttachments(reportId, formData);
+            if (response?.error) {
+                showError(response.error.message);
+            } else {
+                showSuccess('Attachments added successfully');
+                refetch(); // Refresh to get updated attachments
+            }
+        } catch (error) {
+            showError('Unexpected error while adding attachments');
+        }
+    };
+
+    const handleReportAdd = async (title: string, description: string, files: File[]) => {
+        try {
+            const reportBody = {
+                title,
+                description,
+                fundraisingId
+            };
+
+            const response = await fundraisingsReportsRepository.addReport(reportBody);
+            if (response?.error) {
+                showError(response.error.message);
+                return;
+            }
+
+            if (response?.isSuccess && response?.data && files.length > 0) {
+                const formData = new FormData();
+                files.forEach(file => {
+                    formData.append('files', file);
+                });
+
+                const attachmentResponse = await fundraisingsReportsRepository.addAttachments((response.data as any).id, formData);
+                if (attachmentResponse?.error) {
+                    showError(attachmentResponse.error.message);
+                }
+            }
+
+            showSuccess('Report added successfully');
+            refetch(); // Refresh to get updated reports
+        } catch (error) {
+            showError('Unexpected error while adding report');
         }
     };
 
@@ -316,15 +249,10 @@ const EditFundraising = ({ fundraisingId }: EditFundraisingProps) => {
         }
     };
 
-    const handleReportDialogClose = async () => {
-        await refetch();
-        setDialogOpen(false);
-    };
-
     if (dataLoading) {
         return (
             <PageWrapper>
-                <Container maxWidth="md" sx={{ py: 4, display: 'flex', justifyContent: 'center' }}>
+                <Container maxWidth="lg" sx={{ py: 4, display: 'flex', justifyContent: 'center' }}>
                     <CircularProgress />
                 </Container>
             </PageWrapper>
@@ -333,161 +261,303 @@ const EditFundraising = ({ fundraisingId }: EditFundraisingProps) => {
 
     return (
         <PageWrapper>
-            <Container maxWidth="md" sx={{ py: 4 }}>
-                <Card elevation={3} sx={{ borderRadius: 2, overflow: 'visible' }}>
-                    <CardContent sx={{ p: 4 }}>
-                        <Typography
-                            variant="h4"
-                            component="h1"
-                            textAlign="center"
-                            gutterBottom
-                            sx={{ fontWeight: 600, color: 'primary.main', mb: 4 }}
-                        >
-                            Edit Fundraising
-                        </Typography>
-
-                        <Stack spacing={4}>
-                            {/* Image and Basic Info Section */}
-                            <Box sx={{
-                                display: 'flex',
-                                flexDirection: { xs: 'column', md: 'row' },
-                                gap: 3,
-                                alignItems: { xs: 'center', md: 'flex-start' }
-                            }}>
-                                <UploadImage
-                                    inputFile={inputFile}
-                                    handleFileUpload={handleImageUpload}
-                                    handleDeleteFile={handleImageDelete}
-                                    url={formData.imageUrl}
-                                />
-
-                                <Stack spacing={3} sx={{ flex: 1, width: '100%' }}>
-                                    <LimitedTextField
-                                        label="Title"
-                                        maxChar={70}
-                                        value={formData.title}
-                                        fullWidth
-                                        onChange={(value) => setFormData(prev => ({ ...prev, title: value }))}
-                                    />
-
-                                    <LimitedTextField
-                                        label="Description"
-                                        maxRows={4}
-                                        maxChar={500}
-                                        fullWidth
-                                        value={formData.description}
-                                        onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
-                                        multiline
-                                    />
-
-                                    <FormControl fullWidth variant="outlined">
-                                        <InputLabel>Monobank Jar</InputLabel>
-                                        <Select
-                                            value={formData.monobankJar}
-                                            label="Monobank Jar"
-                                            onChange={(e) => setFormData(prev => ({ ...prev, monobankJar: e.target.value }))}
-                                            open={Boolean(openJarsMenu)}
-                                            onClose={handleJarMenuClose}
-                                            onOpen={handleJarMenuOpen}
-                                        >
-                                            {jars.map((jar) => (
-                                                <MenuItem
-                                                    key={jar.id}
-                                                    value={jar.title}
-                                                    onClick={() => handleJarSelect(jar.title, jar.id)}
-                                                >
-                                                    {jar.title}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-
-                                    <MultiSelectWithChips
-                                        freeSolo
-                                        width="100%"
-                                        limitTags={3}
-                                        label="Tags"
-                                        defaultValues={formData.selectedTags}
-                                        values={existingTags}
-                                        onChange={(newTags) => setFormData(prev => ({ ...prev, selectedTags: newTags }))}
-                                    />
-                                </Stack>
+            <Container maxWidth="lg">
+                {/* Header Section */}
+                <Paper
+                    elevation={4}
+                    sx={{
+                        mb: 4,
+                        borderRadius: 4,
+                        overflow: 'hidden',
+                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        position: 'relative'
+                    }}
+                >
+                    <Box sx={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.1 }}>
+                        <Box sx={{
+                            background: 'radial-gradient(circle at 30% 20%, rgba(255,255,255,0.3) 0%, transparent 50%)',
+                            width: '100%',
+                            height: '100%'
+                        }} />
+                    </Box>
+                    <CardContent sx={{ p: 4, position: 'relative', zIndex: 1 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                                <Box sx={{
+                                    p: 2,
+                                    borderRadius: 3,
+                                    bgcolor: 'rgba(255,255,255,0.2)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <EditIcon sx={{ fontSize: 32 }} />
+                                </Box>
+                                <Box>
+                                    <Typography variant="h3" sx={{ fontWeight: 700, mb: 1 }}>
+                                        Edit Fundraising
+                                    </Typography>
+                                    <Typography variant="h6" sx={{ opacity: 0.9 }}>
+                                        Update your fundraising campaign details
+                                    </Typography>
+                                </Box>
                             </Box>
+                            <IconButton
+                                onClick={() => navigate(`/fundraising/${fundraisingId}`)}
+                                sx={{
+                                    color: 'white',
+                                    bgcolor: 'rgba(255,255,255,0.2)',
+                                    '&:hover': {
+                                        bgcolor: 'rgba(255,255,255,0.3)'
+                                    }
+                                }}
+                            >
+                                <ArrowBackIcon />
+                            </IconButton>
+                        </Box>
+                    </CardContent>
+                </Paper>
 
-                            <Divider />
+                <Grid container spacing={4}>
+                    {/* Left Column - Main Content */}
+                    <Grid item xs={12} md={8}>
+                        <Stack spacing={4}>
+                            {/* Campaign Image & Basic Info */}
+                            <Card elevation={3} sx={{ borderRadius: 3 }}>
+                                <CardContent sx={{ p: 4 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                                        <PhotoCameraIcon sx={{ fontSize: 28, color: 'primary.main' }} />
+                                        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                                            Campaign Image & Details
+                                        </Typography>
+                                    </Box>
+
+                                    <Grid container spacing={4}>
+                                        <Grid item xs={12} md={4}>
+                                            <UploadImage
+                                                inputFile={inputFile}
+                                                handleFileUpload={handleImageUpload}
+                                                handleDeleteFile={handleImageDelete}
+                                                url={formData.imageUrl}
+                                            />
+                                        </Grid>
+                                        <Grid item xs={12} md={8}>
+                                            <Stack spacing={3}>
+                                                <LimitedTextField
+                                                    label="Campaign Title"
+                                                    maxChar={70}
+                                                    value={formData.title}
+                                                    fullWidth
+                                                    onChange={(value) => setFormData(prev => ({ ...prev, title: value }))}
+                                                    helperText="Create a compelling title that clearly describes your cause"
+                                                />
+
+                                                <LimitedTextField
+                                                    label="Campaign Description"
+                                                    maxRows={6}
+                                                    maxChar={500}
+                                                    fullWidth
+                                                    value={formData.description}
+                                                    onChange={(value) => setFormData(prev => ({ ...prev, description: value }))}
+                                                    multiline
+                                                    helperText="Tell your story - why is this fundraising important?"
+                                                />
+                                            </Stack>
+                                        </Grid>
+                                    </Grid>
+                                </CardContent>
+                            </Card>
+
+                            {/* Payment & Tags */}
+                            <Card elevation={3} sx={{ borderRadius: 3 }}>
+                                <CardContent sx={{ p: 4 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
+                                        <AccountBalanceIcon sx={{ fontSize: 28, color: 'primary.main' }} />
+                                        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                                            Payment & Classification
+                                        </Typography>
+                                    </Box>
+
+                                    <Stack spacing={3}>
+                                        <FormControl fullWidth variant="outlined">
+                                            <InputLabel>Monobank Jar</InputLabel>
+                                            <Select
+                                                value={formData.monobankJar}
+                                                label="Monobank Jar"
+                                                onChange={(e) => setFormData(prev => ({ ...prev, monobankJar: e.target.value }))}
+                                                open={Boolean(openJarsMenu)}
+                                                onClose={handleJarMenuClose}
+                                                onOpen={handleJarMenuOpen}
+                                            >
+                                                {jars.map((jar) => (
+                                                    <MenuItem
+                                                        key={jar.id}
+                                                        value={jar.title}
+                                                        onClick={() => handleJarSelect(jar.title, jar.id)}
+                                                    >
+                                                        {jar.title}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+
+                                        <Box>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                                                <TagIcon sx={{ fontSize: 20, color: 'text.secondary' }} />
+                                                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                                                    Tags
+                                                </Typography>
+                                            </Box>
+                                            <MultiSelectWithChips
+                                                freeSolo
+                                                width="100%"
+                                                limitTags={5}
+                                                label="Select or create tags"
+                                                defaultValues={formData.selectedTags}
+                                                values={existingTags}
+                                                onChange={(newTags) => setFormData(prev => ({ ...prev, selectedTags: newTags }))}
+                                            />
+                                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                                                Tags help people find your campaign. You can select existing tags or create new ones.
+                                            </Typography>
+                                        </Box>
+                                    </Stack>
+                                </CardContent>
+                            </Card>
 
                             {/* Reports Section */}
-                            <Box>
-                                <Typography
-                                    variant="h5"
-                                    component="h2"
-                                    gutterBottom
-                                    sx={{ fontWeight: 600, color: 'text.primary', mb: 3 }}
-                                >
-                                    Reports
-                                </Typography>
+                            <Card elevation={3} sx={{ borderRadius: 3 }}>
+                                <CardContent sx={{ p: 4 }}>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                            <AssessmentIcon sx={{ fontSize: 28, color: 'primary.main' }} />
+                                            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                                                Progress Reports
+                                            </Typography>
+                                        </Box>
+                                        <Button
+                                            startIcon={<AddIcon />}
+                                            variant="contained"
+                                            onClick={() => setDialogOpen(true)}
+                                            sx={{
+                                                borderRadius: 2,
+                                                textTransform: 'none',
+                                                fontWeight: 600
+                                            }}
+                                        >
+                                            Add Report
+                                        </Button>
+                                    </Box>
 
-                                <Stack spacing={2}>
+                                    {reports.length > 0 ? (
+                                        <Stack spacing={3}>
+                                            {reports.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()).map((report) => (
+                                                <ReportCard
+                                                    key={report.id}
+                                                    report={report}
+                                                    onReportDelete={handleReportDelete}
+                                                    onAttachmentDelete={handleAttachmentDelete}
+                                                    onAttachmentAdd={handleAttachmentAdd}
+                                                />
+                                            ))}
+                                        </Stack>
+                                    ) : (
+                                        <Box sx={{
+                                            p: 4,
+                                            textAlign: 'center',
+                                            bgcolor: 'grey.50',
+                                            borderRadius: 2,
+                                            border: '2px dashed',
+                                            borderColor: 'grey.300'
+                                        }}>
+                                            <AssessmentIcon sx={{ fontSize: 48, color: 'grey.400', mb: 2 }} />
+                                            <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
+                                                No reports yet
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                Add progress reports to keep your supporters updated
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </Stack>
+                    </Grid>
+
+                    {/* Right Column - Actions & Help */}
+                    <Grid item xs={12} md={4}>
+                        <Stack spacing={3}>
+                            {/* Save Changes */}
+                            <Card elevation={3} sx={{ borderRadius: 3, position: 'sticky', top: 100 }}>
+                                <CardContent sx={{ p: 3 }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
+                                        Save Changes
+                                    </Typography>
+
                                     <Button
-                                        startIcon={<AddIcon />}
                                         variant="contained"
                                         size="large"
-                                        onClick={() => setDialogOpen(true)}
+                                        fullWidth
+                                        startIcon={<SaveIcon />}
+                                        onClick={handleSubmit}
+                                        disabled={isSubmitting}
                                         sx={{
                                             borderRadius: 2,
                                             textTransform: 'none',
                                             fontWeight: 600,
-                                            alignSelf: 'flex-start'
+                                            fontSize: '1.1rem',
+                                            py: 1.5
                                         }}
                                     >
-                                        Add Report
+                                        {isSubmitting ? 'Saving...' : 'Save Changes'}
                                     </Button>
 
-                                    {reports.map((report) => (
-                                        <ReportAccordion
-                                            key={report.id}
-                                            report={report}
-                                            mode="edit"
-                                            onReportDelete={handleReportDelete}
-                                            onAttachmentDelete={handleAttachmentDelete}
-                                        />
-                                    ))}
-                                </Stack>
-                            </Box>
+                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2, textAlign: 'center' }}>
+                                        Your changes will be visible immediately after saving
+                                    </Typography>
+                                </CardContent>
+                            </Card>
 
-                            <Divider />
-
-                            {/* Action Buttons */}
-                            <Box sx={{ display: 'flex', justifyContent: 'center', pt: 2 }}>
-                                <Button
-                                    variant="contained"
-                                    size="large"
-                                    onClick={handleSubmit}
-                                    disabled={isSubmitting}
-                                    sx={{
-                                        minWidth: 200,
-                                        borderRadius: 2,
-                                        textTransform: 'none',
-                                        fontWeight: 600,
-                                        fontSize: '1.1rem'
-                                    }}
-                                >
-                                    {isSubmitting ? 'Saving...' : 'Save Changes'}
-                                </Button>
-                            </Box>
+                            {/* Edit Guidelines */}
+                            <Card elevation={3} sx={{ borderRadius: 3 }}>
+                                <CardContent sx={{ p: 3 }}>
+                                    <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
+                                        Editing Guidelines
+                                    </Typography>
+                                    <Stack spacing={2}>
+                                        <Typography variant="body2" color="text.secondary">
+                                            • Keep your title clear and compelling
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            • Update your description to reflect current needs
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            • Add progress reports to build trust
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            • Use relevant tags to improve discoverability
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary">
+                                            • Upload high-quality images that tell your story
+                                        </Typography>
+                                    </Stack>
+                                </CardContent>
+                            </Card>
                         </Stack>
-                    </CardContent>
-                </Card>
+                    </Grid>
+                </Grid>
 
                 <Dialog
                     fullWidth
                     maxWidth="md"
                     open={dialogOpen}
-                    PaperProps={{ sx: { borderRadius: 2 } }}
+                    onClose={() => setDialogOpen(false)}
+                    PaperProps={{ sx: { borderRadius: 3 } }}
                 >
-                    <AddReport
-                        onClose={handleReportDialogClose}
-                        fundraisingId={fundraisingId}
+                    <AddReportForm
+                        onClose={() => setDialogOpen(false)}
+                        onSubmit={handleReportAdd}
                     />
                 </Dialog>
 

@@ -1,13 +1,14 @@
 import Logout from "@mui/icons-material/Logout";
 import AddIcon from '@mui/icons-material/Add';
 import Person2Icon from '@mui/icons-material/Person2';
-import { Avatar, Divider, ListItemIcon, Menu, MenuItem, Typography, Box, useTheme } from '@mui/material';
+import { Avatar, Divider, ListItemIcon, Menu, MenuItem, Typography, Box, useTheme, Badge } from '@mui/material';
 import { useState } from "react";
 import { stringAvatar } from "../../../shared/services/convert";
 import { useUser } from "../../../contexts/UserContext";
 import { CallToAction } from "@mui/icons-material";
 import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import EmailIcon from '@mui/icons-material/Email';
+import ReportIcon from '@mui/icons-material/Report';
 
 interface MenuAvatarProps {
     onSignOut: () => void;
@@ -17,6 +18,8 @@ interface MenuAvatarProps {
     onMyFundraising: () => void;
     onUsers: () => void;
     onInviteUser: () => void;
+    onComplaints: () => void;
+    complaintsCount: number;
 }
 
 const MenuAvatar = (props: MenuAvatarProps) => {
@@ -32,6 +35,8 @@ const MenuAvatar = (props: MenuAvatarProps) => {
     const handleClose = () => {
         setAnchorEl(null);
     };
+
+    console.log(props.complaintsCount);
 
     return (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -133,6 +138,14 @@ const MenuAvatar = (props: MenuAvatarProps) => {
                                 <EmailIcon fontSize="small" />
                             </ListItemIcon>
                             <Typography variant="body2">Invite admin</Typography>
+                        </MenuItem>
+                        <MenuItem onClick={props.onComplaints}>
+                            <ListItemIcon>
+                                <Badge badgeContent={props.complaintsCount} variant='standard' color="error">
+                                    <ReportIcon fontSize="small" />
+                                </Badge>
+                            </ListItemIcon>
+                            <Typography variant="body2">Complaints</Typography>
                         </MenuItem>
                     </>
                 )}

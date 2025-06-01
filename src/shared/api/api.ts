@@ -1,6 +1,5 @@
 import { isAxiosError } from 'axios';
-import { BaseErrorResponse } from '../models/api/BaseErrorResponse';
-import { ApiResponse } from '../models/api/pagination/ApiResponse';
+import { ApiResponse, BaseErrorResponse } from '../models/api/pagination/ApiResponse';
 import { PagedResponse } from '../models/api/pagination/PagedResponse';
 import { PaginatedRequest } from '../models/api/pagination/PaginatedRequest';
 import axios from './axios';
@@ -16,6 +15,9 @@ export const api = {
             }
 
             const response = await axios.get<TResponse>(resultUrl, { params: params });
+
+            console.log('here,,', response.data);
+
             return { isSuccess: true, data: response.data };
         }
         catch (error) {
@@ -23,12 +25,12 @@ export const api = {
         }
     },
 
-    getPaginated: async <TResponse>(url: string, pagination: PaginatedRequest<any>, params?: any): Promise<ApiResponse<PagedResponse<TResponse>>> => {
+    getPaginated: async <TResponse>(url: string, pagination: PaginatedRequest<any>): Promise<ApiResponse<PagedResponse<TResponse>>> => {
         try {
             const response = await axios.get<PagedResponse<TResponse>>(url, {
                 params: {
                     ...pagination,
-                    ...params
+                    ...pagination.request
                 }
             });
             return { isSuccess: true, data: response.data };
@@ -85,12 +87,105 @@ export const api = {
 };
 
 const handleError = <T>(error: any): ApiResponse<T> => {
+    console.error("API Error:", error);
+
     if (isAxiosError(error)) {
-        return { isSuccess: false, error: error.response?.data as BaseErrorResponse };
+        const response = error.response;
+        const request = error.request;
+
+        // Handle HTTP errors (4xx, 5xx)
+        if (response) {
+            const statusCode = response.status;
+            const errorData = response.data;
+
+            console.error(`HTTP Error ${statusCode}:`, errorData);
+
+            // Try to extract error information from response
+            let baseError: BaseErrorResponse;
+
+            if (errorData && typeof errorData === 'object') {
+                // If the response contains structured error data
+                baseError = {
+                    code: statusCode,
+                    message: errorData.message || errorData.error || getDefaultErrorMessage(statusCode)
+                };
+            } else {
+                // Fallback for non-structured error responses
+                baseError = {
+                    code: statusCode,
+                    message: typeof errorData === 'string' ? errorData : getDefaultErrorMessage(statusCode)
+                };
+            }
+
+            return { isSuccess: false, error: baseError };
+        }
+
+        // Handle network errors (no response received)
+        if (request) {
+            console.error("Network Error - No response received:", request);
+            return {
+                isSuccess: false,
+                error: {
+                    code: 0,
+                    message: "Network Error: No response received from server. Please check your internet connection."
+                }
+            };
+        }
+
+        // Handle request setup errors
+        console.error("Request Setup Error:", error.message);
+        return {
+            isSuccess: false,
+            error: {
+                code: -1,
+                message: error.message || "Request Error: An error occurred while setting up the request"
+            }
+        };
     }
 
-    console.error(error);
-    throw error;
+    // Handle non-Axios errors
+    console.error("Unexpected Error:", error);
+    return {
+        isSuccess: false,
+        error: {
+            code: -1,
+            message: error?.message || "Unexpected Error: An unexpected error occurred"
+        }
+    };
+};
+
+const getDefaultErrorMessage = (statusCode: number): string => {
+    switch (statusCode) {
+        case 400:
+            return "Bad Request - The request was invalid";
+        case 401:
+            return "Unauthorized - Authentication required";
+        case 403:
+            return "Forbidden - Access denied";
+        case 404:
+            return "Not Found - The requested resource was not found";
+        case 409:
+            return "Conflict - The request conflicts with current state";
+        case 422:
+            return "Validation Error - The request data is invalid";
+        case 429:
+            return "Too Many Requests - Rate limit exceeded";
+        case 500:
+            return "Internal Server Error - Something went wrong on the server";
+        case 502:
+            return "Bad Gateway - Server received invalid response";
+        case 503:
+            return "Service Unavailable - Server temporarily unavailable";
+        case 504:
+            return "Gateway Timeout - Server response timeout";
+        default:
+            if (statusCode >= 400 && statusCode < 500) {
+                return `Client Error (${statusCode})`;
+            } else if (statusCode >= 500) {
+                return `Server Error (${statusCode})`;
+            }
+            return `HTTP Error (${statusCode})`;
+    }
 };
 
 export default api; 

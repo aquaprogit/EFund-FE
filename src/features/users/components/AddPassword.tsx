@@ -7,6 +7,7 @@ import { Box } from '@mui/material';
 import { useUser } from '../../../contexts/UserContext';
 import { addPasswordSchema, type AddPasswordFormData } from '../../auth/schemas/schemas';
 import { useZodForm } from '../../../shared/hooks/useZodForm';
+import LockIcon from '@mui/icons-material/Lock';
 
 const AddPassword = (props: { onClose: () => void }) => {
     const { refreshUser } = useUser();
@@ -31,21 +32,35 @@ const AddPassword = (props: { onClose: () => void }) => {
     };
 
     return (
-        <ChangeCreds buttonLabel='Add password' title={'Add password'} buttonHandler={handleSubmit(onSubmit)}>
-            <form>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }} >
-                    <PasswordInput
-                        register={register('password')}
-                        placeholder={'Password'}
-                        error={errors['password']}
-                    />
-                    <PasswordInput
-                        register={register('confirmPassword')}
-                        placeholder={'Confirm password'}
-                        error={errors['confirmPassword']}
-                    />
-                </Box>
-            </form>
+        <ChangeCreds
+            buttonLabel="Add Password"
+            title="Add Password"
+            description="Create a password for your account to enhance security"
+            buttonHandler={handleSubmit(onSubmit)}
+            onClose={props.onClose}
+            icon={<LockIcon />}
+        >
+            <Box
+                component="form"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSubmit(onSubmit)(e);
+                }}
+                sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}
+            >
+                <PasswordInput
+                    register={register('password')}
+                    label="Password"
+                    placeholder="Enter your password"
+                    error={errors['password']}
+                />
+                <PasswordInput
+                    register={register('confirmPassword')}
+                    label="Confirm Password"
+                    placeholder="Confirm your password"
+                    error={errors['confirmPassword']}
+                />
+            </Box>
         </ChangeCreds>
     );
 };

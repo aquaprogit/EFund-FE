@@ -32,11 +32,12 @@ import TimelineDot from '@mui/lab/TimelineDot';
 import TimelineOppositeContent, { timelineOppositeContentClasses } from '@mui/lab/TimelineOppositeContent';
 import ArticleIcon from '@mui/icons-material/Article';
 import { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ReportDialog from '../../rules/components/ReportDialog';
 import { complaintRepository } from '../../rules/repository/complaintRepository';
 import { useToast } from '../../../contexts/ToastContext';
 import { useUser } from "../../../contexts/UserContext";
+import UserPreviewTooltip from "../../../shared/components/UserPreviewTooltip";
 
 interface FundraisingDetailsProps {
     fundraisingId: string;
@@ -49,6 +50,7 @@ export const FundraisingDetails = ({ fundraisingId }: FundraisingDetailsProps) =
     const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
     const { showToast } = useToast();
     const { user } = useUser();
+    const navigate = useNavigate();
 
     const scrollToReports = () => {
         reportsRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -58,7 +60,7 @@ export const FundraisingDetails = ({ fundraisingId }: FundraisingDetailsProps) =
         try {
             const response = await complaintRepository.createComplaint({
                 fundraisingId,
-                violationsIds: report.violations,
+                violationIds: report.violations,
                 comment: report.description
             });
 
@@ -157,28 +159,17 @@ export const FundraisingDetails = ({ fundraisingId }: FundraisingDetailsProps) =
                                             Created {format(new Date(fundraising.createdAt), 'MMM dd, yyyy')}
                                         </Typography>
                                     </Box>
-                                    <Box sx={styles.metaItem}>
-                                        <PersonIcon color="action" fontSize="small" />
-                                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: user?.id === fundraising.userId ? 'italic' : 'normal' }} component="div">
-                                            By{' '}
-                                            {
-                                                user?.id === fundraising.userId
-                                                    ? <MuiLink
-                                                        component={Link}
-                                                        to={`/profile`}
-                                                        sx={{ textDecoration: 'none' }}
-                                                    >
-                                                        {'you'}
-                                                    </MuiLink>
-                                                    : <MuiLink
-                                                        component={Link}
-                                                        to={`/user/${fundraising.userId}`}
-                                                        sx={{ textDecoration: 'none' }}
-                                                    >
-                                                        {fundraising.userName}
-                                                    </MuiLink>
-                                            }
-                                        </Typography>
+                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2, transition: 'none', cursor: 'default' }}>
+                                        <PersonIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                            <Typography variant="body2" color="text.secondary">By</Typography>
+                                            {user?.id === fundraising.userId
+                                                ? <Typography variant="body2" color="primary" sx={{ cursor: 'pointer', textDecoration: 'underline', fontWeight: 'bold', fontStyle: 'italic' }} onClick={() => navigate(`/profile`)}>you</Typography>
+                                                : <UserPreviewTooltip userId={fundraising.userId}>
+                                                    <Typography sx={{ textDecoration: 'underline', fontWeight: 'bold' }}
+                                                        color="primary" onClick={() => navigate(`/user/${fundraising.userId}`)} variant="body2">{fundraising.userName}</Typography>
+                                                </UserPreviewTooltip>}
+                                        </Box>
                                     </Box>
                                 </Stack>
 

@@ -22,5 +22,6 @@ export const urls = {
     makeAdmin: '/users/make-admin',
     userAction: '/users/action',
     inviteAdmin: '/users/invite-admin',
-    user: (userId: string) => `/users/${userId}`
+    user: (userId: string) => `/users/${userId}`,
+    searchUsersMinimized: '/users/search-minimized'
 } as const; 

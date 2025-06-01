@@ -10,7 +10,6 @@ import ProfilePage from './features/users/pages/ProfilePage';
 import { UserProvider } from './contexts/UserContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { ToastProvider } from "./contexts/ToastContext";
-import EditFundraising from "./features/fundraising/components/EditFundraising";
 import UsersPage from './features/users/pages/UsersPage';
 import ResetPasswordPage from './features/auth/pages/ResetPasswordPage';
 import FundraisingPage from './features/fundraising/pages/FundraisingPage';
@@ -20,6 +19,9 @@ import FundraisingListPage from './features/fundraising/pages/FundraisingListPag
 import AddFundraisingPage from './features/fundraising/pages/AddFundraisingPage';
 import RulesPage from "./features/rules/pages/RulesPage";
 import EditFundraisingPage from './features/fundraising/pages/EditFundraisingPage';
+import ComplaintsListPage from './features/rules/pages/ComplaintsListPage';
+import ComplaintDetailsPage from './features/rules/pages/ComplaintDetailsPage';
+import NotFoundPage from './shared/pages/NotFoundPage';
 
 const darkTheme = createTheme({
   palette: {
@@ -117,7 +119,9 @@ const App: React.FC = () => (
                 <Route path='/users' element={<UsersPage />} />
                 <Route path='/reset-password' element={<ResetPasswordPage />} />
                 <Route path="/rules" element={<RulesPage />} />
-                <Route path="*" element={<h1 style={{ color: 'red' }} >Not Found</h1>} />
+                <Route path="/complaints" element={<ComplaintsListPage />} />
+                <Route path="/complaint/:id" element={<ComplaintDetailsPage />} />
+                <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </BrowserRouter>
           </UserProvider>

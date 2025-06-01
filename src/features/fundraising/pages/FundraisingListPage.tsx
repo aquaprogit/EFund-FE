@@ -52,8 +52,6 @@ const FundraisingListPage = () => {
     const userId = searchParams.get('userId');
     const searchQuery = searchParams.get('keyword') ?? '';
 
-    console.log(searchQuery);
-
     const {
         fundraisings,
         loading,
@@ -63,6 +61,8 @@ const FundraisingListPage = () => {
         setPage,
         setSearchQuery,
         setSelectedTags,
+        setSelectedUser,
+        selectedUser,
         totalFundraisings
     } = useFundraisingSearch({ initialSearchQuery: searchQuery, pageSize: pageSize, userId: userId ?? undefined });
 
@@ -79,6 +79,8 @@ const FundraisingListPage = () => {
                         onSearchChange={setSearchQuery}
                         onTagsChange={setSelectedTags}
                         allTags={allTags}
+                        onUserChange={setSelectedUser}
+                        selectedUser={selectedUser}
                     />
 
                     <Box>

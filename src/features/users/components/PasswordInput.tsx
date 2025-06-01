@@ -1,7 +1,6 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import TextField from "@mui/material/TextField";
-import { Box, InputAdornment } from "@mui/material";
-import styles from './AddPassword.module.css';
+import { InputAdornment } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { UseFormRegisterReturn } from 'react-hook-form';
@@ -9,13 +8,15 @@ import { UseFormRegisterReturn } from 'react-hook-form';
 type PasswordInputProps = {
     register: UseFormRegisterReturn;
     placeholder: string;
-    error: any
+    error: any;
+    label?: string;
 };
 
 const PasswordInput: React.FC<PasswordInputProps> = ({
     register,
     placeholder,
-    error
+    error,
+    label
 }) => {
     const [isVisible, setIsVisible] = React.useState(false);
 
@@ -30,35 +31,27 @@ const PasswordInput: React.FC<PasswordInputProps> = ({
                     aria-label="toggle password visibility"
                     onClick={handleClickShowPassword}
                     edge="end"
+                    size="small"
                 >
                     {isVisible ? <VisibilityOff /> : <Visibility />}
                 </IconButton>
             </InputAdornment>
         ),
     };
-    const containerStyle = useMemo(() => {
-        return {
-            display: 'flex',
-            flexDirection: 'column',
-            textAlign: 'center',
-            alignItems: 'center',
-            rowGap: '10px'
-        }
-    }, [])
+
     return (
-        <Box className={styles.passwordField} sx={containerStyle}>
-            <TextField
-                type={isVisible ? 'text' : 'password'}
-                required={true}
-                size={'small'}
-                placeholder={placeholder}
-                InputProps={inputProps}
-                error={!!error}
-                helperText={error?.message}
-                {...register}
-                sx={{ width: '400px' }}
-            />
-        </Box>
+        <TextField
+            type={isVisible ? 'text' : 'password'}
+            required={true}
+            label={label || placeholder}
+            placeholder={placeholder}
+            variant="outlined"
+            fullWidth
+            InputProps={inputProps}
+            error={!!error}
+            helperText={error?.message}
+            {...register}
+        />
     );
 };
 

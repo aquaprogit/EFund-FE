@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Tag } from '../../tags/models/Tag';
 import { tagsRepository } from '../../tags/repository/tagsRepository';
+import { userRepository } from '../../users/api/userRepository';
+import { UserDetails } from '../../users/models/UserDetails';
 import Fundraising from '../models/Fundraising';
 import { fundraisingsRepository } from '../repository/fundraisingsRepository';
 
@@ -23,6 +25,9 @@ interface UseFundraisingSearchResult {
     setSearchQuery: (query: string) => void;
     setSelectedTags: (tags: string[]) => void;
     refreshFundraisings: () => Promise<void>;
+    allUsers: UserDetails[];
+    selectedUser: string | undefined;
+    setSelectedUser: (userId: string) => void;
 }
 
 export const useFundraisingSearch = ({
@@ -38,8 +43,10 @@ export const useFundraisingSearch = ({
     const [totalPages, setTotalPages] = useState<number>(1);
     const [fundraisings, setFundraisings] = useState<Fundraising[]>([]);
     const [totalFundraisings, setTotalFundraisings] = useState<number>(0);
-    // const statuses = [1, 2, 3, 4, 5, 6];
-    // const selectedStatuses = type === 'USER' ? [1, 2, 3] : statuses;
+    const [allUsers, setAllUsers] = useState<UserDetails[]>([]);
+    const [selectedUser, setSelectedUser] = useState<string | undefined>(userId);
+
+    // statuses
 
     const fetchFundraisings = async () => {
         setLoading(true);
@@ -49,7 +56,7 @@ export const useFundraisingSearch = ({
                     title: searchQuery,
                     tags: selectedTags,
                     statuses: [1],
-                    userId: userId ?? undefined
+                    userId: selectedUser ?? undefined
                 },
                 page,
                 pageSize
@@ -79,8 +86,16 @@ export const useFundraisingSearch = ({
         }
     };
 
+    const fetchUsers = async () => {
+        const { data: users } = await userRepository.getUsersMinimized(searchQuery);
+        if (users) {
+            setAllUsers(users);
+        }
+    };
+
     useEffect(() => {
         fetchTags();
+        fetchUsers();
     }, []);
 
     useEffect(() => {
@@ -103,6 +118,9 @@ export const useFundraisingSearch = ({
         setSearchQuery,
         setSelectedTags,
         refreshFundraisings: fetchFundraisings,
-        totalFundraisings
+        totalFundraisings,
+        allUsers,
+        selectedUser,
+        setSelectedUser
     };
 }; 

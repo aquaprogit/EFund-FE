@@ -1,15 +1,27 @@
 import { Box, Paper, Typography, useTheme } from "@mui/material";
 import Search from "../../../shared/components/Search";
 import MultiSelectWithChip from "../../../shared/components/MultiSelectWithChips";
+import { UserDetails } from "../../users/models/UserDetails";
+import UserDropDown from "../../users/components/UserDropDown";
 
 interface FilterSectionProps {
     onSearchChange: (query: string) => void;
     onTagsChange: (tags: string[]) => void;
     allTags: Array<{ name: string }>;
     searchInitialValue: string;
+
+    onUserChange: (userId: string) => void;
+    selectedUser: string | undefined;
 }
 
-const FilterSection = ({ onSearchChange, onTagsChange, allTags, searchInitialValue }: FilterSectionProps) => {
+const FilterSection = ({
+    onSearchChange,
+    onTagsChange,
+    allTags,
+    searchInitialValue,
+    onUserChange,
+    selectedUser
+}: FilterSectionProps) => {
     const theme = useTheme();
 
     return (
@@ -40,6 +52,12 @@ const FilterSection = ({ onSearchChange, onTagsChange, allTags, searchInitialVal
             }}>
                 <Box sx={{ flex: 1 }}>
                     <Search onSearch={onSearchChange} sx={{ maxWidth: '300px' }} initialValue={searchInitialValue} />
+                </Box>
+                <Box>
+                    <UserDropDown
+                        selectedUser={selectedUser}
+                        setSelectedUser={onUserChange}
+                    />
                 </Box>
                 <Box sx={{ width: { xs: '100%', sm: '350px' } }}>
                     <MultiSelectWithChip

@@ -29,7 +29,8 @@ export const getFundraisingDetailsStyles = (theme: Theme) => ({
         fontWeight: 500
     },
     metaStack: {
-        mb: 3
+        mb: 3,
+        transition: 'none'
     },
     metaItem: {
         display: 'flex',

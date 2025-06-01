@@ -3,7 +3,7 @@ import { urls } from '../../../shared/api/urls';
 import { ApiResponse } from '../../../shared/models/api/pagination/ApiResponse';
 import { PagedResponse } from '../../../shared/models/api/pagination/PagedResponse';
 import User from '../models/User';
-import { UserDetails as UserDetailsType } from '../models/UserDetails';
+import { UserDetails, UserDetails as UserDetailsType } from '../models/UserDetails';
 import { SearchUsersRequest } from '../models/UsersRequest';
 
 export type UpdateUserInfo = { name: string, description: string };
@@ -63,8 +63,8 @@ export const userRepository = {
         return await api.post<ChangePassword, {}>(urls.changePassword, request);
     },
 
-    async getUsers(request: SearchUsersRequest): Promise<ApiResponse<PagedResponse<User>>> {
-        return await api.post<SearchUsersRequest, PagedResponse<User>>(urls.searchUsers, request);
+    async getUsers(request: SearchUsersRequest, page: number, pageSize: number): Promise<ApiResponse<PagedResponse<User>>> {
+        return await api.postPaginated<SearchUsersRequest, User>(urls.searchUsers, { request, page, pageSize });
     },
 
     async makeAdmin(userId: string): Promise<ApiResponse<{}>> {
@@ -77,5 +77,9 @@ export const userRepository = {
 
     async inviteAdmin(email: string): Promise<ApiResponse<{}>> {
         return await api.post<{ email: string }, {}>(urls.inviteAdmin, { email });
+    },
+
+    async getUsersMinimized(searchQuery: string): Promise<ApiResponse<UserDetails[]>> {
+        return await api.get<UserDetails[]>(urls.searchUsersMinimized, { params: { searchQuery } });
     }
 }; 

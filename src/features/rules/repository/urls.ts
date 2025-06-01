@@ -6,6 +6,7 @@ export const urls = {
     rejectComplaint: '/complaints/reject',
     acceptComplaint: '/complaints/accept',
     requestChanges: '/complaints/requestChanges',
+    getComplaintsTotals: '/complaints/totals',
 
     // Violations
     getViolations: '/violations/groups'
