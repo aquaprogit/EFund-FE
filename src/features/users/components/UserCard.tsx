@@ -56,7 +56,7 @@ const UserCard = ({ user, onAction }: { user: User, onAction: () => void }) => {
                                     height: '75px',
                                 }}
                                 alt={user.name}
-                                src={user.avatarUrl} />
+                                src={user.avatarUrl ?? undefined} />
                         </Badge>
                         :
                         <Avatar
@@ -65,7 +65,7 @@ const UserCard = ({ user, onAction }: { user: User, onAction: () => void }) => {
                                 height: '75px',
                             }}
                             alt={user.name}
-                            src={user.avatarUrl} />
+                            src={user.avatarUrl ?? undefined} />
                 }
             </Box>
             <Box sx={{

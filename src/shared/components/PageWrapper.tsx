@@ -1,4 +1,4 @@
-import { Box, Card, Dialog, Link, TextField, Button, Typography, DialogTitle, Container, useTheme } from "@mui/material";
+import { Box, Dialog, Link, TextField, Button, Typography, DialogTitle, Container, useTheme } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MenuAvatar from "../../features/users/components/MenuAvatar";
 import { ReactNode, useEffect, useState } from "react";
@@ -6,12 +6,15 @@ import '../../styles/page-wrapper.css';
 import { useUser } from "../../contexts/UserContext";
 import { useToast } from "../../contexts/ToastContext";
 import { userRepository } from "../../features/users/api/userRepository";
+import { pageWrapperStyles } from "./PageWrapper.styles";
+import FundraisingSearchDropDown from "../../features/fundraising/components/FundraisingSearchDropDown";
 
 interface PageWrapperProps {
     children: ReactNode;
+    searchAvailable?: boolean;
 }
 
-const PageWrapper = ({ children }: PageWrapperProps) => {
+const PageWrapper = ({ children, searchAvailable = true }: PageWrapperProps) => {
     const { user, loading, updateUser, refreshUser } = useUser();
     const navigate = useNavigate();
     const { showWarning, showSuccess, showError } = useToast();
@@ -40,39 +43,24 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
         <Box className='page-wrapper'>
             <Box
                 component="header"
-                sx={{
-                    backgroundColor: theme.palette.background.paper,
-                    borderBottom: `1px solid ${theme.palette.divider}`,
-                    position: 'sticky',
-                    top: 0,
-                    zIndex: 1100,
-                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-                }}
+                sx={pageWrapperStyles.header(theme)}
             >
                 <Container maxWidth="lg">
-                    <Box
-                        sx={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            py: 2
-                        }}
-                    >
+                    <Box sx={pageWrapperStyles.headerContainer}>
                         <Link
                             href='/'
                             variant="h5"
                             color="primary"
-                            sx={{
-                                fontWeight: 'bold',
-                                textDecoration: 'none',
-                                '&:hover': {
-                                    color: theme.palette.primary.dark
-                                }
-                            }}
+                            sx={pageWrapperStyles.logo(theme)}
                         >
                             EFund
                         </Link>
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+
+                        {searchAvailable && (
+                            <FundraisingSearchDropDown />
+                        )}
+
+                        <Box sx={pageWrapperStyles.headerActions}>
                             {loading ? (
                                 <></>
                             ) : (
@@ -109,23 +97,19 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
                 </Container>
             </Box>
 
-            <Box component="main" sx={{ flexGrow: 1 }}>
+            <Box component="main" sx={pageWrapperStyles.main}>
                 {children}
             </Box>
 
             <Box
                 component="footer"
-                sx={{
-                    backgroundColor: theme.palette.grey[100],
-                    py: 4,
-                    mt: 'auto'
-                }}
+                sx={pageWrapperStyles.footer(theme)}
             >
                 <Container maxWidth="lg">
                     <Typography
                         variant="body2"
                         color="text.secondary"
-                        align="center"
+                        sx={pageWrapperStyles.footerText}
                     >
                         © {new Date().getFullYear()} EFund. All rights reserved.
                     </Typography>
@@ -136,23 +120,13 @@ const PageWrapper = ({ children }: PageWrapperProps) => {
                 open={open}
                 onClose={() => setOpen(false)}
                 PaperProps={{
-                    sx: {
-                        borderRadius: 2,
-                        p: 2
-                    }
+                    sx: pageWrapperStyles.dialog
                 }}
             >
-                <DialogTitle sx={{ textAlign: 'center' }}>
+                <DialogTitle sx={pageWrapperStyles.dialogTitle}>
                     Invite Admin
                 </DialogTitle>
-                <Box sx={{
-                    width: '500px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: 3,
-                    p: 4
-                }}>
+                <Box sx={pageWrapperStyles.dialogContent}>
                     <TextField
                         fullWidth
                         label="Email"

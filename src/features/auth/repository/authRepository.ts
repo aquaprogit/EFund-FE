@@ -1,4 +1,3 @@
-
 import api from '../../../shared/api/api';
 import { urls } from '../../../shared/api/urls';
 import { ApiResponse } from '../../../shared/models/api/pagination/ApiResponse';
@@ -7,7 +6,6 @@ import { ConfirmEmailRequest } from '../models/ConfirmEmailRequest';
 import { SignInRequest } from '../models/SignInRequest';
 import { SignUpRequest } from '../models/SignUpRequest';
 import { SignUpResponse } from '../models/SignUpResponse';
-
 
 export const authRepository = {
     async signIn(request: SignInRequest): Promise<ApiResponse<AuthResponse>> {

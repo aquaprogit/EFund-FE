@@ -6,7 +6,7 @@ import User from '../models/User';
 import { UserDetails as UserDetailsType } from '../models/UserDetails';
 import { SearchUsersRequest } from '../models/UsersRequest';
 
-export type UpdateUserInfo = { name: string };
+export type UpdateUserInfo = { name: string, description: string };
 export type AddPassword = { password: string };
 export type ChangePassword = { oldPassword: string; newPassword: string };
 export type ConfirmChangeEmail = { newEmail: string, code: number };

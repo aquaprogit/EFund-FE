@@ -17,6 +17,8 @@ import PageWrapper from "../../../shared/components/PageWrapper";
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import PersonIcon from '@mui/icons-material/Person';
 import ReceiptIcon from '@mui/icons-material/Receipt';
+import FlagIcon from '@mui/icons-material/Flag';
+import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import { format } from 'date-fns';
 import { useQuery } from "@tanstack/react-query";
 import { fundraisingsRepository } from "../repository/fundraisingsRepository";
@@ -29,8 +31,12 @@ import TimelineContent from '@mui/lab/TimelineContent';
 import TimelineDot from '@mui/lab/TimelineDot';
 import TimelineOppositeContent, { timelineOppositeContentClasses } from '@mui/lab/TimelineOppositeContent';
 import ArticleIcon from '@mui/icons-material/Article';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ReportDialog from '../../rules/components/ReportDialog';
+import { complaintRepository } from '../../rules/repository/complaintRepository';
+import { useToast } from '../../../contexts/ToastContext';
+import { useUser } from "../../../contexts/UserContext";
 
 interface FundraisingDetailsProps {
     fundraisingId: string;
@@ -40,9 +46,31 @@ export const FundraisingDetails = ({ fundraisingId }: FundraisingDetailsProps) =
     const theme = useTheme();
     const styles = getFundraisingDetailsStyles(theme);
     const reportsRef = useRef<HTMLDivElement>(null);
+    const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+    const { showToast } = useToast();
+    const { user } = useUser();
 
     const scrollToReports = () => {
         reportsRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    const handleReportSubmit = async (report: { violations: string[], description: string }) => {
+        try {
+            const response = await complaintRepository.createComplaint({
+                fundraisingId,
+                violationsIds: report.violations,
+                comment: report.description
+            });
+
+            if (response.isSuccess) {
+                showToast('success', 'Report submitted successfully');
+            } else {
+                showToast('error', response.error?.message || 'Failed to submit report');
+            }
+        } catch (error) {
+            showToast('error', 'Failed to submit report');
+            throw error;
+        }
     };
 
     const { data: response, isLoading, error } = useQuery({
@@ -131,15 +159,25 @@ export const FundraisingDetails = ({ fundraisingId }: FundraisingDetailsProps) =
                                     </Box>
                                     <Box sx={styles.metaItem}>
                                         <PersonIcon color="action" fontSize="small" />
-                                        <Typography variant="body2" color="text.secondary" component="div">
+                                        <Typography variant="body2" color="text.secondary" sx={{ fontStyle: user?.id === fundraising.userId ? 'italic' : 'normal' }} component="div">
                                             By{' '}
-                                            <MuiLink
-                                                component={Link}
-                                                to={`/user/${fundraising.userId}`}
-                                                sx={{ textDecoration: 'none' }}
-                                            >
-                                                {fundraising.userName}
-                                            </MuiLink>
+                                            {
+                                                user?.id === fundraising.userId
+                                                    ? <MuiLink
+                                                        component={Link}
+                                                        to={`/profile`}
+                                                        sx={{ textDecoration: 'none' }}
+                                                    >
+                                                        {'you'}
+                                                    </MuiLink>
+                                                    : <MuiLink
+                                                        component={Link}
+                                                        to={`/user/${fundraising.userId}`}
+                                                        sx={{ textDecoration: 'none' }}
+                                                    >
+                                                        {fundraising.userName}
+                                                    </MuiLink>
+                                            }
                                         </Typography>
                                     </Box>
                                 </Stack>
@@ -159,7 +197,13 @@ export const FundraisingDetails = ({ fundraisingId }: FundraisingDetailsProps) =
                                     <Typography variant="h5" sx={styles.reportsTitle}>
                                         Reports
                                     </Typography>
-                                    <Timeline>
+                                    <Timeline
+                                        sx={{
+                                            [`& .${timelineOppositeContentClasses.root}`]: {
+                                                flex: 0.2,
+                                            },
+                                        }}
+                                    >
                                         {fundraising.reports?.map((report, index) => (
                                             <TimelineItem key={index}>
                                                 <TimelineOppositeContent>
@@ -176,10 +220,21 @@ export const FundraisingDetails = ({ fundraisingId }: FundraisingDetailsProps) =
                                                     )}
                                                 </TimelineSeparator>
                                                 <TimelineContent>
-                                                    <Box sx={styles.timelineCard}>
-                                                        <Typography variant="body1" sx={styles.timelineContent}>
+                                                    <Box sx={{ mb: 2 }}>
+                                                        <Typography variant="body2">
                                                             {report.description}
                                                         </Typography>
+                                                        {report.attachments && report.attachments.length > 0 && (
+                                                            <Box sx={{ mt: 1 }}>
+                                                                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                                                                    {report.attachments.map((attachment, attachmentIndex) => (
+                                                                        <a key={attachmentIndex} href={attachment.fileUrl} download={attachment.name} target='_blank' rel='noreferrer'>
+                                                                            <Chip clickable color='info' label={attachment.name} sx={{ cursor: 'pointer', padding: 1.2 }} icon={<InsertDriveFileIcon />} />
+                                                                        </a>
+                                                                    ))}
+                                                                </Stack>
+                                                            </Box>
+                                                        )}
                                                     </Box>
                                                 </TimelineContent>
                                             </TimelineItem>
@@ -190,7 +245,7 @@ export const FundraisingDetails = ({ fundraisingId }: FundraisingDetailsProps) =
                         </Card>
                     </Grid>
 
-                    {/* Right Column - Progress and Actions */}
+                    {/* Right Column - Side Card */}
                     <Grid item xs={12} md={4}>
                         <Card
                             elevation={0}
@@ -239,8 +294,34 @@ export const FundraisingDetails = ({ fundraisingId }: FundraisingDetailsProps) =
                                         sx={styles.button}
                                         onClick={scrollToReports}
                                     >
-                                        View Receipts
+                                        View Reports
                                     </Button>
+                                    {
+                                        user?.id !== fundraising.userId
+                                            ? <Button
+                                                fullWidth
+                                                variant="outlined"
+                                                color="error"
+                                                size="large"
+                                                startIcon={<FlagIcon />}
+                                                sx={styles.button}
+                                                onClick={() => setIsReportDialogOpen(true)}
+                                            >
+                                                Report Fundraising
+                                            </Button>
+                                            : <>
+                                                <Button
+                                                    fullWidth
+                                                    variant="outlined"
+                                                    color="error"
+                                                    sx={styles.button}
+                                                    component={Link}
+                                                    to={`/fundraising/${fundraisingId}/edit`}
+                                                >
+                                                    Edit Fundraising
+                                                </Button>
+                                            </>
+                                    }
                                 </Stack>
 
                                 {/* Additional Info */}
@@ -254,6 +335,13 @@ export const FundraisingDetails = ({ fundraisingId }: FundraisingDetailsProps) =
                     </Grid>
                 </Grid>
             </Container>
+
+            <ReportDialog
+                open={isReportDialogOpen}
+                onClose={() => setIsReportDialogOpen(false)}
+                fundraisingId={fundraisingId}
+                onSubmit={handleReportSubmit}
+            />
         </PageWrapper>
     );
 };

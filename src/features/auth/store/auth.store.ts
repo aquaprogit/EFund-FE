@@ -9,7 +9,7 @@ type AuthState = {
     isAuth: boolean;
     accessToken: string | null;
     refreshToken: string | null;
-    userId: string | null;
+    signUpUserId: string | null;
     signIn: (request: SignInRequest) => Promise<string | undefined>;
     signUp: (request: SignUpRequest) => Promise<{ userId: string | undefined, error: string | undefined }>;
     confirmEmail: (request: ConfirmEmailRequest) => Promise<{ success: boolean, error: string | undefined }>;
@@ -24,7 +24,7 @@ export const useAuth = create<AuthState>()(
             isAuth: false,
             accessToken: null,
             refreshToken: null,
-            userId: null,
+            signUpUserId: null,
             signIn: async (request: SignInRequest) => {
                 const response = await authRepository.signIn(request);
 
@@ -43,7 +43,7 @@ export const useAuth = create<AuthState>()(
                     isAuth: false,
                     accessToken: null,
                     refreshToken: null,
-                    userId: null
+                    signUpUserId: null
                 });
             },
             signUp: async (request: SignUpRequest) => {
@@ -51,7 +51,7 @@ export const useAuth = create<AuthState>()(
 
                 if (response.isSuccess && response.data?.userId) {
                     set({
-                        userId: response.data.userId
+                        signUpUserId: response.data.userId
                     });
                     return { userId: response.data.userId, error: undefined };
                 }
@@ -64,7 +64,8 @@ export const useAuth = create<AuthState>()(
                     set({
                         accessToken: response.data.accessToken,
                         refreshToken: response.data.refreshToken,
-                        isAuth: true
+                        isAuth: true,
+                        signUpUserId: null
                     });
                     return { success: true, error: undefined };
                 }

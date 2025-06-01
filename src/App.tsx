@@ -6,10 +6,9 @@ import SignInPage from './features/auth/pages/SignInPage';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { CssBaseline } from '@mui/material';
 import SettingsPage from './features/users/pages/SettingsPage';
-import ProfilePage from './features/users/components/ProfilePage';
+import ProfilePage from './features/users/pages/ProfilePage';
 import { UserProvider } from './contexts/UserContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import AddPage from './features/fundraising/components/AddFundraisingPage';
 import { ToastProvider } from "./contexts/ToastContext";
 import EditFundraising from "./features/fundraising/components/EditFundraising";
 import UsersPage from './features/users/pages/UsersPage';
@@ -18,6 +17,9 @@ import FundraisingPage from './features/fundraising/pages/FundraisingPage';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { UserDetailsPage } from './features/users/pages/UserDetailsPage';
 import FundraisingListPage from './features/fundraising/pages/FundraisingListPage';
+import AddFundraisingPage from './features/fundraising/pages/AddFundraisingPage';
+import RulesPage from "./features/rules/pages/RulesPage";
+import EditFundraisingPage from './features/fundraising/pages/EditFundraisingPage';
 
 const darkTheme = createTheme({
   palette: {
@@ -110,10 +112,11 @@ const App: React.FC = () => (
                 <Route path='/fundraising/:id' element={<FundraisingPage />} />
                 <Route path='/user/:userId' element={<UserDetailsPage />} />
                 <Route path='/settings' element={<SettingsPage />} />
-                <Route path='/add-fundraising' element={<AddPage />} />
-                <Route path='/edit-fundraising' element={<EditFundraising />} />
+                <Route path='/add-fundraising' element={<AddFundraisingPage />} />
+                <Route path='/fundraising/:id/edit' element={<EditFundraisingPage />} />
                 <Route path='/users' element={<UsersPage />} />
                 <Route path='/reset-password' element={<ResetPasswordPage />} />
+                <Route path="/rules" element={<RulesPage />} />
                 <Route path="*" element={<h1 style={{ color: 'red' }} >Not Found</h1>} />
               </Routes>
             </BrowserRouter>

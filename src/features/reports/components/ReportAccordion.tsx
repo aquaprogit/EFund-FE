@@ -15,6 +15,7 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import Report from '../models/Report';
 import { useState } from 'react';
 import Attachment from '../../attachments/models/Attachment';
+import { format } from 'date-fns';
 
 interface ReportAccordionProps {
     report: Report;
@@ -49,7 +50,13 @@ const ReportAccordion = ({ report, onReportDelete, onAttachmentDelete, mode }: R
         >
             {
                 isDescriptionLong
-                    ? <>{report.title}</>
+                    ? (
+                        <>
+                            <Typography component='span' sx={{ flexShrink: 0, mr: 4 }}>
+                                {report.title}
+                            </Typography>
+                        </>
+                    )
                     : (<>
                         <Typography component='span' sx={{ flexShrink: 0, mr: 2 }}>
                             {report.title}
@@ -60,56 +67,101 @@ const ReportAccordion = ({ report, onReportDelete, onAttachmentDelete, mode }: R
             }
         </AccordionSummary>
         <AccordionDetails>
-            {
-                isDescriptionLong
-                    ? <Typography
-                        style={{
-                            wordWrap: 'break-word'
-                        }}
-                        variant="body1"
-                        component="div"
-                        textOverflow={'ellipsis'}
-                        overflow={'hidden'} >
-                        {report.description}
-                    </Typography>
-                    : <></>
-            }
-            <Box
-                sx={{
-                    display: 'flex',
-                    gap: 1,
-                    flexWrap: 'wrap'
-                }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                {/* Description */}
                 {
-                    report.attachments.map((attachment: Attachment) => {
-                        return mode === 'view'
-                            ? (<Chip
-                                onClick={() => window.location.href = attachment.fileUrl}
-                                clickable
-                                color='info'
-                                label={attachment.name}
-                                icon={<InsertDriveFileIcon />}
-                            />)
-                            : (<Chip
-                                clickable
-                                color='info'
-                                label={attachment.name}
-                                icon={<InsertDriveFileIcon />}
-                                onDelete={() => handleAttachmentDelete(attachment.id, attachment.fileUrl.replace(/^.*[\\/]/, ''))} />)
-                    })
+                    isDescriptionLong
+                        ? <Typography
+                            style={{
+                                wordWrap: 'break-word'
+                            }}
+                            variant="body1"
+                            component="div"
+                            textOverflow={'ellipsis'}
+                            overflow={'hidden'} >
+                            {report.description}
+                        </Typography>
+                        : <></>
                 }
+
+                {/* Attachments */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: 1,
+                        flexWrap: 'wrap'
+                    }}>
+                    {
+                        report.attachments.map((attachment: Attachment) => {
+                            return mode === 'view'
+                                ? (<Chip
+                                    key={attachment.id}
+                                    onClick={() => window.location.href = attachment.fileUrl}
+                                    clickable
+                                    color='info'
+                                    label={attachment.name}
+                                    icon={<InsertDriveFileIcon />}
+                                />)
+                                : (<Chip
+                                    key={attachment.id}
+                                    clickable
+                                    color='info'
+                                    label={attachment.name}
+                                    icon={<InsertDriveFileIcon />}
+                                    onDelete={() => handleAttachmentDelete(attachment.id, attachment.fileUrl.replace(/^.*[\\/]/, ''))} />)
+                        })
+                    }
+                </Box>
+
+                {/* Bottom section with creation date and delete button for Edit Mode */}
+                {mode === 'edit' && (
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        mt: 1
+                    }}>
+                        <Typography
+                            variant="body2"
+                            sx={{
+                                color: 'text.secondary',
+                                fontStyle: 'italic'
+                            }}
+                        >
+                            Created on {format(new Date(report.createdAt), 'MMM dd, yyyy \'at\' HH:mm')}
+                        </Typography>
+
+                        <IconButton
+                            onClick={() => handleReportDelete(report.id)}
+                            sx={{
+                                color: 'error.main',
+                                '&:hover': {
+                                    backgroundColor: 'error.50'
+                                }
+                            }}
+                        >
+                            <DeleteIcon />
+                        </IconButton>
+                    </Box>
+                )}
+
+                {/* Delete Button for Edit Mode - when no creation date shown */}
+                {mode === 'edit' && false && (
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                        <IconButton
+                            onClick={() => handleReportDelete(report.id)}
+                            sx={{
+                                color: 'error.main',
+                                '&:hover': {
+                                    backgroundColor: 'error.50'
+                                }
+                            }}
+                        >
+                            <DeleteIcon />
+                        </IconButton>
+                    </Box>
+                )}
             </Box>
-            {
-                mode === 'edit'
-                    ? (
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                            <IconButton onClick={() => handleReportDelete(report.id)}>
-                                <DeleteIcon />
-                            </IconButton>
-                        </Box>
-                    )
-                    : <></>
-            }
         </AccordionDetails>
         <Dialog
             open={!!dialogueOpen}

@@ -47,7 +47,7 @@ const MenuAvatar = (props: MenuAvatarProps) => {
             <Avatar
                 onClick={handleClick}
                 {...stringAvatar(user?.name)}
-                src={user?.avatarUrl}
+                src={user?.avatarUrl ?? undefined}
                 sx={{
                     cursor: 'pointer',
                     width: 40,

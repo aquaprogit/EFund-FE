@@ -1,5 +1,6 @@
 import api from "../../../shared/api/api";
 import { ApiResponse } from "../../../shared/models/api/pagination/ApiResponse";
+import Jar from "../models/Jar";
 import { urls } from "./urls";
 
 export const monobankRepository = {
@@ -8,7 +9,7 @@ export const monobankRepository = {
             'token': token
         });
     },
-    getJars: async (): Promise<ApiResponse<{}>> => {
+    getJars: async (): Promise<ApiResponse<Jar[]>> => {
         return await api.get(urls.jars)
     }
 }

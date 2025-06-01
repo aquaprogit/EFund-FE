@@ -5,10 +5,11 @@ import { Box, InputAdornment, useTheme } from '@mui/material';
 
 interface SearchProps extends Omit<TextFieldProps, 'onChange'> {
     onSearch: (query: string) => void;
+    initialValue?: string;
 }
 
-const Search: React.FC<SearchProps> = ({ onSearch, InputProps, sx, ...props }) => {
-    const [searchQuery, setSearchQuery] = useState<string>('');
+const Search: React.FC<SearchProps> = ({ onSearch, InputProps, sx, initialValue, ...props }) => {
+    const [searchQuery, setSearchQuery] = useState<string>(initialValue ?? '');
     const theme = useTheme();
 
     useEffect(() => {

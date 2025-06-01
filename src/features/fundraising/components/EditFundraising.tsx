@@ -4,7 +4,23 @@ import { useToast } from "../../../contexts/ToastContext";
 import { useLocation, useNavigate } from "react-router-dom";
 import { fundraisingsRepository } from '../repository/fundraisingsRepository';
 import PageWrapper from "../../../shared/components/PageWrapper";
-import { Backdrop, Box, Button, Card, CardContent, CircularProgress, Dialog, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import {
+    Backdrop,
+    Box,
+    Button,
+    Card,
+    CardContent,
+    CircularProgress,
+    Container,
+    Dialog,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    Typography,
+    Divider,
+    Stack
+} from "@mui/material";
 import UploadImage from "../../users/components/UploadImage";
 import LimitedTextField from "../../../shared/components/LimitedTextField";
 import MultiSelectWithChips from '../../../shared/components/MultiSelectWithChips';
@@ -18,7 +34,7 @@ import { monobankRepository } from '../../monobank/repository/monobankRepository
 import { fundraisingsReportsRepository } from '../../reports/repository/fundraisingsReportsRepository';
 import { Tag } from '../../tags/models/Tag';
 
-const EditFundraising = () => {
+const EditFundraising = ({ fundraisingId }: { fundraisingId: string }) => {
     const defaultImage = 'http://localhost:8080/Uploads/Default/Fundraisings/avatar.png'
 
     const [imageUrl, setImageUrl] = useState<string>('');
@@ -33,12 +49,12 @@ const EditFundraising = () => {
     const [openJarsMenu, setOpenJarsMenu] = useState(null);
     const [reports, setReports] = useState<Report[]>([])
     const { showError, showSuccess } = useToast();
-    const inputFile = useRef<HTMLInputElement | null>(null)
-    const navigate = useNavigate()
-    const { state } = useLocation()
+    const inputFile = useRef<HTMLInputElement | null>(null);
+    const navigate = useNavigate();
     const [dialogueOpen, setDialogueOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
-    const { user } = useUser();
+    const [createdByUserId, setCreatedByUserId] = useState<string>('');
+    const { user, loading: userLoading } = useUser();
 
     const handleOpenJarsMenu = (event: any) => {
         setOpenJarsMenu(event.currentTarget);
@@ -49,17 +65,12 @@ const EditFundraising = () => {
     };
 
     const getMonobankJars = async () => {
-        try {
-            const response = await monobankRepository.getJars();
-            if (response) {
-                if (response.data) {
-                    // @ts-ignore
-                    setJars(response.data)
-                }
-            }
+        const response = await monobankRepository.getJars();
+        if (response && response.data) {
+            setJars(response.data)
         }
-        catch (e) {
-            showError('Unexpected error')
+        else {
+            showError(response?.error?.message || 'Unexpected error')
         }
     }
 
@@ -155,7 +166,7 @@ const EditFundraising = () => {
             inputFile.current.value = '';
             inputFile.current.files = new DataTransfer().files;
         }
-        await fundraisingsRepository.deleteImage(state.id)
+        await fundraisingsRepository.deleteImage(fundraisingId)
     }
     const onSubmit = async () => {
         const requestBody = {
@@ -165,7 +176,7 @@ const EditFundraising = () => {
             tags: selectedTags,
         }
         try {
-            const response = await fundraisingsRepository.updateFundraising(state.id, requestBody)
+            const response = await fundraisingsRepository.updateFundraising(fundraisingId, requestBody)
             if (response) {
                 if (response.error) {
                     showError(response.error.message)
@@ -178,7 +189,7 @@ const EditFundraising = () => {
                         await uploadImage(fundraisingId, files[0])
                     }
                     showSuccess('Fundraising has been successfully edited')
-                    navigate('/my-fundraisings')
+                    navigate(`/fundraising/${fundraisingId}`)
                 }
             }
         }
@@ -188,15 +199,15 @@ const EditFundraising = () => {
     }
     const fetchData = async () => {
         try {
-            const response = await fundraisingsRepository.getFundraising(state.id)
+            const response = await fundraisingsRepository.getFundraising(fundraisingId)
 
             if (!response || !response.data) {
-                showError('Unexpected error while fetching fundraising')
+                showError(response?.error?.message || 'Unexpected error while fetching fundraising')
                 setLoading(false)
                 return
             }
 
-            const { avatarUrl, title, description, monobankJarId, monobankJar, tags, reports } = response.data
+            const { avatarUrl, title, description, monobankJarId, monobankJar, tags, reports, userId } = response.data
 
             setImageUrl(avatarUrl)
             setTitle(title)
@@ -206,12 +217,12 @@ const EditFundraising = () => {
             setReports(reports)
             setDefaultTags(tags)
             setLoading(false)
+            setCreatedByUserId(userId)
         }
         catch (e) {
             showError('Unexpected error')
             setLoading(false)
         }
-
     }
 
     useEffect(() => {
@@ -226,158 +237,213 @@ const EditFundraising = () => {
         fetchData()
     }, []);
 
+    useEffect(() => {
+        if (!userLoading && createdByUserId && !loading && user) {
+            if (user.id !== createdByUserId) {
+                showError('You are not allowed to edit this fundraising')
+                navigate(`/fundraising/${fundraisingId}`)
+            }
+        }
+    }, [user, createdByUserId, userLoading, loading])
+
     return (
         <PageWrapper>
-            {user
-                ? (<Box className='content-wrapper'>
-                    <Card style={{
-                        marginTop: '10px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        padding: '25px',
-                        paddingLeft: '20px',
-                        height: '100%',
-                        width: 800,
-                    }}>
-                        <Box sx={{
-                            display: 'flex',
-                            justifyContent: 'center',
-                        }}>
-                            <Typography variant='h5'>Edit Fundraising</Typography>
-                        </Box>
-                        <Box sx={{
-                            display: 'flex',
-                            flexDirection: 'row',
-                            gap: '15px',
-                        }}>
-                            <UploadImage
-                                inputFile={inputFile}
-                                handleFileUpload={handleUploadFundraisingAvatar}
-                                handleDeleteFile={handleDeleteFundraisingAvatar}
-                                url={imageUrl}
-                            />
-                            <CardContent style={{
-                                flexGrow: 1,
-                                padding: 0,
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'flex-start',
-                                gap: 5
-                            }}>
+            <Container maxWidth="md" sx={{ py: 4 }}>
+                <Card
+                    elevation={3}
+                    sx={{
+                        borderRadius: 2,
+                        overflow: 'visible'
+                    }}
+                >
+                    <CardContent sx={{ p: 4 }}>
+                        <Typography
+                            variant="h4"
+                            component="h1"
+                            textAlign="center"
+                            gutterBottom
+                            sx={{
+                                fontWeight: 600,
+                                color: 'primary.main',
+                                mb: 4
+                            }}
+                        >
+                            Edit Fundraising
+                        </Typography>
 
-                                <LimitedTextField
-                                    label="Title"
-                                    maxChar={70}
-                                    value={title}
-                                    fullWidth
-                                    onChange={(value) => setTitle(value)}
+                        <Stack spacing={4}>
+                            {/* Image and Basic Info Section */}
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: { xs: 'column', md: 'row' },
+                                gap: 3,
+                                alignItems: { xs: 'center', md: 'flex-start' }
+                            }}>
+                                <UploadImage
+                                    inputFile={inputFile}
+                                    handleFileUpload={handleUploadFundraisingAvatar}
+                                    handleDeleteFile={handleDeleteFundraisingAvatar}
+                                    url={imageUrl}
                                 />
-                                <LimitedTextField
-                                    label="Description"
-                                    maxRows={3}
-                                    maxChar={500}
-                                    fullWidth
-                                    value={description}
-                                    onChange={(value) => setDescription(value)}
-                                    multiline
-                                />
-                                <FormControl sx={{ m: 1, ml: 0, minWidth: 200 }} size="small">
-                                    <InputLabel id="demo-select-small-label">Monobank jar</InputLabel>
-                                    <Select
-                                        labelId="demo-select-small-label"
-                                        id="demo-select-small"
-                                        value={monobankJar}
-                                        label="Monobank jar"
-                                        onChange={(e) => setMonobankJar(e.target.value)}
-                                        open={Boolean(openJarsMenu)}
-                                        onClose={handleCloseJarsMenu}
-                                        onOpen={handleOpenJarsMenu}
-                                    >
-                                        {jars && jars.map((jar) => (
-                                            <MenuItem
-                                                key={jar.title}
-                                                value={jar.title}
-                                                onClick={() => setMonobankJarId(jar.id)}
-                                            >
-                                                {jar.title}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
-                                <MultiSelectWithChips
-                                    freeSolo
-                                    width='400px'
-                                    limitTags={2}
-                                    label="Tags"
-                                    defaultValues={defaultTags}
-                                    values={existingTags}
-                                    onChange={(newTags) => setSelectedTags(newTags)}
-                                />
-                                <Typography variant={'h6'}>Reports:</Typography>
-                                <Box>
+
+                                <Stack spacing={3} sx={{ flex: 1, width: '100%' }}>
+                                    <LimitedTextField
+                                        label="Title"
+                                        maxChar={70}
+                                        value={title}
+                                        fullWidth
+                                        onChange={(value) => setTitle(value)}
+                                    />
+
+                                    <LimitedTextField
+                                        label="Description"
+                                        maxRows={4}
+                                        maxChar={500}
+                                        fullWidth
+                                        value={description}
+                                        onChange={(value) => setDescription(value)}
+                                        multiline
+                                    />
+
+                                    <FormControl fullWidth variant="outlined">
+                                        <InputLabel>Monobank Jar</InputLabel>
+                                        <Select
+                                            value={monobankJar}
+                                            label="Monobank Jar"
+                                            onChange={(e) => setMonobankJar(e.target.value)}
+                                            open={Boolean(openJarsMenu)}
+                                            onClose={handleCloseJarsMenu}
+                                            onOpen={handleOpenJarsMenu}
+                                        >
+                                            {jars && jars.map((jar) => (
+                                                <MenuItem
+                                                    key={jar.title}
+                                                    value={jar.title}
+                                                    onClick={() => setMonobankJarId(jar.id)}
+                                                >
+                                                    {jar.title}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+
+                                    <MultiSelectWithChips
+                                        freeSolo
+                                        width="100%"
+                                        limitTags={3}
+                                        label="Tags"
+                                        defaultValues={defaultTags}
+                                        values={existingTags}
+                                        onChange={(newTags) => setSelectedTags(newTags)}
+                                    />
+                                </Stack>
+                            </Box>
+
+                            <Divider />
+
+                            {/* Reports Section */}
+                            <Box>
+                                <Typography
+                                    variant="h5"
+                                    component="h2"
+                                    gutterBottom
+                                    sx={{
+                                        fontWeight: 600,
+                                        color: 'text.primary',
+                                        mb: 3
+                                    }}
+                                >
+                                    Reports
+                                </Typography>
+
+                                <Stack spacing={2}>
                                     <Button
                                         startIcon={<AddIcon />}
+                                        variant="contained"
+                                        size="large"
+                                        onClick={() => setDialogueOpen(true)}
                                         sx={{
-                                            mb: 2,
+                                            borderRadius: 2,
+                                            textTransform: 'none',
+                                            fontWeight: 600,
+                                            alignSelf: 'flex-start'
                                         }}
-                                        variant='contained'
-                                        size={'medium'}
-                                        onClick={() => setDialogueOpen(true)}>
-                                        Add report
+                                    >
+                                        Add Report
                                     </Button>
+
                                     {reports.map((report) => (
                                         <ReportAccordion
+                                            key={report.id}
                                             report={report}
                                             mode={'edit'}
                                             onReportDelete={handleDeleteReport}
                                             onAttachmentDelete={handleDeleteAttachment}
                                         />
                                     ))}
-                                </Box>
+                                </Stack>
+                            </Box>
 
-                            </CardContent>
-                        </Box>
-                        <Box
-                            mt={3}
-                            display={'flex'}
-                            width='100%'
-                            justifyContent={'center'}>
-                            <Button
-                                variant='contained'
-                                size={'medium'}
-                                onClick={onSubmit}>
-                                Save
-                            </Button>
-                        </Box>
-                    </Card>
-                    <Dialog
-                        fullWidth
-                        open={dialogueOpen}
-                    >
-                        <AddReport
-                            onClose={async () => {
-                                const response = await fundraisingsRepository.getFundraising(state.id)
-                                if (response) {
-                                    if (response.data) {
-                                        setReports(response.data.reports)
-                                    }
+                            <Divider />
+
+                            {/* Action Buttons */}
+                            <Box sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                pt: 2
+                            }}>
+                                <Button
+                                    variant="contained"
+                                    size="large"
+                                    onClick={onSubmit}
+                                    sx={{
+                                        minWidth: 200,
+                                        borderRadius: 2,
+                                        textTransform: 'none',
+                                        fontWeight: 600,
+                                        fontSize: '1.1rem'
+                                    }}
+                                >
+                                    Save Changes
+                                </Button>
+                            </Box>
+                        </Stack>
+                    </CardContent>
+                </Card>
+
+                <Dialog
+                    fullWidth
+                    maxWidth="md"
+                    open={dialogueOpen}
+                    PaperProps={{
+                        sx: { borderRadius: 2 }
+                    }}
+                >
+                    <AddReport
+                        onClose={async () => {
+                            const response = await fundraisingsRepository.getFundraising(fundraisingId)
+                            if (response) {
+                                if (response.data) {
+                                    setReports(response.data.reports)
                                 }
-                                setDialogueOpen(false);
-                            }}
-                            fundraisingId={state.id}
-                        />
-                    </Dialog>
-                    <Backdrop
-                        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-                        open={loading}
-                    >
-                        <CircularProgress color="inherit" />
-                    </Backdrop>
-                </Box>
-                )
-                : (<>{navigate('/')}</>)
-            }
-        </PageWrapper >
+                            }
+                            setDialogueOpen(false);
+                        }}
+                        fundraisingId={fundraisingId}
+                    />
+                </Dialog>
+
+                <Backdrop
+                    sx={{
+                        color: '#fff',
+                        zIndex: (theme) => theme.zIndex.drawer + 1
+                    }}
+                    open={loading}
+                >
+                    <CircularProgress color="inherit" />
+                </Backdrop>
+            </Container>
+        </PageWrapper>
     );
 };
 

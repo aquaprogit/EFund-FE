@@ -67,9 +67,10 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
 				open={open}
 				autoHideDuration={3000}
 				onClose={handleClose}
-				anchorOrigin={{ vertical: "top", horizontal: "center" }}
+				anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
 			>
 				<Alert
+					variant="filled"
 					onClose={handleClose}
 					severity={info.severity}
 					sx={{ width: "100%" }}

@@ -50,6 +50,9 @@ const FundraisingListPage = () => {
 
     const [searchParams] = useSearchParams();
     const userId = searchParams.get('userId');
+    const searchQuery = searchParams.get('keyword') ?? '';
+
+    console.log(searchQuery);
 
     const {
         fundraisings,
@@ -61,10 +64,10 @@ const FundraisingListPage = () => {
         setSearchQuery,
         setSelectedTags,
         totalFundraisings
-    } = useFundraisingSearch({ initialSearchQuery: '', pageSize: pageSize, userId: userId ?? undefined });
+    } = useFundraisingSearch({ initialSearchQuery: searchQuery, pageSize: pageSize, userId: userId ?? undefined });
 
     return (
-        <PageWrapper>
+        <PageWrapper searchAvailable={false}>
             <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 4 } }}>
                 <Box sx={{
                     display: 'flex',
@@ -72,6 +75,7 @@ const FundraisingListPage = () => {
                     gap: { xs: 2, sm: 3 }
                 }}>
                     <FilterSection
+                        searchInitialValue={searchQuery}
                         onSearchChange={setSearchQuery}
                         onTagsChange={setSelectedTags}
                         allTags={allTags}
