@@ -14,7 +14,7 @@ type AuthState = {
     signUp: (request: SignUpRequest) => Promise<{ userId: string | undefined, error: string | undefined }>;
     confirmEmail: (request: ConfirmEmailRequest) => Promise<{ success: boolean, error: string | undefined }>;
     signOut: () => void;
-    refresh: (accessToken: string, refreshToken: string) => Promise<void>;
+    refresh: (accessToken: string, refreshToken: string) => void;
     googleSignIn: (token: string) => Promise<void>;
 }
 
@@ -71,15 +71,12 @@ export const useAuth = create<AuthState>()(
                 }
                 return { success: false, error: response.error?.message };
             },
-            refresh: async (accessToken: string, refreshToken: string) => {
-                const response = await authRepository.refresh(accessToken, refreshToken);
-
-                if (response.isSuccess && response.data) {
-                    set({
-                        accessToken: response.data.accessToken,
-                        refreshToken: response.data.refreshToken
-                    });
-                }
+            refresh: (accessToken: string, refreshToken: string) => {
+                set({
+                    isAuth: true,
+                    accessToken: accessToken,
+                    refreshToken: refreshToken
+                });
             },
             googleSignIn: async (token: string) => {
                 const response = await authRepository.googleSignIn(token);
