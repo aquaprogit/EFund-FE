@@ -109,21 +109,23 @@ const MenuAvatar = (props: MenuAvatarProps) => {
                     </ListItemIcon>
                     <Typography variant="body2">Profile</Typography>
                 </MenuItem>
-                <Divider />
                 {!user?.isAdmin && (
-                    <MenuItem onClick={props.onAdd}>
-                        <ListItemIcon>
-                            <AddIcon fontSize="small" />
-                        </ListItemIcon>
-                        <Typography variant="body2">Add fundraising</Typography>
-                    </MenuItem>
+                    <>
+                        <Divider />
+                        <MenuItem onClick={props.onAdd}>
+                            <ListItemIcon>
+                                <AddIcon fontSize="small" />
+                            </ListItemIcon>
+                            <Typography variant="body2">Add fundraising</Typography>
+                        </MenuItem>
+                        <MenuItem onClick={props.onMyFundraising}>
+                            <ListItemIcon>
+                                <CallToAction fontSize="small" />
+                            </ListItemIcon>
+                            <Typography variant="body2">My fundraising</Typography>
+                        </MenuItem>
+                    </>
                 )}
-                <MenuItem onClick={props.onMyFundraising}>
-                    <ListItemIcon>
-                        <CallToAction fontSize="small" />
-                    </ListItemIcon>
-                    <Typography variant="body2">My fundraising</Typography>
-                </MenuItem>
                 {user?.isAdmin && (
                     <>
                         <Divider />

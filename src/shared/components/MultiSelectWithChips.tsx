@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import { Chip, FilterOptionsState, useTheme } from '@mui/material';
+import { Chip, FilterOptionsState, useTheme, Paper } from '@mui/material';
 import { useToast } from '../../contexts/ToastContext';
 
 const MultiSelectWithChip = (props: {
@@ -19,7 +19,7 @@ const MultiSelectWithChip = (props: {
     const [selectedOptions, setSelectedOptions] = useState<string[]>(props.defaultValues || []);
 
     const handleChange = (event: React.SyntheticEvent, value: string[]) => {
-        if (value.length > 5) {
+        if (value.length > (props.limitTags || 5)) {
             showError('You can select up to 5 tags');
             return;
         }
@@ -68,26 +68,37 @@ const MultiSelectWithChip = (props: {
                         }
                     }
                 },
-                '& .MuiAutocomplete-paper': {
-                    border: `1px solid ${theme.palette.divider}`,
-                    borderRadius: 1,
-                    marginTop: 1,
-                    boxShadow: 'none'
-                },
-                '& .MuiAutocomplete-option': {
-                    py: 1,
-                    px: 2,
-                    '&[aria-selected="true"]': {
-                        backgroundColor: theme.palette.primary.light,
-                    },
-                    '&[aria-selected="true"].Mui-focused': {
-                        backgroundColor: theme.palette.primary.light,
-                    },
+                '& .MuiInputLabel-root': {
+                    color: theme.palette.text.secondary,
                     '&.Mui-focused': {
-                        backgroundColor: theme.palette.action.hover,
+                        color: theme.palette.primary.main,
                     }
                 }
             }}
+            PaperComponent={(paperProps) => (
+                <Paper
+                    {...paperProps}
+                    sx={{
+                        border: `1px solid ${theme.palette.divider}`,
+                        borderRadius: 1,
+                        marginTop: 1,
+                        boxShadow: theme.shadows[4],
+                        '& .MuiAutocomplete-option': {
+                            py: 1,
+                            px: 2,
+                            '&[aria-selected="true"]': {
+                                backgroundColor: theme.palette.primary.light,
+                            },
+                            '&[aria-selected="true"].Mui-focused': {
+                                backgroundColor: theme.palette.primary.light,
+                            },
+                            '&.Mui-focused': {
+                                backgroundColor: theme.palette.action.hover,
+                            }
+                        }
+                    }}
+                />
+            )}
             multiple
             limitTags={props.limitTags}
             freeSolo={props.freeSolo}
@@ -115,14 +126,6 @@ const MultiSelectWithChip = (props: {
                     {...params}
                     label={props.label}
                     placeholder={props.label}
-                    sx={{
-                        '& .MuiInputLabel-root': {
-                            color: theme.palette.text.secondary,
-                            '&.Mui-focused': {
-                                color: theme.palette.primary.main,
-                            }
-                        }
-                    }}
                 />
             )}
             ListboxProps={{

@@ -86,7 +86,7 @@
 /* Hover effects for feature cards */
 .MuiGrid-item .MuiBox-root {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    height: 100%;
+    /* height: 100%; */
 }
 
 .MuiGrid-item .MuiBox-root:hover {

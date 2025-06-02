@@ -58,9 +58,11 @@ const FundraisingListPage = () => {
         page,
         totalPages,
         allTags,
+        selectedStatuses,
         setPage,
         setSearchQuery,
         setSelectedTags,
+        setSelectedStatuses,
         setSelectedUser,
         selectedUser,
         totalFundraisings
@@ -81,6 +83,8 @@ const FundraisingListPage = () => {
                         allTags={allTags}
                         onUserChange={setSelectedUser}
                         selectedUser={selectedUser}
+                        onStatusChange={setSelectedStatuses}
+                        selectedStatuses={selectedStatuses}
                     />
 
                     <Box>

@@ -117,7 +117,7 @@ const UserSearchDropdown: React.FC<UserSearchDropdownProps> = ({
             options={options}
             loading={loading}
             disabled={disabled}
-            fullWidth={fullWidth}
+            fullWidth
             size={size}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             getOptionLabel={(option) => option.name || ''}

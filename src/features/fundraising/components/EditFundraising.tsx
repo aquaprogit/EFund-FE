@@ -295,7 +295,7 @@ const EditFundraising = ({ fundraisingId }: EditFundraisingProps) => {
                                     <EditIcon sx={{ fontSize: 32 }} />
                                 </Box>
                                 <Box>
-                                    <Typography variant="h3" sx={{ fontWeight: 700, mb: 1 }}>
+                                    <Typography variant="h5" sx={{ fontWeight: 700, mb: 1 }}>
                                         Edit Fundraising
                                     </Typography>
                                     <Typography variant="h6" sx={{ opacity: 0.9 }}>
@@ -328,7 +328,7 @@ const EditFundraising = ({ fundraisingId }: EditFundraisingProps) => {
                                 <CardContent sx={{ p: 4 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
                                         <PhotoCameraIcon sx={{ fontSize: 28, color: 'primary.main' }} />
-                                        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
                                             Campaign Image & Details
                                         </Typography>
                                     </Box>
@@ -374,7 +374,7 @@ const EditFundraising = ({ fundraisingId }: EditFundraisingProps) => {
                                 <CardContent sx={{ p: 4 }}>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
                                         <AccountBalanceIcon sx={{ fontSize: 28, color: 'primary.main' }} />
-                                        <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                                        <Typography variant="h6" sx={{ fontWeight: 700 }}>
                                             Payment & Classification
                                         </Typography>
                                     </Box>
@@ -432,7 +432,7 @@ const EditFundraising = ({ fundraisingId }: EditFundraisingProps) => {
                                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 3 }}>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                             <AssessmentIcon sx={{ fontSize: 28, color: 'primary.main' }} />
-                                            <Typography variant="h5" sx={{ fontWeight: 700 }}>
+                                            <Typography variant="h6" sx={{ fontWeight: 700 }}>
                                                 Progress Reports
                                             </Typography>
                                         </Box>

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import TextField, { TextFieldProps } from '@mui/material/TextField';
 import SearchIcon from '@mui/icons-material/Search';
-import { Box, InputAdornment, useTheme } from '@mui/material';
+import { InputAdornment } from '@mui/material';
 
 interface SearchProps extends Omit<TextFieldProps, 'onChange'> {
     onSearch: (query: string) => void;
@@ -10,7 +10,6 @@ interface SearchProps extends Omit<TextFieldProps, 'onChange'> {
 
 const Search: React.FC<SearchProps> = ({ onSearch, InputProps, sx, initialValue, ...props }) => {
     const [searchQuery, setSearchQuery] = useState<string>(initialValue ?? '');
-    const theme = useTheme();
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -24,14 +23,14 @@ const Search: React.FC<SearchProps> = ({ onSearch, InputProps, sx, initialValue,
         <TextField
             {...props}
             fullWidth
-            variant="standard"
+            variant="outlined"
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             InputProps={{
                 ...InputProps,
-                endAdornment: (
-                    <InputAdornment position="end">
+                startAdornment: (
+                    <InputAdornment position="start">
                         <SearchIcon
                             sx={{
                                 color: 'text.secondary',
@@ -40,20 +39,20 @@ const Search: React.FC<SearchProps> = ({ onSearch, InputProps, sx, initialValue,
                         />
                     </InputAdornment>
                 ),
-                sx: {
-                    '&:before': {
-                        borderColor: theme.palette.divider,
-                    },
-                    '&:hover:not(.Mui-disabled):before': {
-                        borderColor: theme.palette.primary.main,
-                    },
-                    '&.Mui-focused:after': {
-                        borderColor: theme.palette.primary.main,
-                    },
-                    ...InputProps?.sx
-                }
+                ...InputProps
             }}
             sx={{
+                '& .MuiOutlinedInput-root': {
+                    '& fieldset': {
+                        borderColor: 'divider',
+                    },
+                    '&:hover fieldset': {
+                        borderColor: 'primary.main',
+                    },
+                    '&.Mui-focused fieldset': {
+                        borderColor: 'primary.main',
+                    },
+                },
                 ...sx
             }}
         />

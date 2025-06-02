@@ -59,6 +59,7 @@ const lightTheme = createTheme({
   palette: {
     primary: {
       main: '#ff7654',
+      light: '#ff886a',
       contrastText: '#ebf2fa',
     },
     // secondary: {

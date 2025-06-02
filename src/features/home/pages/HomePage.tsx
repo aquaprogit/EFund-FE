@@ -58,6 +58,7 @@ const HomePage = () => {
                         <Box sx={{
                             textAlign: 'center',
                             p: 2,
+                            height: '100%',
                             backgroundColor: theme.palette.background.paper,
                             borderRadius: 1
                         }}>
@@ -74,6 +75,7 @@ const HomePage = () => {
                         <Box sx={{
                             textAlign: 'center',
                             p: 2,
+                            height: '100%',
                             backgroundColor: theme.palette.background.paper,
                             borderRadius: 1
                         }}>
@@ -90,6 +92,7 @@ const HomePage = () => {
                         <Box sx={{
                             textAlign: 'center',
                             p: 2,
+                            height: '100%',
                             backgroundColor: theme.palette.background.paper,
                             borderRadius: 1
                         }}>
@@ -106,6 +109,7 @@ const HomePage = () => {
                         <Box sx={{
                             textAlign: 'center',
                             p: 2,
+                            height: '100%',
                             backgroundColor: theme.palette.background.paper,
                             borderRadius: 1
                         }}>

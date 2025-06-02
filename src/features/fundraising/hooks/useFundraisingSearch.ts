@@ -20,10 +20,12 @@ interface UseFundraisingSearchResult {
     totalFundraisings: number;
     searchQuery: string;
     selectedTags: string[];
+    selectedStatuses: number[];
     allTags: Tag[];
     setPage: (page: number) => void;
     setSearchQuery: (query: string) => void;
     setSelectedTags: (tags: string[]) => void;
+    setSelectedStatuses: (statuses: number[]) => void;
     refreshFundraisings: () => Promise<void>;
     allUsers: UserDetails[];
     selectedUser: string | undefined;
@@ -38,6 +40,7 @@ export const useFundraisingSearch = ({
     const [searchQuery, setSearchQuery] = useState<string>(initialSearchQuery);
     const [allTags, setAllTags] = useState<Tag[]>([]);
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const [selectedStatuses, setSelectedStatuses] = useState<number[]>([1]); // Default to Open status
     const [loading, setLoading] = useState<boolean>(false);
     const [page, setPage] = useState<number>(1);
     const [totalPages, setTotalPages] = useState<number>(1);
@@ -55,7 +58,7 @@ export const useFundraisingSearch = ({
                 {
                     title: searchQuery,
                     tags: selectedTags,
-                    statuses: [1],
+                    statuses: selectedStatuses,
                     userId: selectedUser ?? undefined
                 },
                 page,
@@ -100,11 +103,11 @@ export const useFundraisingSearch = ({
 
     useEffect(() => {
         fetchFundraisings();
-    }, [selectedTags, searchQuery, page]);
+    }, [selectedTags, searchQuery, selectedStatuses, selectedUser, page]);
 
     useEffect(() => {
         setPage(1);
-    }, [selectedTags, searchQuery]);
+    }, [selectedTags, searchQuery, selectedStatuses, selectedUser]);
 
     return {
         fundraisings,
@@ -113,10 +116,12 @@ export const useFundraisingSearch = ({
         totalPages,
         searchQuery,
         selectedTags,
+        selectedStatuses,
         allTags,
         setPage,
         setSearchQuery,
         setSelectedTags,
+        setSelectedStatuses,
         refreshFundraisings: fetchFundraisings,
         totalFundraisings,
         allUsers,

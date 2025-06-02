@@ -1,4 +1,4 @@
-import { Box, Dialog, Link, TextField, Button, Typography, DialogTitle, Container, useTheme, IconButton } from "@mui/material";
+import { Box, Dialog, Link, TextField, Button, Typography, DialogTitle, Container, useTheme, IconButton, Badge } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MenuAvatar from "../../features/users/components/MenuAvatar";
@@ -10,6 +10,7 @@ import { userRepository } from "../../features/users/api/userRepository";
 import { pageWrapperStyles } from "./PageWrapper.styles";
 import FundraisingSearchDropDown from "../../features/fundraising/components/FundraisingSearchDropDown";
 import { complaintRepository } from "../../features/rules/repository/complaintRepository";
+import NotificationBadge from "../../features/notifications/components/NotificationBadge";
 
 interface PageWrapperProps {
     children: ReactNode;
@@ -30,18 +31,18 @@ const PageWrapper = ({ children, searchAvailable = true, showBackButton = false 
 
     useEffect(() => {
         refreshUser();
-        const fetchComplaintsCount = async () => {
-            const result = await complaintRepository.getComplaintsTotals();
 
-            console.log('page wrapper', result.data);
+        if (user?.isAdmin) {
+            const fetchComplaintsCount = async () => {
+                const result = await complaintRepository.getComplaintsTotals();
 
-
-            if (result.isSuccess) {
-                setComplaintsCount(result.data?.Pending ?? 0);
+                if (result.isSuccess) {
+                    setComplaintsCount(result.data?.Pending ?? 0);
+                }
             }
-        }
 
-        fetchComplaintsCount();
+            fetchComplaintsCount();
+        }
     }, []);
 
     const handleBackClick = () => {
@@ -99,27 +100,30 @@ const PageWrapper = ({ children, searchAvailable = true, showBackButton = false 
                                 <></>
                             ) : (
                                 user ? (
-                                    <MenuAvatar
-                                        complaintsCount={complaintsCount}
-                                        onInviteUser={() => setOpen(true)}
-                                        onUsers={() => navigate('/users')}
-                                        onSignOut={() => updateUser(null)}
-                                        onSettings={() => navigate('/settings')}
-                                        onProfile={() => navigate('/profile')}
-                                        onAdd={() => {
-                                            if (!user!.hasMonobankToken) {
-                                                showWarning('Please link monobank token to your account to get access to this functionality');
-                                            }
-                                            else {
-                                                navigate('/add-fundraising');
-                                            }
-                                        }}
-                                        onMyFundraising={() => {
-                                            navigate(`/search?userId=${user?.id}`);
-                                            navigate(0);
-                                        }}
-                                        onComplaints={() => navigate('/complaints')}
-                                    />
+                                    <>
+                                        <NotificationBadge />
+                                        <MenuAvatar
+                                            complaintsCount={complaintsCount}
+                                            onInviteUser={() => setOpen(true)}
+                                            onUsers={() => navigate('/users')}
+                                            onSignOut={() => updateUser(null)}
+                                            onSettings={() => navigate('/settings')}
+                                            onProfile={() => navigate('/profile')}
+                                            onAdd={() => {
+                                                if (!user!.hasMonobankToken) {
+                                                    showWarning('Please link monobank token to your account to get access to this functionality');
+                                                }
+                                                else {
+                                                    navigate('/add-fundraising');
+                                                }
+                                            }}
+                                            onMyFundraising={() => {
+                                                navigate(`/search?userId=${user?.id}`);
+                                                navigate(0);
+                                            }}
+                                            onComplaints={() => navigate('/complaints')}
+                                        />
+                                    </>
                                 ) : (
                                     <>
                                         <Button

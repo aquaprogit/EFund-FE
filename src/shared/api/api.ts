@@ -5,18 +5,14 @@ import { PaginatedRequest } from '../models/api/pagination/PaginatedRequest';
 import axios from './axios';
 
 export const api = {
-    get: async <TResponse>(url: string, params?: any, queryParams?: any): Promise<ApiResponse<TResponse>> => {
+    get: async <TResponse>(url: string, params?: any): Promise<ApiResponse<TResponse>> => {
         try {
-            let resultUrl = url;
-
-            if (queryParams) {
-                const query = new URLSearchParams(queryParams);
-                resultUrl = resultUrl + '?' + query.toString();
-            }
-
-            const response = await axios.get<TResponse>(resultUrl, { params: params });
-
-            console.log('here,,', response.data);
+            const response = await axios.get<TResponse>(url,
+                {
+                    params: {
+                        ...params,
+                    }
+                });
 
             return { isSuccess: true, data: response.data };
         }
