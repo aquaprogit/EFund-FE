@@ -1,4 +1,4 @@
-import { Box, Dialog, Link, TextField, Button, Typography, DialogTitle, Container, useTheme, IconButton, Badge } from "@mui/material";
+import { Box, Dialog, Link, TextField, Button, Typography, DialogTitle, Container, useTheme, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import MenuAvatar from "../../features/users/components/MenuAvatar";
@@ -181,8 +181,8 @@ const PageWrapper = ({ children, searchAvailable = true, showBackButton = false 
                         fullWidth
                         label="Email"
                         value={email}
-                        error={!!email && email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i) === null}
-                        helperText={!!email && email.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/i) === null ? 'Invalid email' : ''}
+                        error={!!email && !email.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/i)}
+                        helperText={!!email && !email.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/i) ? 'Invalid email' : ''}
                         onChange={(e) => setEmail(e.target.value)}
                     />
                     <Button

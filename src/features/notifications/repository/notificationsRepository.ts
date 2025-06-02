@@ -1,5 +1,6 @@
 import api from "../../../shared/api/api";
 import { ApiResponse } from "../../../shared/models/api/pagination/ApiResponse";
+import { Notification } from "../models/Notification";
 import { notificationsUrls as urls } from "./urls";
 
 const notificationsRepository = {

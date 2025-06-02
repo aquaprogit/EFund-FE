@@ -1,19 +1,14 @@
-import { ReactNode, useEffect, useState } from "react";
+import { useState } from "react";
 import {
     Tooltip,
     Typography,
     Box,
     Avatar,
-    Chip,
     Card,
     CardContent,
     CircularProgress,
-    Stack,
     Divider
 } from "@mui/material";
-import EmailIcon from '@mui/icons-material/Email';
-import PersonIcon from '@mui/icons-material/Person';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
 import { userRepository } from "../../features/users/api/userRepository";
 import { UserDetails } from "../../features/users/models/UserDetails";
 import { useNavigate } from "react-router-dom";

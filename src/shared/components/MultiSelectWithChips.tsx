@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import { Chip, FilterOptionsState, useTheme, Paper } from '@mui/material';
+import { Chip, useTheme, Paper } from '@mui/material';
 import { useToast } from '../../contexts/ToastContext';
 
 const MultiSelectWithChip = (props: {
