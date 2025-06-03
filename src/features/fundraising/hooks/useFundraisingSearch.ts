@@ -1,131 +1,166 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Tag } from '../../tags/models/Tag';
-import { tagsRepository } from '../../tags/repository/tagsRepository';
-import { userRepository } from '../../users/api/userRepository';
 import { UserDetails } from '../../users/models/UserDetails';
 import Fundraising from '../models/Fundraising';
+import { MapFromPublicStatus } from '../models/FundraisingStatus';
 import { fundraisingsRepository } from '../repository/fundraisingsRepository';
+import { useFundraisingFilters } from './useFundraisingFilters';
+import { usePagination } from './usePagination';
+import { useTags } from './useTags';
+import { useUsers } from './useUsers';
 
 interface UseFundraisingSearchProps {
     pageSize?: number;
     initialSearchQuery?: string;
     userId?: string;
+    defaultStatuses?: number[];
 }
 
 interface UseFundraisingSearchResult {
+    // Data
     fundraisings: Fundraising[];
     loading: boolean;
+
+    // Pagination
     page: number;
     totalPages: number;
     totalFundraisings: number;
+    setPage: (page: number) => void;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+
+    // Filters
     searchQuery: string;
     selectedTags: string[];
     selectedStatuses: number[];
-    allTags: Tag[];
-    setPage: (page: number) => void;
+    selectedUser: string | undefined;
     setSearchQuery: (query: string) => void;
     setSelectedTags: (tags: string[]) => void;
     setSelectedStatuses: (statuses: number[]) => void;
-    refreshFundraisings: () => Promise<void>;
-    allUsers: UserDetails[];
-    selectedUser: string | undefined;
     setSelectedUser: (userId: string) => void;
+    resetFilters: () => void;
+
+    // Tags
+    allTags: Tag[];
+
+    // Users
+    allUsers: UserDetails[];
+
+    // Actions
+    refreshFundraisings: () => Promise<void>;
 }
 
 export const useFundraisingSearch = ({
     pageSize = 6,
     initialSearchQuery = '',
-    userId
+    userId,
+    defaultStatuses = [1]
 }: UseFundraisingSearchProps = {}): UseFundraisingSearchResult => {
-    const [searchQuery, setSearchQuery] = useState<string>(initialSearchQuery);
-    const [allTags, setAllTags] = useState<Tag[]>([]);
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const [selectedStatuses, setSelectedStatuses] = useState<number[]>([1]); // Default to Open status
-    const [loading, setLoading] = useState<boolean>(false);
-    const [page, setPage] = useState<number>(1);
-    const [totalPages, setTotalPages] = useState<number>(1);
+
+    // Separated concerns
+    const filters = useFundraisingFilters({
+        initialSearchQuery,
+        initialUserId: userId,
+        defaultStatuses
+    });
+
+    const pagination = usePagination({ pageSize });
+    const tags = useTags();
+    const users = useUsers({ initialUserId: userId });
+
+    // Main data state
     const [fundraisings, setFundraisings] = useState<Fundraising[]>([]);
-    const [totalFundraisings, setTotalFundraisings] = useState<number>(0);
-    const [allUsers, setAllUsers] = useState<UserDetails[]>([]);
-    const [selectedUser, setSelectedUser] = useState<string | undefined>(userId);
+    const [loading, setLoading] = useState<boolean>(false);
 
-    // statuses
-
-    const fetchFundraisings = async () => {
+    // Fetch fundraisings function
+    const fetchFundraisings = useCallback(async () => {
         setLoading(true);
         try {
+            const internalStatuses = filters.selectedStatuses.map(status => MapFromPublicStatus(status)).flat();
+
             const response = await fundraisingsRepository.getFundraisings(
                 {
-                    title: searchQuery,
-                    tags: selectedTags,
-                    statuses: selectedStatuses,
-                    userId: selectedUser ?? undefined
+                    title: filters.searchQuery,
+                    tags: filters.selectedTags,
+                    statuses: internalStatuses,
+                    userId: filters.selectedUser ?? undefined
                 },
-                page,
-                pageSize
+                pagination.page,
+                pagination.pageSize
             );
 
             if (response?.data) {
                 setFundraisings(response.data.items);
-                setTotalPages(response.data.totalPages);
-                setTotalFundraisings(response.data.totalCount);
+                pagination.updatePaginationData(
+                    response.data.totalPages,
+                    response.data.totalCount
+                );
             } else {
                 setFundraisings([]);
-                setTotalPages(1);
-                setTotalFundraisings(0);
+                pagination.resetPagination();
             }
         } catch (error) {
+            console.error('Failed to fetch fundraisings:', error);
             setFundraisings([]);
-            setTotalPages(1);
+            pagination.resetPagination();
         } finally {
             setLoading(false);
         }
-    };
+    }, [
+        filters.searchQuery,
+        filters.selectedTags,
+        filters.selectedStatuses,
+        filters.selectedUser,
+        pagination.page,
+        pagination.pageSize
+    ]);
 
-    const fetchTags = async () => {
-        const { data: tags } = await tagsRepository.getTags();
-        if (tags) {
-            setAllTags(tags);
-        }
-    };
-
-    const fetchUsers = async () => {
-        const { data: users } = await userRepository.getUsersMinimized(searchQuery);
-        if (users) {
-            setAllUsers(users);
-        }
-    };
-
+    // Reset to first page when filters change
     useEffect(() => {
-        fetchTags();
-        fetchUsers();
-    }, []);
+        pagination.goToFirstPage();
+    }, [
+        filters.searchQuery,
+        filters.selectedTags,
+        filters.selectedStatuses,
+        filters.selectedUser
+    ]);
 
+    // Fetch data when dependencies change
     useEffect(() => {
         fetchFundraisings();
-    }, [selectedTags, searchQuery, selectedStatuses, selectedUser, page]);
-
-    useEffect(() => {
-        setPage(1);
-    }, [selectedTags, searchQuery, selectedStatuses, selectedUser]);
+    }, [fetchFundraisings]);
 
     return {
+        // Data
         fundraisings,
         loading,
-        page,
-        totalPages,
-        searchQuery,
-        selectedTags,
-        selectedStatuses,
-        allTags,
-        setPage,
-        setSearchQuery,
-        setSelectedTags,
-        setSelectedStatuses,
-        refreshFundraisings: fetchFundraisings,
-        totalFundraisings,
-        allUsers,
-        selectedUser,
-        setSelectedUser
+
+        // Pagination
+        page: pagination.page,
+        totalPages: pagination.totalPages,
+        totalFundraisings: pagination.totalCount,
+        setPage: pagination.setPage,
+        hasNextPage: pagination.hasNextPage,
+        hasPreviousPage: pagination.hasPreviousPage,
+
+        // Filters
+        searchQuery: filters.searchQuery,
+        selectedTags: filters.selectedTags,
+        selectedStatuses: filters.selectedStatuses,
+        selectedUser: filters.selectedUser,
+        setSearchQuery: filters.setSearchQuery,
+        setSelectedTags: filters.setSelectedTags,
+        setSelectedStatuses: filters.setSelectedStatuses,
+        setSelectedUser: filters.setSelectedUser,
+        resetFilters: filters.resetFilters,
+
+        // Tags
+        allTags: tags.allTags,
+
+        // Users
+        allUsers: users.allUsers,
+
+        // Actions
+        refreshFundraisings: fetchFundraisings
     };
 }; 

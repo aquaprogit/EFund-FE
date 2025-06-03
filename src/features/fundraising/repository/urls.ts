@@ -4,5 +4,7 @@ export const urls = {
     fundraising: (id: string) => `/fundraisings/${id}`,
     fundraisingAvatar: (id: string) => `/fundraisings/${id}/avatar`,
     fundraisingSearch: '/fundraisings/search',
-    fundraisingCreate: '/fundraisings'
+    fundraisingCreate: '/fundraisings',
+    updateFundraisingStatus: (id: string) => `/fundraisings/${id}/status`,
+    updateFundraisingStatusByAdmin: (id: string) => `/fundraisings/${id}/status/admin`
 } as const; 

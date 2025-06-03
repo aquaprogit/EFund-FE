@@ -1,48 +1,10 @@
 import { Container, Box, Paper, Pagination, useTheme, Theme } from "@mui/material"
 import PageWrapper from "../../../shared/components/PageWrapper"
-import FilterSection from "../components/FilterSection"
+import FilterSection from "../components/search/FilterSection"
 import { useFundraisingSearch } from "../hooks/useFundraisingSearch"
-import FundraisingList from "../components/FundraisingList"
-import { useParams, useSearchParams } from "react-router-dom"
-
-const PaginationPaper = ({ totalPages, page, setPage, theme }: { totalPages: number, page: number, setPage: (page: number) => void, theme: Theme }) => {
-    return (
-        <>
-            {totalPages > 1 && (
-                <Paper
-                    elevation={0}
-                    sx={{
-                        p: { xs: 2, sm: 3 },
-                        borderRadius: 2,
-                        backgroundColor: theme.palette.background.paper,
-                        border: `1px solid ${theme.palette.divider}`,
-                    }}
-                >
-                    <Box sx={{
-                        display: 'flex',
-                        justifyContent: 'center',
-                    }}>
-                        <Pagination
-                            count={totalPages}
-                            page={page}
-                            onChange={(_, value) => setPage(value)}
-                            color="primary"
-                            size="large"
-                            showFirstButton
-                            showLastButton
-                            sx={{
-                                '& .MuiPaginationItem-root': {
-                                    borderRadius: 1,
-                                }
-                            }}
-                        />
-                    </Box>
-                </Paper>
-            )}
-        </>
-    )
-}
-
+import { useSearchParams } from "react-router-dom"
+import FundraisingList from "../components/search/FundraisingList"
+import PaginationPaper from "../../../shared/components/PaginationPaper"
 
 const FundraisingListPage = () => {
     const theme = useTheme();

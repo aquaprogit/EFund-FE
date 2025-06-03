@@ -53,7 +53,8 @@ const EditFundraising = ({ fundraisingId }: EditFundraisingProps) => {
 
     const { data: fundraisingData, loading: dataLoading, refetch } = useFundraisingData(fundraisingId);
     const jars = useMonobankJars();
-    const existingTags = useTags();
+    const { allTags } = useTags();
+    const existingTags = allTags.map(tag => tag.name); // Convert Tag objects to string array
     const user = useAuthorizationCheck(fundraisingData.createdByUserId, fundraisingId, dataLoading);
 
     // Local state

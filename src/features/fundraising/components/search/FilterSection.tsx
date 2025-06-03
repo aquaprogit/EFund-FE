@@ -3,14 +3,9 @@ import {
     Card,
     CardContent,
     Typography,
-    Stack,
     Grid,
     FormControl,
     InputLabel,
-    Select,
-    MenuItem,
-    OutlinedInput,
-    Chip,
     Avatar,
     Divider
 } from "@mui/material";
@@ -19,10 +14,11 @@ import PersonIcon from '@mui/icons-material/Person';
 import TagIcon from '@mui/icons-material/Tag';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import Search from "../../../shared/components/Search";
-import MultiSelectWithChip from "../../../shared/components/MultiSelectWithChips";
-import UserDropDown from "../../users/components/UserDropDown";
-import { getStatusOptions, FundraisingStatusLabels } from "../models/FundraisingStatus";
+import Search from "../../../../shared/components/Search";
+import MultiSelectWithChip from "../../../../shared/components/MultiSelectWithChips";
+import { FundraisingStatus, FundraisingStatusLabels } from "../../models/FundraisingStatus";
+import UserDropDown from "../../../users/components/UserDropDown";
+import StatusSelect from "./StatusSelect";
 
 interface FilterSectionProps {
     onSearchChange: (query: string) => void;
@@ -35,17 +31,6 @@ interface FilterSectionProps {
     selectedStatuses: number[];
 }
 
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-    PaperProps: {
-        style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
-        },
-    },
-};
-
 const FilterSection = ({
     onSearchChange,
     onTagsChange,
@@ -56,13 +41,6 @@ const FilterSection = ({
     onStatusChange,
     selectedStatuses
 }: FilterSectionProps) => {
-    const statusOptions = getStatusOptions();
-
-    const handleStatusChange = (event: any) => {
-        const value = event.target.value;
-        onStatusChange(typeof value === 'string' ? value.split(',').map(Number) : value);
-    };
-
     return (
         <Card elevation={3} sx={{ borderRadius: 3, mb: 2 }}>
             <CardContent sx={{ p: { xs: 3, md: 4 } }}>
@@ -141,46 +119,10 @@ const FilterSection = ({
                         </Box>
                         <FormControl fullWidth>
                             <InputLabel>Select Status</InputLabel>
-                            <Select
-                                multiple
-                                value={selectedStatuses}
-                                onChange={handleStatusChange}
-                                input={<OutlinedInput label="Select Status" />}
-                                renderValue={(selected) => (
-                                    <Box sx={{
-                                        display: 'flex',
-                                        flexWrap: 'wrap',
-                                        gap: 0.5,
-                                        maxWidth: '100%',
-                                        overflow: 'hidden'
-                                    }}>
-                                        {selected.map((value) => (
-                                            <Chip
-                                                key={value}
-                                                label={FundraisingStatusLabels[value as keyof typeof FundraisingStatusLabels]}
-                                                size="small"
-                                                color="primary"
-                                                variant="outlined"
-                                                sx={{
-                                                    maxWidth: '150px',
-                                                    '& .MuiChip-label': {
-                                                        overflow: 'hidden',
-                                                        textOverflow: 'ellipsis',
-                                                        whiteSpace: 'nowrap'
-                                                    }
-                                                }}
-                                            />
-                                        ))}
-                                    </Box>
-                                )}
-                                MenuProps={MenuProps}
-                            >
-                                {statusOptions.map((option) => (
-                                    <MenuItem key={option.value} value={option.value}>
-                                        {option.label}
-                                    </MenuItem>
-                                ))}
-                            </Select>
+                            <StatusSelect
+                                defaultValue={selectedStatuses}
+                                onChange={onStatusChange}
+                            />
                         </FormControl>
                     </Grid>
                 </Grid>

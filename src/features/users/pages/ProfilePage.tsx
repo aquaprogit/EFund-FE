@@ -235,7 +235,7 @@ const ProfilePage = () => {
                                 </Box>
                                 <CardContent sx={{ p: 3 }}>
                                     <RatingSlider
-                                        rating={0}
+                                        rating={user.rating || 0}
                                         size='medium'
                                         showLabels={true}
                                         showValue={true}

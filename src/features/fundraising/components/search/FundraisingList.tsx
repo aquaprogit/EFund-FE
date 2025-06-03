@@ -1,6 +1,6 @@
 import { Box, Skeleton, Typography, Theme } from "@mui/material";
 import FundraisingCard from "./FundraisingCard";
-import Fundraising from "../models/Fundraising";
+import Fundraising from "../../models/Fundraising";
 
 type FundraisingListProps = {
     pageSize: number

@@ -35,7 +35,11 @@ export const getFundraisingDetailsStyles = (theme: Theme) => ({
     metaItem: {
         display: 'flex',
         alignItems: 'center',
-        gap: 1
+        gap: 1,
+        transition: 'none',
+        '&:hover': {
+            transform: 'none !important'
+        }
     },
     divider: {
         my: 3

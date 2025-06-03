@@ -3,6 +3,7 @@ import { ApiResponse } from "../../../shared/models/api/pagination/ApiResponse";
 import { PagedResponse } from "../../../shared/models/api/pagination/PagedResponse";
 import Fundraising from "../models/Fundraising";
 import { SearchFundraisingsRequest } from "../models/FundraisingsRequests";
+import { FundraisingStatus } from "../models/FundraisingStatus";
 import { urls } from "./urls";
 
 type AddFundraisingBody = {
@@ -42,5 +43,13 @@ export const fundraisingsRepository = {
     },
     updateFundraising: async (id: string, requestBody: AddFundraisingBody): Promise<ApiResponse<Fundraising>> => {
         return await api.put<AddFundraisingBody, Fundraising>(urls.fundraising(id), requestBody)
-    }
+    },
+
+    updateFundraisingStatus: async (id: string, status: FundraisingStatus): Promise<ApiResponse<Fundraising>> => {
+        return await api.put<{ status: FundraisingStatus }, Fundraising>(urls.updateFundraisingStatus(id), { status })
+    },
+
+    // updateFundraisingStatusByAdmin: async (id: string, status: FundraisingStatus): Promise<ApiResponse<Fundraising>> => {
+    //     return await api.put<{ status: FundraisingStatus }, Fundraising>(urls.updateFundraisingStatusByAdmin(id), { status })
+    // }
 };

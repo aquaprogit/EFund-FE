@@ -1,20 +1,22 @@
 import { useEffect, useState } from 'react';
-import { useToast } from '../../../contexts/ToastContext';
 import { Tag } from '../../tags/models/Tag';
 import { tagsRepository } from '../../tags/repository/tagsRepository';
 
 export const useTags = () => {
-    const [existingTags, setExistingTags] = useState<string[]>([]);
-    const { showError } = useToast();
+    const [allTags, setAllTags] = useState<Tag[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
 
     const fetchTags = async () => {
+        setLoading(true);
         try {
-            const response = await tagsRepository.getTags();
-            if (response?.data) {
-                setExistingTags(response.data.map((tag: Tag) => tag.name));
+            const { data: tags } = await tagsRepository.getTags();
+            if (tags) {
+                setAllTags(tags);
             }
         } catch (error) {
-            showError('Unexpected error while fetching tags');
+            console.error('Failed to fetch tags:', error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -22,5 +24,9 @@ export const useTags = () => {
         fetchTags();
     }, []);
 
-    return existingTags;
+    return {
+        allTags,
+        loading,
+        refreshTags: fetchTags
+    };
 }; 

@@ -11,14 +11,14 @@ import {
     useTheme,
     Stack
 } from '@mui/material';
-import Fundraising from '../models/Fundraising';
+import Fundraising from '../../models/Fundraising';
 import { useNavigate } from "react-router-dom";
-import FundraisingMenu from './FundraisingMenu';
-import { getFundraisingCardStyles } from '../styles/FundraisingCard.style';
+import { getFundraisingCardStyles } from '../../styles/FundraisingCard.style';
+import FundraisingStatusChip from '../FundraisingStatusChip';
+import { MapToPublicStatus } from '../../models/FundraisingStatus';
 
 interface FundraisingCardProps {
     fundraising: Fundraising;
-    isUser?: boolean;
 }
 
 const FundraisingCard = (props: FundraisingCardProps) => {
@@ -46,26 +46,16 @@ const FundraisingCard = (props: FundraisingCardProps) => {
                 sx={styles.cardMedia}
             />
             <CardContent sx={styles.cardContent}>
-                <Box sx={{ position: 'relative', mb: 2 }}>
-                    {props.isUser && (
-                        <Box sx={styles.menuContainer}>
-                            <FundraisingMenu
-                                onEdit={() => navigate('/edit-fundraising', { state: { id: props.fundraising.id } })}
-                                onDelete={() => { }}
-                                fundraisingId={props.fundraising.id}
-                                ownerId={props.fundraising.userId}
-                            />
-                        </Box>
-                    )}
+                <Box sx={{ position: 'relative', mb: 2, display: 'flex', justifyContent: 'space-between' }}>
                     <Typography
                         variant="h6"
                         sx={{
                             ...styles.title,
-                            pr: props.isUser ? 4 : 0
                         }}
                     >
                         {props.fundraising.title}
                     </Typography>
+                    <FundraisingStatusChip status={MapToPublicStatus(props.fundraising.status)} />
                 </Box>
 
                 <Typography

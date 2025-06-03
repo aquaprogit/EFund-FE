@@ -52,7 +52,7 @@ export const getFundraisingCardStyles = (theme: Theme) => ({
     },
     tag: {
         backgroundColor: theme.palette.primary.light,
-        color: theme.palette.text.primary,
+        color: theme.palette.primary.contrastText,
         fontWeight: 500,
         fontSize: '0.75rem'
     },
